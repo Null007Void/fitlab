@@ -178,6 +178,44 @@ class PublicCliSurface(unittest.TestCase):
 
 
 
+
+
+class PlanningDeclarationRedactionTests(unittest.TestCase):
+    """Owner declarations must be private-by-construction in every stored copy."""
+
+    def test_planning_declarations_redacted_in_stored_record_and_bundle(self):
+        import tempfile
+        import copy
+        from unittest.mock import patch
+        from fitlab_evaluation.run import evaluate
+        from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.artifacts import stable_json
+        from fitlab_evaluation.workflow import identity
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        plan["scenarios"][0]["model"]["model_id"] = MODEL
+        plan["scenarios"][0]["workload"]["residency_assumption"] = (
+            "weights cached at /data/private/model.gguf for fd00::1234")
+        trust = make_trust("HEAD")
+        with patch("fitlab_evaluation.run.identity", return_value=trust["source_sha256"]):
+            with tempfile.TemporaryDirectory() as tmp:
+                record = evaluate(plan, 1, client=FakeClient(), memory=lambda: dict(GOOD_MEMORY),
+                                  pause=lambda _s: None, checkpoint=None)
+                joined = stable_json(record)
+                self.assertNotIn("/data/private", joined)
+                self.assertNotIn("fd00::1234", joined)
+
+                out = Path(tmp) / "passport"
+                export_report(out, trust, record=record)
+                pub = (out / "evaluation.json").read_text("utf-8")
+                self.assertNotIn("/data/private", pub)
+                self.assertNotIn("fd00::1234", pub)
+
+
 class AHardeningTests(unittest.TestCase):
     """Round-6 part-A findings: companion redaction, advisory label binding,
     explicit-GGUF identity validation, task-only offline guard."""

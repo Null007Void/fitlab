@@ -1,5 +1,6 @@
 """Explicit live evaluation; stop before any request when resource checks fail."""
 import argparse
+import sys
 from .artifacts import BoundedParser
 import hashlib
 import json
@@ -42,10 +43,19 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
     plan = None if plan_document is None else to_primitive(run_document(plan_document))
     if plan_document is not None and any(s['model']['model_id'] != MODEL for s in plan_document['scenarios']):
         raise ValueError('all planning scenarios must name the evaluated model')
+    # Owner declarations are private-by-construction: residency assumptions,
+    # scenario labels and model blocks may carry local paths, user names or
+    # endpoints. Redact the STORED declarations at the source (before any
+    # checkpoint byte or shareable bundle exists). Planning math already ran
+    # on the raw document; only the retained copies are sanitized, and the
+    # numbers that planning_output derives from declarations' numerics are
+    # unaffected by string redaction.
+    stored_input = None if plan_document is None else redact_value(to_primitive(plan_document))
+    stored_plan = None if plan is None else redact_value(plan)
     record = {'schema_version':'fitlab-evaluation-v2','execution_kind':execution_kind,'run_id':str(uuid.uuid4()),
               'started_at':datetime.now(timezone.utc).isoformat(),'source_sha256':identity(),
               'task_pack_sha256':pack_hash,'requested_repeats':repeats,'model':MODEL,
-              'planning_input':plan_document,'planning_output':plan,
+              'planning_input':stored_input,'planning_output':stored_plan,
               'planning_status':'UNAVAILABLE' if plan is None else 'CALCULATED_FROM_DECLARATIONS',
               'planning_provenance':('No planning metadata supplied; task-only run does not establish hardware fit or either planning journey.' if plan is None else 'Owner-declared model/workload metadata; not inferred from measured task performance.'),
               'rows':[],'status':'NOT_STARTED','resource_samples':[],

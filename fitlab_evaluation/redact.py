@@ -26,7 +26,19 @@ _WINDOWS_FILE_PATH = re.compile(
 _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
 # Absolute POSIX path under a system or home root.
 _POSIX_PATH = re.compile(
-    r"/(?:home|Users|usr|var|opt|etc|mnt|media|srv|root|tmp|private|Volumes)(?:/[^\s\"'<>]*)*"
+    r"/(?:home|Users|usr|var|opt|etc|mnt|media|srv|root|tmp|private|data|Volumes|snap|flatpak)(?:/[^\s\"'<>]*)*"
+)
+# Any other absolute POSIX-looking path with a file suffix (covers /data/...,
+# /srv2/..., custom mounts) — require a recognizable file suffix to avoid
+# mangling ordinary prose that merely starts with a slash.
+_ANY_POSIX_FILE = re.compile(
+    r"(?<![\w>/])/(?:[\w.-]+/)+[\w.-]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    re.IGNORECASE,
+)
+# IPv6 (compressed and full forms), conservative: requires a colon-pair and
+# hex groups; avoids version strings like 1.2 by requiring colons.
+_IPV6 = re.compile(
+    r"(?<![\w:])(?:[A-Fa-f0-9]{1,4}:){2,7}[A-Fa-f0-9]{0,4}(?:::[A-Fa-f0-9:]+)?(?![\w:])"
 )
 # Bare user-home fragment such as Users/name or home/name.
 _HOME_SEGMENT = re.compile(r"\b(?:Users|home)/[^\s\"'<>]+")
@@ -74,6 +86,8 @@ def redact_text(value):
     # A lambda replacement avoids backslash-escape interpretation of "\Users".
     result = _WINDOWS_USER.sub(lambda match: "\\Users\\" + REDACTED, result)
     result = _POSIX_PATH.sub(REDACTED, result)
+    result = _ANY_POSIX_FILE.sub(REDACTED, result)
+    result = _IPV6.sub(REDACTED, result)
     result = _HOME_SEGMENT.sub(REDACTED, result)
     result = _EMAIL.sub(REDACTED, result)
     result = _MAC.sub(REDACTED, result)
@@ -102,6 +116,8 @@ def contains_private_detail(value):
         _WINDOWS_PATH,
         _UNC_PATH,
         _POSIX_PATH,
+        _ANY_POSIX_FILE,
+        _IPV6,
         _HOME_SEGMENT,
         _EMAIL,
         _IPV4,
