@@ -413,6 +413,13 @@ class RedactionTests(unittest.TestCase):
             # Round-15 reviewer case: a complete path is NEVER extended into
             # a following suffixed prose token.
             ("/data/private/model.gguf notes.txt remain", "[redacted] notes.txt remain"),
+            # Round-16 reviewer case: a complete WINDOWS path is never
+            # extended into a following suffixed prose token.
+            ("C:\\models\\model.gguf notes.txt remain",
+             "[redacted] notes.txt remain"),
+            # The final filename segment is contiguous with its suffix; a
+            # space inside it is consumed only for NON-suffixed pre-space
+            # words ("My Model.gguf").
             ("/data/private/My Model.gguf", "[redacted]"),
             # Round-13 reviewer case: even an extensionless path must not
             # span trailing prose to reach a distant slash-tail.

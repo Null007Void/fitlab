@@ -32,7 +32,7 @@ from pathlib import Path
 from .artifacts import ArtifactError, digest, stable_json, publish_bundle, source_digest
 from .evidence import validate_trust, verify_record, source_binding
 from .grader import exact_equal
-from .redact import redact_text, redact_value, redact_with_distinct_identities
+from .redact import redact_text, redact_value, redact_with_distinct_identities, contains_private_detail
 from fitlab_foundation.planner_cli import run_document
 from fitlab_foundation.serialization import to_primitive
 
@@ -751,6 +751,14 @@ def render_report(report, trust, record=None, plan=None, advisory=None, provenan
 
 def export_report(directory, trust, record=None, plan=None, advisory=None, provenance=None, host=None, historical=None):
     """Publish a complete, atomic report bundle. Never overwrites."""
+    # The privacy boundary is enforced at PUBLICATION time, not only at
+    # evaluation time: an imported record may still verify cryptographically
+    # (its hashes bind the bytes that were written) while predating a
+    # redaction rule. Such a record must not reach the shareable bundle in
+    # its raw form, and silently rewriting verified evidence is not allowed
+    # either — so an unsanitized record FAILS the export instead.
+    if record is not None and contains_private_detail(json.dumps(record)):
+        raise ArtifactError("EVALUATION_RECORD_NOT_SANITIZED")
     report = build_report(trust, record, plan, advisory, provenance, host, historical)
     rendered = render_report(report, trust, record, plan, advisory, provenance, host, historical)
     files = {

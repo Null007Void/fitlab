@@ -354,6 +354,64 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
             result_ids = sorted(r["scenario_id"] for r in passport["planning"]["results"])
             self.assertEqual(result_ids, sorted(stored_ids))
 
+    def test_unsanitized_imported_record_is_refused_at_publication(self):
+        # A record that verifies cryptographically but predates a redaction
+        # rule must FAIL the export instead of reaching the shareable bundle
+        # in raw form (publication-time privacy boundary).
+        import tempfile
+        import copy as copy_module
+        from unittest.mock import patch
+        from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.artifacts import ArtifactError
+        from fitlab_evaluation import run as run_module
+        from fitlab_evaluation.run import evaluate
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        plan["scenarios"][0]["model"]["model_id"] = MODEL
+        plan["scenarios"][0]["workload"]["residency_assumption"] = (
+            "legacy weights at /data/legacy/model.bin")
+        trust = make_trust("HEAD")
+        with patch("fitlab_evaluation.run.identity",
+                   return_value=trust["source_sha256"]):
+            record = evaluate(copy_module.deepcopy(plan), 1,
+                              client=FakeClient(),
+                              memory=lambda: dict(GOOD_MEMORY),
+                              pause=lambda _s: None, checkpoint=None)
+        # Simulate an imported record from an earlier sanitizer era: inject
+        # a private marker into the stored planning input.
+        record["planning_input"]["scenarios"][0]["workload"][
+            "residency_assumption"] = "legacy weights at /data/legacy/model.bin"
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "passport"
+            with self.assertRaises(ArtifactError) as caught:
+                export_report(out, trust, record=record)
+            self.assertIn("EVALUATION_RECORD_NOT_SANITIZED",
+                          str(caught.exception))
+            self.assertFalse(out.exists())
+
+    def test_host_identity_companion_is_redacted(self):
+        # The host-identity companion satisfies the same privacy contract
+        # as the rendered report.
+        import tempfile
+        from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.evidence import make_trust
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        trust = make_trust("HEAD")
+        host = {"operator_email": "owner@host.invalid",
+                "work_dir": "C:\\Users\\sampleuser\\private"}
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "passport"
+            export_report(out, trust, None, plan, host=host)
+            body = (out / "host-identity.json").read_text("utf-8")
+            self.assertNotIn("owner@host.invalid", body)
+            self.assertNotIn("sampleuser", body)
+            self.assertIn("[redacted]", body)
+
     def test_planning_rederivation_failure_propagates(self):
         # The stored planning output must come from a verified re-derivation
         # against the stored input. A failing re-derivation must FAIL the

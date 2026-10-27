@@ -19,14 +19,19 @@ REDACTED = "[redacted]"
 _WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
 # Windows file paths: drive-anchored, final filename CONTIGUOUS with its
 # suffix. Interior segments are space-free single tokens; the filename tail
-# directly before the anchor suffix may contain ONE space (real model files
-# are often named "My Model.gguf"), never crossing a segment boundary. A
-# space-bearing interior run can therefore never span toward a distant
-# slash-anchored filename ("...consult docs/README.md") or trailing prose.
+# directly before the anchor suffix may contain ONE space, ONLY when the
+# pre-space word itself carries no known suffix — so a complete path is
+# never extended into following suffixed prose ("model.gguf notes.txt"
+# stops at model.gguf) while space-bearing model filenames
+# ("My Model.gguf") are consumed whole.
 _WINDOWS_FILE_PATH = re.compile(
     r"[A-Za-z]:[/\\][^\s\"'<>|/\\]+"
     r"(?:[/\\][^\s\"'<>|/\\]+)*"
-    r"[/\\][^\s\"'<>|/\\]+(?: [^\s\"'<>|/\\]+)?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?:[/\\]"
+    r"(?![^\s\"'<>|/\\]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
+    r"[^\s\"'<>|/\\]+ [^\s\"'<>|/\\]+"
+    r"|[/\\][^\s\"'<>|/\\]+"
+    r")\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # UNC path, e.g. \\server\share\file.
