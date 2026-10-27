@@ -17,14 +17,16 @@ REDACTED = "[redacted]"
 
 # Windows drive-letter path without spaces.
 _WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
-# Windows file paths: drive-anchored with a CONTIGUOUS final filename
-# anchored directly on its suffix. Interior segments may contain spaces
-# (whole-segment tokens), but the final segment may not, so a path match can
-# never extend across prose to a distant filename later in the sentence.
+# Windows file paths: drive-anchored, final filename CONTIGUOUS with its
+# suffix. Interior path segments may contain spaces, but a space-bearing
+# interior run may not itself contain a suffixed filename token — otherwise a
+# space-joined prose run could cross the sentence to a distant
+# slash-anchored filename ("...then consult docs/README.md") and consume it.
 _WINDOWS_FILE_PATH = re.compile(
-    r"[A-Za-z]:[/\\]"
-    r"(?:[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*)"
-    r"(?:[/\\](?:[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*))*"
+    r"[A-Za-z]:[/\\][^\s\"'<>|/\\]+"
+    r"(?:[/\\][^\s\"'<>|/\\]+"
+    r"|[/\\](?![^\s\"'<>|/\\]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
+    r"[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*)*"
     r"[/\\][^\s\"'<>|/\\]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
@@ -42,15 +44,17 @@ _POSIX_PATH = re.compile(
     re.IGNORECASE,
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
-# /srv2/..., custom mounts). Interior segments may contain spaces
-# (whole-segment tokens), but the final filename is CONTIGUOUS with its
-# suffix, so ordinary prose containing a distant filename ("...consult
-# README.md") can never extend a path match. A recognizable file suffix is
-# still required to avoid mangling prose that merely starts with a slash.
+# /srv2/..., custom mounts). Interior segments may contain spaces, but a
+# space-bearing interior run may not contain a suffixed filename token, and
+# the final filename is CONTIGUOUS with its suffix — so ordinary prose
+# containing a distant filename ("...then consult docs/README.md") can never
+# extend a path match. A recognizable file suffix is still required to avoid
+# mangling prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
-    r"(?<![\w>/.])/"
-    r"(?:[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*)"
-    r"(?:/(?:[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*))*"
+    r"(?<![\w>/.])/[^\s\"'<>|/]+"
+    r"(?:/[^\s\"'<>|/]+"
+    r"|/(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
+    r"[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*)*"
     r"/[^\s\"'<>|/]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
@@ -134,6 +138,69 @@ def redact_value(value):
     if type(value) is list:
         return [redact_value(item) for item in value]
     return value
+
+
+def redact_structure(value, transform):
+    """Deeply apply transform to every string in a JSON-like value.
+
+    Containers are rebuilt dict-first, preserving key order.
+    """
+    if isinstance(value, str):
+        return transform(value)
+    if isinstance(value, dict):
+        return {k: redact_structure(v, transform) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [redact_structure(v, transform) for v in value]
+    return value
+
+
+def redact_with_distinct_identities(document):
+    """Sanitize a structured document, keeping distinct identities distinct.
+
+    Owner-supplied strings that redact away (scenario IDs and similar unique
+    labels) would otherwise collapse into identical markers and break replay
+    validation. Every distinct sanitized value receives a namespaced ordinal
+    ("[redacted:k]") that can never collide with an owner-supplied literal:
+    every string that survives redaction unchanged — including literals that
+    already look like generated markers — is pre-reserved first.
+
+    Returns (sanitized_document, mapping) where mapping yields each distinct
+    generated token for its original string.
+    """
+    primitive = document
+    reserved = set()
+
+    def _reserve(value):
+        # Reserve EVERY unchanged string, not only marker-shaped ones: a
+        # literal such as "[redacted:0]" survives redaction unchanged and
+        # yet collides with the generated-token namespace.
+        if type(value) is str and redact_value(value) == value:
+            reserved.add(value)
+        return value
+
+    redact_structure(primitive, _reserve)
+    used = set()
+    markers = {}
+
+    def _namespaced(text, k):
+        i = text.rfind(REDACTED)
+        return text[:i] + "[redacted:" + str(k) + "]" + text[i + len(REDACTED):]
+
+    def _uniquify(value):
+        sanitized = redact_value(value)
+        if sanitized == value or REDACTED not in sanitized:
+            return sanitized
+        if value not in markers:
+            k = 0
+            candidate = _namespaced(sanitized, k)
+            while candidate in reserved or candidate in used:
+                k += 1
+                candidate = _namespaced(sanitized, k)
+            markers[value] = candidate
+            used.add(candidate)
+        return markers[value]
+
+    return redact_structure(primitive, _uniquify), markers
 
 
 def contains_private_detail(value):

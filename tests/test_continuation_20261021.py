@@ -386,6 +386,13 @@ class RedactionTests(unittest.TestCase):
              "[redacted] contains results described in README.md"),
             ("/optional means consult README.md",
              "/optional means consult README.md"),
+            # Round-12 reviewer cases: a distant slash-anchored filename
+            # ("docs/README.md") must not be consumed through a space-joined
+            # interior run either.
+            ("/data/private/model.gguf then consult docs/README.md",
+             "[redacted] then consult docs/README.md"),
+            ("/optional mode consult docs/README.md",
+             "/optional mode consult docs/README.md"),
             # Drive-path prefix redacts conservatively; prose after it
             # survives (the old grammar consumed the whole sentence).
             ("C:\\tmp folder holds notes about readme.md",

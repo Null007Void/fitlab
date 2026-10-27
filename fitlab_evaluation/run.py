@@ -13,24 +13,8 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from .grader import grade, load_pack
-from .redact import redact_value
+from .redact import redact_value, redact_with_distinct_identities
 
-# A value collapses when redaction replaced owner content inside it; such
-# strings risk merging distinct identities, so they carry an ordinal.
-_REDACTION_MARKER = '[redacted]'
-
-def redact_structure(value, transform):
-    """Deeply apply transform to every string in a JSON-like value.
-
-    Containers are rebuilt dict-first, preserving key order.
-    """
-    if isinstance(value, str):
-        return transform(value)
-    if isinstance(value, dict):
-        return {k: redact_structure(v, transform) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [redact_structure(v, transform) for v in value]
-    return value
 from .lemonade import IntegrationError, LemonadeClient, MODEL, windows_memory, require_resources, validate_health, validate_result, validate_memory
 from .artifacts import source_digest,digest,stable_json
 from fitlab_foundation.planner_cli import _read_bounded_document, run_document
@@ -72,54 +56,16 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
     stored_input = None
     stored_plan = None
     if plan_document is not None:
-        primitive = to_primitive(plan_document)
-        # Pre-reserve strings that survive redaction unchanged yet already
-        # look like redaction markers, so a generated token can never
-        # collide with an owner-supplied literal in the same record.
-        reserved = set()
-
-        def _reserve(value):
-            # Reserve EVERY unchanged string, not only marker-shaped ones:
-            # a literal such as "[redacted:0]" survives redaction unchanged
-            # and yet collides with the generated-token namespace, so the
-            # allocator must treat it as taken before generating anything.
-            if type(value) is str and redact_value(value) == value:
-                reserved.add(value)
-            return value
-
-        redact_structure(primitive, _reserve)
-        used = set()
-        markers = {}
-
-        def _namespaced(text, k):
-            i = text.rfind(_REDACTION_MARKER)
-            return text[:i] + '[redacted:' + str(k) + ']' + text[i + len(_REDACTION_MARKER):]
-
-        def _uniquify(value):
-            sanitized = redact_value(value)
-            if sanitized == value or _REDACTION_MARKER not in sanitized:
-                return sanitized
-            # Distinct originals must stay distinct after redaction so
-            # identity validation during replay still holds. Generated
-            # markers are namespaced and skip reserved/prior tokens.
-            if value not in markers:
-                k = 0
-                candidate = _namespaced(sanitized, k)
-                while candidate in reserved or candidate in used:
-                    k += 1
-                    candidate = _namespaced(sanitized, k)
-                markers[value] = candidate
-                used.add(candidate)
-            return markers[value]
-        stored_input = redact_structure(primitive, _uniquify)
+        # Distinct identities must survive redaction (replay re-validates the
+        # stored input, which rejects duplicate scenario IDs), and a failed
+        # re-derivation must FAIL the run: the stored planning output is
+        # always re-derived from the sanitized stored input, never silently
+        # replaced by an unverifiable copy.
+        stored_input, _markers = redact_with_distinct_identities(
+            to_primitive(plan_document))
         if plan is not None:
-            # Re-derive the plan output from the sanitized input so any
-            # assumption strings echoed into results match the stored input.
-            # A failed re-derivation must FAIL the run: replay verifies
-            # against the stored input and never silently falls back to a
-            # stored copy that cannot be re-checked.
-            stored_plan = redact_structure(
-                to_primitive(run_document(stored_input)), _uniquify)
+            stored_plan = redact_value(
+                to_primitive(run_document(stored_input)))
     record = {'schema_version':'fitlab-evaluation-v2','execution_kind':execution_kind,'run_id':str(uuid.uuid4()),
               'started_at':datetime.now(timezone.utc).isoformat(),'source_sha256':identity(),
               'task_pack_sha256':pack_hash,'requested_repeats':repeats,'model':MODEL,

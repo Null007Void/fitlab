@@ -313,6 +313,47 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
         validated = run_document(stored)
         self.assertEqual(len(validated["results"]), 2)
 
+    def test_standalone_plan_identities_survive_report_export(self):
+        # A standalone plan exported to a passport bundle must keep distinct
+        # scenario identities distinct (the exported planning input must
+        # still replay), and its sanitized copy must match the report's own
+        # planning input.
+        import tempfile
+        import copy as copy_module
+        from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.evidence import make_trust
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        ids = ["/data/private/a", "/data/private/b"]
+        scenarios = []
+        for sid in ids:
+            scenario = json.loads(json.dumps(plan["scenarios"][0]))
+            scenario["scenario_id"] = sid
+            scenarios.append(scenario)
+        private_plan = {"direction": "workload_to_hardware",
+                        "scenarios": scenarios,
+                        "schema_version": plan.get("schema_version", 1)}
+        trust = make_trust("HEAD")
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "passport"
+            export_report(out, trust, None, private_plan)
+            body = (out / "planning-input.json").read_text("utf-8")
+            self.assertNotIn("/data/private", body)
+            stored = json.loads(body)
+            stored_ids = [s["scenario_id"] for s in stored["scenarios"]]
+            self.assertEqual(len(set(stored_ids)), 2, stored_ids)
+            for token in stored_ids:
+                self.assertTrue(token.startswith("[redacted:"), token)
+            from fitlab_foundation.planner_cli import run_document
+            validated = run_document(stored)
+            self.assertEqual(len(validated["results"]), 2)
+            # The report's embedded planning results carry the same
+            # sanitized identities as the stored input.
+            passport = json.loads((out / "passport.json").read_text("utf-8"))
+            result_ids = sorted(r["scenario_id"] for r in passport["planning"]["results"])
+            self.assertEqual(result_ids, sorted(stored_ids))
+
     def test_planning_rederivation_failure_propagates(self):
         # The stored planning output must come from a verified re-derivation
         # against the stored input. A failing re-derivation must FAIL the
@@ -369,7 +410,9 @@ class AHardeningTests(unittest.TestCase):
             export_report(out, trust, None, plan)
             body = (out / "planning-input.json").read_text("utf-8")
             self.assertNotIn("sampleuser", body)
-            self.assertIn("[redacted]", body)
+            # Planning inputs pass through the collision-safe allocator, so
+            # generated markers carry the namespaced shape.
+            self.assertIn("[redacted:", body)
 
     def test_advisory_with_measurement_label_is_refused(self):
         import tempfile

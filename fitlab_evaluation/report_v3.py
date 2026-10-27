@@ -32,7 +32,7 @@ from pathlib import Path
 from .artifacts import ArtifactError, digest, stable_json, publish_bundle, source_digest
 from .evidence import validate_trust, verify_record, source_binding
 from .grader import exact_equal
-from .redact import redact_text, redact_value
+from .redact import redact_text, redact_value, redact_with_distinct_identities
 from fitlab_foundation.planner_cli import run_document
 from fitlab_foundation.serialization import to_primitive
 
@@ -205,8 +205,24 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
             raise ArtifactError("PLANNING_MODEL_MISMATCH")
         if record["planning_input"] is not None and not exact_equal(plan, record["planning_input"]):
             raise ArtifactError("PLANNING_OVERRIDE_FORBIDDEN")
-    planning_input = plan if plan is not None else (None if record is None else record["planning_input"])
-    planning = None if plan is None else to_primitive(run_document(plan))
+    # A standalone owner plan is sanitized with the collision-safe identity
+    # allocator BEFORE use: planning math runs on the sanitized copy, so the
+    # report, its claims and the stored planning input are all mutually
+    # consistent and the input replays through the planner byte-exact as
+    # stored.
+    stored_plan_input = None
+    if plan is not None:
+        stored_plan_input, _ = redact_with_distinct_identities(to_primitive(plan))
+    planning_input = (
+        stored_plan_input
+        if plan is not None
+        else (None if record is None else record["planning_input"])
+    )
+    planning = (
+        None
+        if stored_plan_input is None
+        else to_primitive(run_document(stored_plan_input))
+    )
     if planning is None and verified is not None:
         planning = verified["planning_output"]
     eligible = verified is not None and verified["measurement_eligible"]
@@ -744,13 +760,22 @@ def export_report(directory, trust, record=None, plan=None, advisory=None, prove
     }
     if record is not None:
         files["evaluation.json"] = stable_json(record)
-    planning_input = plan if plan is not None else (None if record is None else record["planning_input"])
+    # The stored planning input is written exactly as the report consumed
+    # it: standalone plans arrive through the collision-safe identity
+    # allocator, record copies were already sanitized at evaluation time. No
+    # second redaction pass, or the published file would diverge from the
+    # report's own input.
+    planning_input = (
+        redact_with_distinct_identities(to_primitive(plan))[0]
+        if plan is not None
+        else (None if record is None else record["planning_input"])
+    )
     # Publication copies of owner-supplied companion artifacts pass through
     # the same redaction engine as the report: declarations may innocently
     # carry local paths, usernames or host names, and the bundle is the
     # shareable component.
     if planning_input is not None:
-        files["planning-input.json"] = stable_json(redact_value(planning_input))
+        files["planning-input.json"] = stable_json(planning_input)
     if advisory is not None:
         files["memory-advisory.json"] = stable_json(redact_value(advisory))
     if provenance is not None:
