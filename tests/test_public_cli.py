@@ -268,6 +268,34 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
         validated = run_document(stored)
         self.assertEqual(len(validated["results"]), 3)
 
+    def test_private_detail_in_dictionary_keys_is_redacted(self):
+        # Dictionary KEYS are owner-controlled content: an email or host
+        # name used as a key must not survive into any publication component
+        # (round-18 finding), and the publication scan must see keys too.
+        from fitlab_evaluation.redact import redact_value, redact_structure, contains_private_detail
+        payload = {
+            "sampleuser@fitlab.invalid": "owner",
+            "nested": {"host.redacted.invalid": {"deep": "value"}},
+            "safe_key": "safe value",
+        }
+        result = redact_value(payload)
+        joined = json.dumps(result)
+        self.assertNotIn("sampleuser@fitlab.invalid", joined)
+        self.assertNotIn("host.redacted.invalid", joined)
+        self.assertFalse(contains_private_detail(joined))
+        # Collapsing keys would lose data; distinct keys that redact to the
+        # same marker are deterministically disambiguated.
+        collapsing = {"/data/private/a": 1, "/data/private/b": 2}
+        result2 = redact_value(collapsing)
+        self.assertEqual(len(result2), 2)
+        self.assertEqual(sorted(str(k) for k in result2),
+                         ["[redacted]", "[redacted]:1"])
+        # The redact_structure transform sees keys as well as values.
+        seen = []
+        redact_structure({"k": "v"}, lambda s: seen.append(s) or s)
+        self.assertIn("k", seen)
+        self.assertIn("v", seen)
+
     def test_generated_tokens_avoid_colliding_with_unchanged_literals(self):
         # An owner-supplied literal that ALREADY uses the generated-token
         # namespace ("[redacted:0]") must be pre-reserved: the allocator may

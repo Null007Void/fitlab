@@ -138,11 +138,28 @@ def redact_text(value):
 
 
 def redact_value(value):
-    """Recursively redact every string inside a JSON-compatible structure."""
+    """Recursively redact every string inside a JSON-compatible structure.
+
+    Dictionary KEYS are owner-controlled content too: a key carrying a
+    private identifier is redacted with the same engine. Keys that redact
+    away are disambiguated deterministically (":n" ordinal) when collapsing
+    would merge two distinct entries, so no data is silently lost.
+    """
     if type(value) is str:
         return redact_text(value)
     if type(value) is dict:
-        return {key: redact_value(item) for key, item in value.items()}
+        out = {}
+        taken = set()
+        for key, item in value.items():
+            new_key = redact_text(key) if type(key) is str else key
+            if new_key in taken:
+                suffix = 1
+                while str(new_key) + ":" + str(suffix) in taken:
+                    suffix += 1
+                new_key = str(new_key) + ":" + str(suffix)
+            taken.add(new_key)
+            out[new_key] = redact_value(item)
+        return out
     if type(value) is list:
         return [redact_value(item) for item in value]
     return value
@@ -151,12 +168,15 @@ def redact_value(value):
 def redact_structure(value, transform):
     """Deeply apply transform to every string in a JSON-like value.
 
+    Strings include dictionary KEYS, so a key passes through the same
+    transform as any value — with the project transforms this keeps
+    distinct private identities distinct across keys and values alike.
     Containers are rebuilt dict-first, preserving key order.
     """
     if isinstance(value, str):
         return transform(value)
     if isinstance(value, dict):
-        return {k: redact_structure(v, transform) for k, v in value.items()}
+        return {transform(k): redact_structure(v, transform) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [redact_structure(v, transform) for v in value]
     return value
