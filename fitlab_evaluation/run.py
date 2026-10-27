@@ -14,6 +14,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 from .grader import grade, load_pack
 from .redact import redact_value
+
+# A value collapses when redaction replaced owner content inside it; such
+# strings risk merging distinct identities, so they carry an ordinal.
+_REDACTION_MARKER = '[redacted]'
+
+def redact_structure(value, transform):
+    """Deeply apply transform to every string in a JSON-like value.
+
+    Containers are rebuilt dict-first, preserving key order.
+    """
+    if isinstance(value, str):
+        return transform(value)
+    if isinstance(value, dict):
+        return {k: redact_structure(v, transform) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [redact_structure(v, transform) for v in value]
+    return value
 from .lemonade import IntegrationError, LemonadeClient, MODEL, windows_memory, require_resources, validate_health, validate_result, validate_memory
 from .artifacts import source_digest,digest,stable_json
 from fitlab_foundation.planner_cli import _read_bounded_document, run_document
@@ -47,11 +64,33 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
     # scenario labels and model blocks may carry local paths, user names or
     # endpoints. Redact the STORED declarations at the source (before any
     # checkpoint byte or shareable bundle exists). Planning math already ran
-    # on the raw document; only the retained copies are sanitized, and the
-    # numbers that planning_output derives from declarations' numerics are
-    # unaffected by string redaction.
-    stored_input = None if plan_document is None else redact_value(to_primitive(plan_document))
-    stored_plan = None if plan is None else redact_value(plan)
+    # on the raw document; only the retained copies are sanitized. Identity
+    # strings (scenario_id and similar unique labels) must stay DISTINCT
+    # after redaction — replay re-validates the stored input with
+    # run_document, which rejects duplicate identities — so a deterministic
+    # ordinal suffix marks each distinct sanitized value within this record.
+    stored_input = None
+    stored_plan = None
+    if plan_document is not None:
+        seen = {}
+        def _uniquify(value):
+            sanitized = redact_value(value)
+            if sanitized == value or _REDACTION_MARKER not in sanitized:
+                return sanitized
+            # Distinct originals must stay distinct after redaction so
+            # identity validation during replay still holds.
+            if value not in seen:
+                seen[value] = len(seen)
+            return sanitized if seen[value] == 0 else f"{sanitized}#{seen[value]}"
+        stored_input = redact_structure(to_primitive(plan_document), _uniquify)
+        if plan is not None:
+            stored_plan = redact_structure(plan, _uniquify)
+            # Re-derive the plan output from the sanitized input so any
+            # assumption strings echoed into results match the stored input.
+            try:
+                stored_plan = redact_structure(to_primitive(run_document(stored_input)), _uniquify)
+            except Exception:
+                stored_plan = redact_structure(plan, _uniquify)
     record = {'schema_version':'fitlab-evaluation-v2','execution_kind':execution_kind,'run_id':str(uuid.uuid4()),
               'started_at':datetime.now(timezone.utc).isoformat(),'source_sha256':identity(),
               'task_pack_sha256':pack_hash,'requested_repeats':repeats,'model':MODEL,

@@ -32,7 +32,7 @@ _POSIX_PATH = re.compile(
 # /srv2/..., custom mounts) — require a recognizable file suffix to avoid
 # mangling ordinary prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
-    r"(?<![\w>/])/(?:[\w.-]+/)+[\w.-]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?<![\w>/])/(?:[^\"'<>|\r\n]*?/)*?[^\"'<>|\r\n]*?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # IPv6: full form (8 groups) or compressed form containing "::" (including

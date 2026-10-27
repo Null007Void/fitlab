@@ -215,6 +215,46 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
                 self.assertNotIn("/data/private", pub)
                 self.assertNotIn("fd00::1234", pub)
 
+    def test_distinct_private_scenario_ids_stay_distinct_after_redaction(self):
+        # Two scenarios whose identities redact to the same marker must not
+        # collapse: replay re-validates the stored input with run_document,
+        # which rejects duplicate scenario identities.
+        import tempfile
+        from unittest.mock import patch
+        from fitlab_evaluation.run import evaluate
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.workflow import identity
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        first = json.loads(json.dumps(plan))
+        first["direction"] = "workload_to_hardware"
+        first["scenarios"][0]["model"]["model_id"] = MODEL
+        first["scenarios"][0]["scenario_id"] = "/data/private/alpha"
+        second = json.loads(json.dumps(plan))
+        second["direction"] = "workload_to_hardware"
+        second["scenarios"][0]["model"]["model_id"] = MODEL
+        second["scenarios"][0]["scenario_id"] = "/data/private/beta"
+        document = {"direction": "workload_to_hardware",
+                    "scenarios": [first["scenarios"][0], second["scenarios"][0]],
+                    "schema_version": plan.get("schema_version", 1)}
+        trust = make_trust("HEAD")
+        with patch("fitlab_evaluation.run.identity", return_value=trust["source_sha256"]):
+            with tempfile.TemporaryDirectory() as tmp:
+                record = evaluate(document, 1, client=FakeClient(),
+                                  memory=lambda: dict(GOOD_MEMORY),
+                                  pause=lambda _s: None, checkpoint=None)
+        stored = record["planning_input"]
+        ids = sorted(s["scenario_id"] for s in stored["scenarios"])
+        self.assertNotIn("/data/private", ids[0] + ids[1])
+        self.assertNotEqual(ids[0], ids[1])
+        # Replay: the sanitized input must still validate through the planner.
+        from fitlab_evaluation.plan_builder import run_document
+        validated = run_document(stored)
+        self.assertEqual(len(validated["results"]), 2)
+
 
 class AHardeningTests(unittest.TestCase):
     """Round-6 part-A findings: companion redaction, advisory label binding,
