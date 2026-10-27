@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Explicit live evaluation; stop before any request when resource checks fail."""
 import argparse
 import sys
@@ -171,12 +172,14 @@ def main():
     # Telemetry parity (workflow.execute's guarded_ready contract): the
     # ready runtime must report telemetry explicitly disabled before this
     # entry point may issue inference.
+    adapter = None
     try:
-        probe_health=validate_health(LemonadeClient().ready())
-    except (IntegrationError,OSError,ValueError):
+        probe_client = LemonadeClient()
+        probe_health = validate_health(probe_client.ready())
+    except (IntegrationError, OSError, ValueError):
         print(stable_json({'status':'ERROR','code':'RUNTIME_NOT_READY'}),end='',file=sys.stderr)
         return 2
-    telemetry=probe_health.get('telemetry')
+    telemetry = probe_health.get('telemetry')
     if type(telemetry) is not dict or telemetry.get('enabled') is not False:
         print(stable_json({'status':'ERROR','code':'RUNTIME_TELEMETRY_NOT_DISABLED'}),end='',file=sys.stderr)
         return 2
@@ -210,7 +213,25 @@ def main():
                 'error':type(exc).__name__,'rows':[],'inference_requests':0}
         checkpoint(result)
     else:
-        result=evaluate(document,args.repeats,client=LemonadeClient(),
+        # Per-request guard (workflow.execute's guarded_ready contract, made
+        # binding for this entry too at the review's direction): every
+        # readiness check inside evaluate re-verifies the offline contract
+        # and the disabled-telemetry state, so a runtime posture change
+        # after the initial probes stops inference instead of continuing.
+        # The guard wraps the SAME LemonadeClient instance — evaluate's
+        # LOCAL_RUNTIME type gate requires the concrete client type, so the
+        # instance attribute is rebound rather than the client replaced.
+        from .workflow import IntegrationError
+        original_ready=probe_client.ready
+        def guarded_ready():
+            if not exact_equal(safe_runtime_config(),{'offline':True,'no_fetch_executables':True}):
+                raise IntegrationError('runtime offline state changed')
+            value=original_ready()
+            if type(value.get('telemetry')) is not dict or value['telemetry'].get('enabled') is not False:
+                raise IntegrationError('runtime telemetry state changed')
+            return value
+        probe_client.ready=guarded_ready
+        result=evaluate(document,args.repeats,client=probe_client,
                         memory=windows_memory,checkpoint=checkpoint,execution_kind='LOCAL_RUNTIME')
     return 0 if result['status']=='COMPLETED' else 2
 

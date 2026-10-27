@@ -23,6 +23,11 @@ from fitlab_evaluation.report_v3 import export_report
 from fitlab_evaluation.model_profile import derive_profile
 
 
+def GOOD_MEMORY_FAKE():
+    from test_f4_integration import GOOD_MEMORY
+    return dict(GOOD_MEMORY)
+
+
 def _run(*argv):
     """Drive the console entry in-process; return (returncode, stdout_json)."""
     import io
@@ -565,6 +570,94 @@ class AHardeningTests(unittest.TestCase):
                     run_mod.main()
             # The guard sits BEFORE evidence reservation: nothing was created.
             self.assertFalse(out.exists())
+
+    def test_task_only_run_guards_every_readiness_check(self):
+        # Round-25 A-2: the task-only entry previously verified the offline
+        # contract once and then created an unguarded client — a posture
+        # change after the initial probe would not stop inference. The entry
+        # must now wrap the adapter so every readiness check re-validates
+        # BOTH the offline contract and the disabled-telemetry state, exactly
+        # like workflow.execute's guarded_ready. A posture change mid-run
+        # must produce a STOPPED record with zero additional inference.
+        import tempfile
+        import copy
+        from unittest.mock import patch
+        from fitlab_evaluation import run as run_mod
+        from fitlab_evaluation import workflow as wf_mod
+        from fitlab_evaluation.lemonade import validate_health, LemonadeClient
+        from test_f4_integration import FakeClient, HEALTH
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        plan["direction"] = "workload_to_hardware"
+        plan["scenarios"][0]["model"]["model_id"] = MODEL
+        offline = {"offline": True, "no_fetch_executables": True}
+        telemetry_calls = {"n": 0}
+
+        def telemetry_state(*_a, **_k):
+            telemetry_calls["n"] += 1
+            # First check (initial probe): valid health, telemetry explicitly
+            # disabled.
+            if telemetry_calls["n"] == 1:
+                health = copy.deepcopy(HEALTH)
+                health["telemetry"] = {"enabled": False}
+                return validate_health(health)
+            # Later checks (guarded re-checks inside evaluate): telemetry
+            # has been re-enabled mid-run — the guard must stop the run. The
+            # guard reads the raw dict, so no health validation here; the
+            # shape still looks like a health response with telemetry on.
+            health = copy.deepcopy(HEALTH)
+            health["telemetry"] = {"enabled": True}
+            return health
+
+        calls = {"n": 0}
+
+        def posture_change():
+            calls["n"] += 1
+            # First call (initial probe): contract proven offline.
+            if calls["n"] == 1:
+                return dict(offline)
+            # Later calls (guarded re-checks inside evaluate): posture flip.
+            return {"offline": False, "no_fetch_executables": True}
+
+        # The entry constructs its own client; it must be a REAL
+        # LemonadeClient (evaluate's LOCAL_RUNTIME type gate), so patch the
+        # class with a counting subclass whose ready() replays the scripted
+        # telemetry posture instead of touching a real runtime.
+        class GuardedLemonade(LemonadeClient):
+            def __init__(self):
+                super().__init__()
+                self.readies = 0
+
+            def ready(self):
+                self.readies += 1
+                return telemetry_state()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "campaign.json"
+            with patch.object(wf_mod, "safe_runtime_config",
+                              side_effect=posture_change), \
+                 patch.object(run_mod, "windows_memory",
+                              return_value=GOOD_MEMORY_FAKE()), \
+                 patch.object(run_mod, "LemonadeClient", GuardedLemonade), \
+                 patch.object(sys, "argv",
+                              ["run.py", "--output", str(out), "--repeats", "1"]):
+                code = run_mod.main()
+            self.assertEqual(code, 2)
+            record = json.loads(out.read_text("utf-8"))
+            # The guarded readiness check must have stopped the run before
+            # any row reached MEASURED, and the record is not COMPLETED.
+            self.assertNotEqual(record.get("status"), "COMPLETED")
+            measured = [r for r in record.get("rows", [])
+                        if r.get("status") == "MEASURED"]
+            self.assertEqual(len(measured), 0, measured)
+            # The guard actually re-checked the contract after the probe:
+            # safe_runtime_config was consulted at least twice (initial
+            # probe + guarded re-check inside evaluate) before the run
+            # stopped, and the stop reason records the guarded refusal.
+            self.assertGreaterEqual(calls["n"], 2, calls)
+            self.assertEqual(record.get("stop_reason"),
+                             "runtime offline state changed")
 
 
 def out_debug(code, text):

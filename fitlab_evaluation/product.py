@@ -1,4 +1,11 @@
-"""Local FitLab product CLI. Errors are bounded JSON; outputs are never overwritten."""
+"""Local FitLab product CLI. Errors are bounded JSON; outputs are never overwritten.
+
+DEPRECATED surface: the passport/report command here predates the v3
+publication privacy boundary and is retained only for legacy callers. New
+publications must go through fitlab_evaluation.report_v3.export_report
+(fitlab passport / python -m fitlab_evaluation.cli passport), which enforces
+redaction on every publication component and refuses unsanitized evidence.
+"""
 import argparse
 from .artifacts import BoundedParser
 import sys
@@ -26,7 +33,13 @@ def main(argv=None):
                 print(stable_json({'status':'VERIFIED','run_status':verified['status'],'measurement_eligible':verified['measurement_eligible'],'complete_protocol':verified['complete_protocol']}),end='')
                 return 0
             plan=None if args.plan is None else load_json(args.plan)[0]
-            export_report(args.output_dir,trust,record,plan)
+            # The legacy exporter predates the publication privacy boundary
+            # (round-25 review A-1). Rather than publish owner-controlled
+            # content unredacted, refuse with a bounded migration error
+            # directing every publication to the enforcing v3 exporter —
+            # the same engine fitlab passport / cli passport already use.
+            raise ArtifactError(
+                "LEGACY_PASSPORT_WITHDRAWN_USE_V3_EXPORTER")
         print(stable_json({'status':'WRITTEN','artifact_kind':args.command}),end='')
         return 0
     except ArtifactError as exc:
