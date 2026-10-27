@@ -250,6 +250,13 @@ def _read_metadata(reader):
             length = reader.unpack("<Q", 8)
             if length > MAX_ARRAY_ITEMS:
                 _fail("GGUF_ARRAY_TOO_LARGE")
+            if element_type == ARRAY:
+                # A nested array would build an ENTIRE inner list at once,
+                # breaking the one-item streaming bound of the discard
+                # path: reader.array() rejects nested arrays for retained
+                # values, and the discard path rejects them BEFORE reading
+                # any item (round-50 A-1).
+                _fail("GGUF_UNSUPPORTED_VALUE_TYPE")
             # Discarded items are read one at a time and immediately
             # dropped: only ONE decoded item is ever alive, so their
             # charges route to the transient pool and must not consume

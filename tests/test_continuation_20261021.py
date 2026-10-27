@@ -286,6 +286,20 @@ class GgufParserTests(unittest.TestCase):
             path.write_bytes(ok)
             raw = read_metadata(path)
             self.assertEqual(raw["metadata"]["token_count"], 70000)
+            # A discarded array whose ELEMENT type is itself ARRAY is
+            # refused BEFORE any inner item is read: nested lists would
+            # build a whole inner list simultaneously, breaking the
+            # one-item streaming bound (round-50 A-1).
+            nested = b"GGUF" + struct.pack("<I", 3)
+            nested += struct.pack("<Q", 0)
+            nested += struct.pack("<Q", 1)
+            nested += struct.pack("<Q", 21) + b"tokenizer.ggml.tokens"
+            nested += struct.pack("<I", 9) + struct.pack("<I", 9)
+            nested += struct.pack("<Q", 1)
+            nested_path = Path(directory) / "nested.gguf"
+            nested_path.write_bytes(nested)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_UNSUPPORTED_VALUE_TYPE"):
+                read_metadata(nested_path)
             # Aggregate discarded payload beyond the transient cap is
             # refused before allocation: each discarded item charges the
             # transient pool, so 110 one-MiB STRING tokens (~2.7 GiB
