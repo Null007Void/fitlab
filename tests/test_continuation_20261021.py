@@ -298,6 +298,51 @@ class GgufParserTests(unittest.TestCase):
             with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
                 read_metadata(path2)
 
+    def test_retained_numeric_array_items_charge_conservatively(self):
+        # Round-49 A-1: the retained per-item charge must cover BOTH the
+        # list slot and the decoded object (a huge UINT64 stores a ~32 B
+        # int object, plus the ~8 B list slot). Two retained arrays of
+        # 999,999 UINT64-maximum values occupy ~76 MiB on 64-bit CPython
+        # while the former 32 B/item charge declared only ~61 MiB total
+        # and let both through; with the conservative 64 B/item charge
+        # the second array crosses the 64 MiB retained budget and is
+        # refused BEFORE allocation with a stable code.
+        key = b"planner.retained.numbers"
+        key2 = b"planner.retained.numbers2"
+        with tempfile.TemporaryDirectory() as directory:
+            head = b"GGUF" + struct.pack("<I", 3)
+            head += struct.pack("<Q", 0)
+            head += struct.pack("<Q", 2)
+            head += struct.pack("<Q", len(key)) + key
+            head += struct.pack("<I", 9) + struct.pack("<I", 10)
+            head += struct.pack("<Q", 999999)
+            head += b"\x00" * (8 * 999999)
+            head += struct.pack("<Q", len(key2)) + key2
+            head += struct.pack("<I", 9) + struct.pack("<I", 10)
+            head += struct.pack("<Q", 999999)
+            path = Path(directory) / "numeric-retained.gguf"
+            path.write_bytes(head)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
+                read_metadata(path)
+            # One such array (still under the cap with its headers) plus
+            # normal profile metadata parses; legitimate planner-relevant
+            # metadata sits orders of magnitude below the budget.
+            parts = [
+                b"GGUF", struct.pack("<I", 3),
+                struct.pack("<Q", 0), struct.pack("<Q", 2),
+                struct.pack("<Q", 20), b"general.architecture",
+                struct.pack("<I", 8), struct.pack("<Q", 4), b"lfm2",
+                struct.pack("<Q", len(key)), key,
+                struct.pack("<I", 9), struct.pack("<I", 10),
+                struct.pack("<Q", 999999),
+            ]
+            ok = b"".join(parts) + b"\x00" * (8 * 999999)
+            ok += b"\x00" * ((-len(ok)) % 32)
+            path2 = Path(directory) / "numeric-ok.gguf"
+            path2.write_bytes(ok)
+            raw = read_metadata(path2)
+            self.assertEqual(raw["metadata"]["general.architecture"], "lfm2")
+
     def test_descriptor_container_footprint_enforces_retained_budget(self):
         # Round-48 A-1: descriptors charge a conservative fixed container
         # footprint plus per-dimension object costs BEFORE allocation. A

@@ -41,7 +41,15 @@ MAX_QUANTIZATION_NAME = 64
 #   transient cap still bounds hostile streaming payloads.
 MAX_METADATA_RESIDENCY_BYTES = 64 * 1024 * 1024
 MAX_DISCARDED_BYTES = 512 * 1024 * 1024
-_SCALAR_ITEM_RESIDENCY_BYTES = 32
+# Retained scalar array items: the list slot plus the decoded object must
+# both be covered - a large UINT64 stores a ~32-byte int object and the
+# list slot costs ~8 bytes more, so a conservative 64-byte per-item charge
+# bounds the real footprint (two 1M-item arrays hold ~88 MiB while a raw
+# 32-byte charge would show only 64 MB - round-49 A-1). The transient
+# discard path keeps its smaller processing charge because only one item
+# is alive at a time.
+_RETAINED_SCALAR_ITEM_RESIDENCY_BYTES = 64
+_TRANSIENT_SCALAR_ITEM_RESIDENCY_BYTES = 32
 # Tensor descriptors: the retained cost is dominated by container objects,
 # not the parsed bytes - on 64-bit CPython a six-entry descriptor dict, the
 # outer-list slot, shape list and the offset/elements integer objects cost
@@ -209,7 +217,7 @@ class _Reader:
         if element_type == ARRAY:
             _fail("GGUF_UNSUPPORTED_VALUE_TYPE")
         # Charge the declared item footprint BEFORE building the list.
-        self.charge(count * _SCALAR_ITEM_RESIDENCY_BYTES)
+        self.charge(count * _RETAINED_SCALAR_ITEM_RESIDENCY_BYTES)
         return [self.scalar(element_type) for _ in range(count)]
 
 
@@ -252,7 +260,7 @@ def _read_metadata(reader):
             reader.set_transient(True)
             try:
                 for _ in range(length):
-                    reader.charge(_SCALAR_ITEM_RESIDENCY_BYTES)
+                    reader.charge(_TRANSIENT_SCALAR_ITEM_RESIDENCY_BYTES)
                     reader.scalar(element_type)
             finally:
                 reader.set_transient(False)
