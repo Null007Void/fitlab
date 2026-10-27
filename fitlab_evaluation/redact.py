@@ -39,13 +39,18 @@ _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
 # User-profile identity segments are handled BEFORE generic path grammar:
 # the user name may itself contain one space, so consuming only to the first
 # whitespace would leave the rest of the identity ("sampleuser sampleuser")
-# exposed. The match is anchored on a following separator or whitespace so
-# ordinary prose ("the Users group") is never touched.
+# exposed. The optional second word is only consumed when the NEXT
+# non-space character after it is a path separator — prose after the user
+# name ("sampleuser cache docs/README.md") is never taken (round-26 A-1),
+# and a following separator means the space-bearing run really was one
+# user-directory name. Ordinary prose ("the Users group") is untouched
+# because the root must be followed by a separator first.
 _WINDOWS_USER = re.compile(
-    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+)?(?=[/\\]|\s|$)"
+    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)"
 )
 _POSIX_USER = re.compile(
-    r"/(?:home|Users)/(?![/\s])[^\s/\"'<>|]+(?: [^\s/\"'<>|]+)?(?=[/\s]|$)",
+    r"/(?:home|Users)/(?![/\s])"
+    r"[^\s/\"'<>|]+(?: [^\s/\"'<>|]+(?=[/\\]))?(?=[/\s]|$)",
     re.IGNORECASE,
 )
 # Absolute POSIX path under a system or home root. Two-pass design:

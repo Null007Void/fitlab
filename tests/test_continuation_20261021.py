@@ -417,9 +417,13 @@ class RedactionTests(unittest.TestCase):
             # extended into a following suffixed prose token.
             ("C:\\models\\model.gguf notes.txt remain",
              "[redacted] notes.txt remain"),
-            # Round-19 A-1: the user-profile identity segment is consumed
-            # BEFORE generic path grammar, including ONE space inside the
-            # user name; ordinary prose ("the Users group") is untouched.
+            # Round-26 A-1: prose after a space-bearing username is NEVER
+            # consumed ("cache" is not part of the identity); the optional
+            # second word is taken only when a path separator follows.
+            ("/home/sampleuser cache docs/README.md",
+             "/[redacted] cache docs/README.md"),
+            # Round-19 A-1 (refined): a space-bearing username followed by a
+            # separator is one identity and is consumed whole.
             ("C:\\Users\\sampleuser sampleuser\\model.gguf", "[redacted]"),
             ("/home/sampleuser sampleuser/model.gguf", "[redacted]"),
             ("the Users group has 3 members", "the Users group has 3 members"),
