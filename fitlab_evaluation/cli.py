@@ -35,6 +35,7 @@ from pathlib import Path
 
 from .artifacts import ArtifactError, BoundedParser, load_json, publish_bundle, stable_json
 from .evidence import make_trust, validate_trust, verify_record
+from .redact import redact_text
 from .report_v3 import export_report, validate_advisory
 
 # The two planning journeys share one requirements engine.
@@ -229,18 +230,28 @@ def _doctor(arguments):
     try:
         model_path, revision = locate_model_file()
         profile = derive_profile(model_path, revision)
+
+        def _display(value):
+            # Metadata-derived display fields come from operator-supplied
+            # GGUF header strings; a private path, username, email or
+            # other identifier inside general.license.name or
+            # general.architecture would otherwise ride doctor/inspect
+            # output verbatim (round-56 A-1). Redaction replaces the
+            # identifier; a non-string passes through unchanged.
+            return redact_text(value) if type(value) is str else value
+
         record["model"] = {
             "model_id": profile["model_id"],
             "checkpoint": profile["checkpoint"],
-            "snapshot_revision": revision,
-            "architecture_family": profile["architecture_family"],
+            "snapshot_revision": _display(revision),
+            "architecture_family": _display(profile["architecture_family"]),
             "architecture_kind": profile["architecture_kind"],
             "attention_mechanism": profile["attention_mechanism"],
             "hybrid": profile["hybrid"],
             "total_parameters": profile["total_parameters"],
             "quantization": profile["quantization"],
             "weight_bits_per_parameter": profile["weight_bits_per_parameter"],
-            "declared_license_name": profile["declared_license_name"],
+            "declared_license_name": _display(profile["declared_license_name"]),
         }
     except ArtifactError as exc:
         record["model"] = {"available": False, "reason": exc.code}

@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 from fitlab_evaluation.public_cli import main as public_main
 from fitlab_evaluation.report_v3 import export_report
 from fitlab_evaluation.model_profile import derive_profile
+from fitlab_evaluation.artifacts import ArtifactError
 
 
 def GOOD_MEMORY_FAKE():
@@ -49,6 +50,48 @@ class PublicCliSurface(unittest.TestCase):
         self.assertFalse(record["model_load_attempted"])
         # Evidence-class discipline: unavailable values are honest, never guessed.
         self.assertIn("host", record)
+
+    def test_doctor_display_fields_exclude_private_metadata(self):
+        # Round-56 A-1: doctor/inspect copy metadata-derived display
+        # fields (snapshot revision, general.architecture,
+        # general.license.name) from operator-supplied strings into their
+        # output; a private path or email in those fields rode the result
+        # verbatim. Display fields are now redacted before publication.
+        from unittest.mock import patch
+        from fitlab_evaluation import cli as cli_module
+        rogue_profile = {
+            "model_id": "m", "checkpoint": "c",
+            "architecture_family": "lfm2",
+            "architecture_kind": "DENSE",
+            "attention_mechanism": "STANDARD_FULL",
+            "hybrid": False, "total_parameters": 1,
+            "quantization": "Q4_K_M", "weight_bits_per_parameter": "4",
+            "declared_license_name": "contact admin@corp.invalid or "
+                                     "C:\\Users\\sampleuser\\license.txt",
+        }
+
+        class _Args:
+            commit = "HEAD"
+
+        with patch.object(cli_module, "make_trust",
+                          side_effect=ArtifactError("SOURCE_UNAVAILABLE")), \
+             patch("fitlab_evaluation.model_profile.profile_hardware",
+                   lambda: {"t": 1}), \
+             patch("fitlab_evaluation.model_profile.locate_model_file",
+                   lambda: ("plain.gguf",
+                            "snap C:/Users/sampleuser/revision")), \
+             patch("fitlab_evaluation.model_profile.derive_profile",
+                   lambda *a, **k: rogue_profile):
+            record = cli_module._doctor(_Args())
+        model = record["model"]
+        serialized = json.dumps(model)
+        self.assertNotIn("sampleuser", serialized)
+        self.assertNotIn("admin@corp.invalid", serialized)
+        self.assertNotIn("corp.invalid", serialized)
+        # Structure survives redaction: identifiers are replaced, keys stay.
+        self.assertIn("[redacted", model["declared_license_name"])
+        self.assertIn("[redacted", model["snapshot_revision"])
+        self.assertEqual(model["architecture_family"], "lfm2")
 
     def test_module_entry_points_exist(self):
         from fitlab_evaluation import public_cli, cli, workflow
