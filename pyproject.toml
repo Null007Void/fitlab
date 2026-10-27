@@ -33,7 +33,14 @@ Homepage = "https://github.com/Null007Void/fitlab"
 fitlab = "fitlab_evaluation.public_cli:main"
 
 [tool.setuptools]
-packages = ["fitlab_evaluation", "fitlab_foundation"]
+packages = ["fitlab_evaluation", "fitlab_foundation", "fixtures"]
 
 [tool.setuptools.package-data]
 fitlab_evaluation = ["py.typed"]
+# The engine binds fixtures relative to the package PARENT directory
+# (site-packages/fixtures/... in an installed wheel), so the fixtures ride
+# along as a data directory inside site-packages. This keeps the frozen
+# source/fixture identity contract intact for the commands a non-editable
+# install supports (inspect/passport). evaluate/trust remain checkout-bound
+# by design and refuse a non-checkout layout explicitly.
+fixtures = ["*.json", "*.sha256"]
