@@ -251,7 +251,7 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
         self.assertNotIn("/data/private", ids[0] + ids[1])
         self.assertNotEqual(ids[0], ids[1])
         # Replay: the sanitized input must still validate through the planner.
-        from fitlab_evaluation.plan_builder import run_document
+        from fitlab_foundation.planner_cli import run_document
         validated = run_document(stored)
         self.assertEqual(len(validated["results"]), 2)
 
