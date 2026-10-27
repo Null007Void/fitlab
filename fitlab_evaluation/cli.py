@@ -85,6 +85,25 @@ def _default_workload():
     return dict(DEFAULT_WORKLOAD)
 
 
+
+_ADVISORY_EVIDENCE_CLASSES = ("CALCULATED", "ESTIMATED", "DECLARED",
+                              "UNSUPPORTED", "UNKNOWN")
+
+
+def _validate_advisory(advisory):
+    """The memory advisory is a disclosed composite estimate: reject any
+    component claiming a measurement-class evidence value, so an unvalidated
+    sidecar can never render as data the engine did not produce."""
+    if advisory is None:
+        return
+    if type(advisory) is not dict or type(advisory.get("components")) is not list:
+        raise ArtifactError("ADVISORY_INVALID")
+    for component in advisory["components"]:
+        if type(component) is not dict or component.get("evidence") not in (
+                _ADVISORY_EVIDENCE_CLASSES):
+            raise ArtifactError("ADVISORY_INVALID")
+
+
 def _read_plan_bundle(path):
     """Read a plan document, optionally with its advisory and provenance.
 
@@ -99,6 +118,7 @@ def _read_plan_bundle(path):
         provenance = None
         if (directory / "advisory.json").exists():
             advisory, _ = load_json(directory / "advisory.json")
+            _validate_advisory(advisory)
         if (directory / "provenance.json").exists():
             provenance, _ = load_json(directory / "provenance.json")
         return plan, advisory, provenance

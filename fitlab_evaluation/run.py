@@ -124,6 +124,16 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--repeats',type=int,choices=(1,2,3),default=3)
     args=parser.parse_args()
+    # Offline/no-fetch guard, identical to workflow.execute's contract: this
+    # entry point can issue LOCAL_RUNTIME inference, so it refuses unless a
+    # prepared, offline, telemetry-disabled runtime contract is observable.
+    # Refusal happens before any evidence path is created.
+    from .artifacts import ArtifactError
+    observed=safe_runtime_config()
+    from .grader import exact_equal
+    if not exact_equal(observed,{'offline':True,'no_fetch_executables':True}):
+        print(stable_json({'status':'ERROR','code':'RUNTIME_NOT_PROVEN_OFFLINE'}),end='',file=sys.stderr)
+        return 2
     # Reserve a new evidence path before any inference; never overwrite past trials.
     # newline='' keeps the placeholder byte-stable across platforms.
     with args.output.open('x',encoding='utf-8',newline='') as output:

@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 
 from fitlab_evaluation.public_cli import main as public_main
+from fitlab_evaluation.report_v3 import export_report
 
 
 def _run(*argv):
@@ -173,6 +174,94 @@ class PublicCliSurface(unittest.TestCase):
             cwd=str(ROOT), capture_output=True, text=True, timeout=60)
         self.assertEqual(r2.returncode, 0)
         self.assertIn("passport", r2.stdout)
+
+
+
+class AHardeningTests(unittest.TestCase):
+    """Round-6 part-A findings: companion redaction, advisory label binding,
+    explicit-GGUF identity validation, task-only offline guard."""
+
+    def test_companion_publication_is_redacted(self):
+        # An owner declaration carrying a local path must never leak into the
+        # published companion artifacts.
+        import tempfile
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.artifacts import stable_json
+        from fitlab_evaluation.report_v3 import export_report
+        trust = make_trust("HEAD")
+        plan = {"schema_version": "fitlab-plan-v2", "private_probe": "",
+                "scenarios": [{"model": {"model_id": "LFM2.5-1.2B-Instruct-GGUF",
+                                          "residency_assumption":
+                                          "loaded from C:\\Users\\sampleuser\\model.gguf"}}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "passport"
+            export_report(out, trust, None, plan)
+            body = (out / "planning-input.json").read_text("utf-8")
+            self.assertNotIn("sampleuser", body)
+            self.assertIn("[redacted]", body)
+
+    def test_advisory_with_measurement_label_is_refused(self):
+        import tempfile
+        from fitlab_evaluation.cli import _validate_advisory
+        from fitlab_evaluation.artifacts import ArtifactError
+        with self.assertRaises(ArtifactError):
+            _validate_advisory({"components": [
+                {"component": "weights", "evidence": "MEASURED",
+                 "bytes": 1, "limitation": ""}]})
+        _validate_advisory({"components": [
+            {"component": "weights", "evidence": "CALCULATED",
+             "bytes": 1, "limitation": ""}]})
+
+    def test_explicit_foreign_gguf_is_refused(self):
+        # derive_profile refuses a GGUF whose header names a different model:
+        # fixed-contract identity cannot be attributed to foreign metadata.
+        import tempfile
+        from fitlab_evaluation.gguf_meta import summarize
+        # Minimal GGUF v3 header: magic, version, tensor_count, kv_count=0.
+        import struct
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "other-model-Q4_K_M.gguf"
+            with path.open("wb") as fh:
+                fh.write(b"GGUF")
+                fh.write((3).to_bytes(4, "little"))
+                fh.write((0).to_bytes(8, "little"))
+            with self.assertRaises(Exception) as caught:
+                derive_profile(path, None)
+            self.assertIn("MODEL_IDENTITY_MISMATCH",
+                          str(getattr(caught.exception, "args", [caught.exception])[0])
+                          + str(caught.exception))
+
+    def test_task_only_run_refuses_unproven_offline_config(self):
+        # run.main (task-only LOCAL_RUNTIME path) must refuse before creating
+        # any evidence path when the runtime-config gate cannot see the
+        # offline contract. Simulate by pointing the guard at a failing port.
+        import tempfile
+        import subprocess
+        from unittest.mock import patch
+        from fitlab_evaluation import run as run_mod
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "campaign.json"
+            with patch.object(run_mod, "safe_runtime_config",
+                              side_effect=OSError("refused")):
+                code, _ = _run("evaluate", "--output-dir", str(out),
+                               "--repeats", "1")
+            # public evaluate -> workflow (not run.main); exercise run.main
+            # directly for this seam.
+            with patch.object(run_mod, "safe_runtime_config",
+                              side_effect=OSError("refused")):
+                r = subprocess.run(
+                    [sys.executable, "-c",
+                     "import sys; sys.path.insert(0, '.');\n"
+                     "from unittest.mock import patch\n"
+                     "from fitlab_evaluation import run as run_mod\n"
+                     "with patch.object(run_mod, 'safe_runtime_config',"
+                     " side_effect=ConnectionRefusedError('x')):\n"
+                     "    rc = run_mod.main(['--output',"
+                     " r'%s', '--repeats', '1'])\n"
+                     "print('RC', rc)\n" % out],
+                    cwd=str(ROOT), capture_output=True, text=True, timeout=120)
+            self.assertIn("RC 2", r.stdout, r.stderr[-300:])
+            self.assertFalse(out.exists())
 
 
 def out_debug(code, text):

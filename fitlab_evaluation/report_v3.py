@@ -523,8 +523,8 @@ def _render_html(report):
     if advisory:
         rows = "".join(
             f"<tr><th>{esc(text(c['component'].replace('_', ' ')))}</th>"
-            f"<td><span class=\"kind {'estimated' if c['evidence'] != 'CALCULATED' else 'measured'}\">"
-            f"{esc(c['evidence'])}</span></td>"
+            f"<td><span class=\"kind {'measured' if c['evidence'] == 'CALCULATED' else 'estimated'}\">"
+            f"{esc(c['evidence'] if c['evidence'] in ('CALCULATED', 'ESTIMATED', 'DECLARED', 'UNSUPPORTED') else 'UNVERIFIED')}</span></td>"
             f"<td>{esc(_bytes(c['bytes']))}</td>"
             f"<td class=\"lim\">{esc(text(c['limitation']))}</td></tr>"
             for c in advisory["components"]
@@ -741,12 +741,16 @@ def export_report(directory, trust, record=None, plan=None, advisory=None, prove
     if record is not None:
         files["evaluation.json"] = stable_json(record)
     planning_input = plan if plan is not None else (None if record is None else record["planning_input"])
+    # Publication copies of owner-supplied companion artifacts pass through
+    # the same redaction engine as the report: declarations may innocently
+    # carry local paths, usernames or host names, and the bundle is the
+    # shareable component.
     if planning_input is not None:
-        files["planning-input.json"] = stable_json(planning_input)
+        files["planning-input.json"] = stable_json(redact_value(planning_input))
     if advisory is not None:
-        files["memory-advisory.json"] = stable_json(advisory)
+        files["memory-advisory.json"] = stable_json(redact_value(advisory))
     if provenance is not None:
-        files["planning-provenance.json"] = stable_json(provenance)
+        files["planning-provenance.json"] = stable_json(redact_value(provenance))
     if host is not None:
         files["host-identity.json"] = stable_json(host)
     return publish_bundle(directory, files)
