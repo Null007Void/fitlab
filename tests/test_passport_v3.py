@@ -166,6 +166,56 @@ class PassportV3Tests(unittest.TestCase):
         self.assertIn("Test CPU", html)
         self.assertIn("Memory advisory", html)
 
+    def test_direct_export_refuses_measured_advisory_claim(self):
+        # Round-54 A-1: advisory evidence-class validation previously lived
+        # only at CLI ingest; a direct export_report call could publish an
+        # advisory component claiming MEASURED evidence - data the engine
+        # never produced - into passport.json and memory-advisory.json.
+        # The canonical validator now runs at the shared publication
+        # boundary: the export fails with ADVISORY_INVALID and creates no
+        # bundle, while the ingest path still delegates to the same rule.
+        from fitlab_evaluation.report_v3 import export_report
+        measured = {
+            "kind": "COMPOSITE_MEMORY_ADVISORY",
+            "bytes": 1000,
+            "components": [
+                {
+                    "component": "idealized_weight_payload_bytes",
+                    "bytes": 1000,
+                    "evidence": "MEASURED",
+                    "basis": "test",
+                    "limitation": "test",
+                }
+            ],
+            "engine_result": "UNKNOWN",
+            "engine_reason": "test",
+            "limitations": ["test"],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "passport"
+            with self.assertRaisesRegex(ArtifactError, "ADVISORY_INVALID"):
+                export_report(destination, self.trust, advisory=measured)
+            self.assertEqual(list(Path(directory).iterdir()), [])
+        # Well-formed advisory components still pass ingest validation.
+        estimated = {
+            "kind": "COMPOSITE_MEMORY_ADVISORY",
+            "bytes": 1000,
+            "components": [
+                {
+                    "component": "idealized_weight_payload_bytes",
+                    "bytes": 1000,
+                    "evidence": "ESTIMATED",
+                    "basis": "test",
+                    "limitation": "test",
+                }
+            ],
+            "engine_result": "UNKNOWN",
+            "engine_reason": "test",
+            "limitations": ["test"],
+        }
+        from fitlab_evaluation.cli import _validate_advisory
+        _validate_advisory(estimated)
+
     def test_private_detail_is_redacted_from_rendered_output(self):
         provenance = {
             "model_id": "LFM2.5-1.2B-Instruct-GGUF",

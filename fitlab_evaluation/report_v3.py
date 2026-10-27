@@ -84,6 +84,27 @@ _HISTORICAL_KEYS = {
 }
 
 
+# The memory advisory is a disclosed composite estimate: any component
+# claiming a measurement-class evidence value is refused. The canonical
+# validation lives at the shared publication boundary (report_v3), NOT only
+# at CLI ingest, so a direct export_report call cannot publish an
+# unvalidated sidecar claim (round-54 A-1).
+_ADVISORY_EVIDENCE_CLASSES = ("CALCULATED", "ESTIMATED", "DECLARED",
+                              "UNSUPPORTED", "UNKNOWN")
+
+
+def validate_advisory(advisory):
+    """Reject advisory components that claim measurement-class evidence."""
+    if advisory is None:
+        return
+    if type(advisory) is not dict or type(advisory.get("components")) is not list:
+        raise ArtifactError("ADVISORY_INVALID")
+    for component in advisory["components"]:
+        if type(component) is not dict or component.get("evidence") not in (
+                _ADVISORY_EVIDENCE_CLASSES):
+            raise ArtifactError("ADVISORY_INVALID")
+
+
 def evidence_label(kind, *, execution_kind=None, historical=False):
     """Present one machine evidence class in the owner's vocabulary.
 
@@ -885,6 +906,11 @@ def render_report(report, trust, record=None, plan=None, advisory=None, provenan
 
 def export_report(directory, trust, record=None, plan=None, advisory=None, provenance=None, host=None, historical=None):
     """Publish a complete, atomic report bundle. Never overwrites."""
+    # Advisory evidence classes are enforced at the shared publication
+    # boundary BEFORE anything is built or written, so a direct API call
+    # cannot publish a MEASURED advisory claim the engine never produced
+    # (round-54 A-1).
+    validate_advisory(advisory)
     # The privacy boundary is enforced at PUBLICATION time, not only at
     # evaluation time: an imported record may still verify cryptographically
     # (its hashes bind the bytes that were written) while predating a

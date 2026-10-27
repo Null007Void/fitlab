@@ -35,7 +35,7 @@ from pathlib import Path
 
 from .artifacts import ArtifactError, BoundedParser, load_json, publish_bundle, stable_json
 from .evidence import make_trust, validate_trust, verify_record
-from .report_v3 import export_report
+from .report_v3 import export_report, validate_advisory
 
 # The two planning journeys share one requirements engine.
 DIRECTIONS = ("workload_to_hardware", "hardware_to_workloads")
@@ -91,17 +91,13 @@ _ADVISORY_EVIDENCE_CLASSES = ("CALCULATED", "ESTIMATED", "DECLARED",
 
 
 def _validate_advisory(advisory):
-    """The memory advisory is a disclosed composite estimate: reject any
-    component claiming a measurement-class evidence value, so an unvalidated
-    sidecar can never render as data the engine did not produce."""
-    if advisory is None:
-        return
-    if type(advisory) is not dict or type(advisory.get("components")) is not list:
-        raise ArtifactError("ADVISORY_INVALID")
-    for component in advisory["components"]:
-        if type(component) is not dict or component.get("evidence") not in (
-                _ADVISORY_EVIDENCE_CLASSES):
-            raise ArtifactError("ADVISORY_INVALID")
+    """Legacy ingest-time alias of the publication-boundary validator.
+
+    The canonical validation lives in report_v3 at the shared publication
+    boundary (round-54 A-1); the CLI keeps its early rejection at plan-bundle
+    ingest by delegating to it.
+    """
+    return validate_advisory(advisory)
 
 
 def _read_plan_bundle(path):
