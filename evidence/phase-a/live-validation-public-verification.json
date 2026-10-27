@@ -4,10 +4,10 @@
     "components": {
       "evaluation.json": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
       "passport.html": "95040633ab38fe2a4c9f6546fc25a60eb95ef1d17985737f6f469460f3992a0a",
-      "passport.json": "351b1c5706dd56eefcaa5050e7f54e334bb3c8dc5e3b5fa1c993dd3e965ff55e",
+      "passport.json": "621e146bd813aa8e6d2c1d4214231e27345324147fa0d7b3b025bed71dc037fe",
       "trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc"
     },
-    "manifest_sha256": "ee1f763b6e63dc8e340eaff62ae8cd301a3bdd23067428fdaf020188de013e05"
+    "manifest_sha256": "0dcf2a81f7271c84d398b129f579f322042fdaf16a3a51c417b650b3267c15c8"
   },
   "schema_version": "fitlab-campaign-verification-v1",
   "seal": {
@@ -16,9 +16,9 @@
       "evaluation.json": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
       "manifest.json": "c2fe576ef1220b08a9c53089be57aafed12cd98e219e32fdf8d09ad899507424",
       "passport/evaluation.json": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
-      "passport/manifest.json": "ee1f763b6e63dc8e340eaff62ae8cd301a3bdd23067428fdaf020188de013e05",
+      "passport/manifest.json": "0dcf2a81f7271c84d398b129f579f322042fdaf16a3a51c417b650b3267c15c8",
       "passport/passport.html": "95040633ab38fe2a4c9f6546fc25a60eb95ef1d17985737f6f469460f3992a0a",
-      "passport/passport.json": "351b1c5706dd56eefcaa5050e7f54e334bb3c8dc5e3b5fa1c993dd3e965ff55e",
+      "passport/passport.json": "621e146bd813aa8e6d2c1d4214231e27345324147fa0d7b3b025bed71dc037fe",
       "passport/trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc",
       "session.json": "f16f786b60daa46019c38b013f42a537ab32fcd2ad641337d978b0e1663ef637",
       "trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc"

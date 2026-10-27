@@ -99,41 +99,45 @@ def main():
     from fitlab_evaluation.artifacts import digest
     # passport.json's displayed evaluation provenance must identify the
     # Sanitized evaluation that actually ships in this bundle (round-21
-    # review C-1): rewrite source.evaluation_sha256 to the bundled bytes'
-    # digest while preserving every other field. The ORIGINAL historical
-    # digest remains disclosed inside the note below, so no provenance is
-    # silently replaced.
-    import re as _re
+    # review C-1): rewrite source.evaluation_sha256 structurally, and carry
+    # the provenance note as a STRUCTURAL field (never injected by string
+    # replacement — that produced duplicate keys on re-runs, round-23 C-1).
+    # The note is idempotent: repeated runs keep one note and preserve the
+    # ORIGINAL historical digest, even when input was already rewritten.
     passport_json_path = CAMP / "passport" / "passport.json"
     passport_text = passport_json_path.read_text(encoding="utf-8")
     passport = json.loads(passport_text)
-    old_digest = passport["source"]["evaluation_sha256"]
+    current = passport["source"]["evaluation_sha256"]
     new_digest = digest(campaign_eval)
+    note = passport["source"].get("note", "")
+    historical = current
+    marker = "original historical digest was "
+    if marker in note:
+        # Already-sanitized input: preserve the recorded historical digest,
+        # never overwrite it with the intermediate one.
+        historical = note.split(marker, 1)[1].split()[0].strip('"')
     passport["source"]["evaluation_sha256"] = new_digest
+    passport["source"]["note"] = (
+        "digest of the sanitized evaluation copy shipped in this bundle; "
+        "original historical digest was " + historical)
     passport_text = stable_json(passport)
-    # Disclose the historical digest rewrite inside the JSON itself.
-    passport_text = passport_text.replace(
-        '"evaluation_sha256": "' + new_digest + '"',
-        '"evaluation_sha256": "' + new_digest + '", "note": "digest of the '
-        'sanitized evaluation copy shipped in this bundle; original '
-        'historical digest was ' + old_digest + '"',
-        1)
     assert "\r" not in passport_text
     assert not contains_private_detail(passport_text)
     passport_json_path.write_bytes(passport_text.encode("utf-8"))
 
-    # The HTML must display the same corrected provenance. The rewritten
-    # passport.json embeds the historical digest inside its provenance note,
-    # so the HTML replacement must distinguish the bare-digest occurrence
-    # (the displayed provenance row) from any note-embedded occurrence, and
-    # the invariant "no stale display digest" applies to the displayed form
-    # only.
+    # The HTML must display the same corrected provenance. The structural
+    # note embeds the historical digest inside passport.json, so the HTML
+    # replacement must distinguish the bare-digest occurrence (the displayed
+    # provenance row) from the note-embedded occurrence inside the JSON (not
+    # present in the HTML). The invariant: the displayed provenance must not
+    # show the stale digest unless it is the disclosed historical one inside
+    # the JSON note.
     passport_html_path = CAMP / "passport" / "passport.html"
     html_text = passport_html_path.read_text(encoding="utf-8")
-    html_text = html_text.replace(old_digest, new_digest)
-    escaped_notes = passport_text.count(old_digest)
-    displayed = html_text.count(old_digest)
-    assert displayed <= escaped_notes, (displayed, escaped_notes)
+    if historical != new_digest:
+        html_text = html_text.replace(historical, new_digest)
+    assert new_digest in html_text
+    assert (historical not in html_text) or historical == new_digest
     assert "\r" not in html_text
     passport_html_path.write_bytes(html_text.encode("utf-8"))
 

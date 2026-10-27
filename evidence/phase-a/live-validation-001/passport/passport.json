@@ -124,7 +124,7 @@
   "source": {
     "binding": "LOCAL_GIT_VERIFIED",
     "commit": "c3d72d72d93e35ea6963c3f3fdaa34c39a7e3ca5",
-    "evaluation_sha256": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c", "note": "digest of the sanitized evaluation copy shipped in this bundle; original historical digest was 2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
+    "evaluation_sha256": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
     "note": "digest of the sanitized evaluation copy shipped in this bundle; original historical digest was fc0bddbde22b930cd46ee0af9707826cfc0e9e026a19f8c4635df56ba65f78d4",
     "planning_sha256": null,
     "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
