@@ -329,6 +329,54 @@ class HybridArchitectureTests(unittest.TestCase):
                 advisory["bytes"], sum(c["bytes"] for c in advisory["components"])
             )
 
+    def test_excessive_block_count_is_refused_before_classification(self):
+        # Round-42: a structurally valid GGUF can declare a UINT64-maximum
+        # block_count; classify_blocks would iterate range(block_count) and
+        # hang the offline planner. The refuse must happen BEFORE block
+        # classification, with a stable error code.
+        from fitlab_evaluation.model_profile import derive_profile
+        from fitlab_evaluation.artifacts import ArtifactError as ProfileError
+        with tempfile.TemporaryDirectory() as directory:
+            path = _write_gguf(
+                directory,
+                {
+                    "general.architecture": (8, "lfm2"),
+                    "general.file_type": (4, 15),
+                    "lfm2.block_count": (10, 18446744073709551615),
+                    "lfm2.embedding_length": (4, 64),
+                    "lfm2.attention.head_count": (4, 4),
+                },
+                [
+                    ("blk.0.shortconv.in_proj.weight", [64, 192], 12),
+                ],
+            )
+            with self.assertRaisesRegex(
+                    ProfileError, "MODEL_METADATA_BLOCK_COUNT_EXCESSIVE"):
+                derive_profile(path, "r")
+            # A modest block count still passes the same gate.
+            ok_dir = Path(directory) / "ok"
+            ok_dir.mkdir()
+            ok = _write_gguf(
+                Path(directory) / "ok",
+                {
+                    "general.architecture": (8, "lfm2"),
+                    "general.file_type": (4, 15),
+                    "lfm2.block_count": (4, 4),
+                    "lfm2.embedding_length": (4, 64),
+                    "lfm2.attention.head_count": (4, 4),
+                    "lfm2.attention.head_count_kv": (9, (4, [0, 0, 2, 0])),
+                    "lfm2.shortconv.l_cache": (4, 3),
+                },
+                [
+                    ("blk.0.shortconv.in_proj.weight", [64, 192], 12),
+                    ("blk.1.shortconv.in_proj.weight", [64, 192], 12),
+                    ("blk.2.attn_q.weight", [64, 64], 12),
+                    ("blk.3.attn_q.weight", [64, 64], 12),
+                ],
+            )
+            profile = derive_profile(ok, "r")
+            self.assertEqual(profile["block_count"], 4)
+
 
 class RedactionTests(unittest.TestCase):
     """Private detail must not survive into a shareable report."""

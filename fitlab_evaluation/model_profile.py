@@ -134,6 +134,13 @@ def derive_profile(model_path, revision=None):
 
     if type(block_count) is not int or block_count <= 0:
         _fail("MODEL_METADATA_INCOMPLETE", "block_count")
+    # A structurally valid GGUF can declare a UINT64-maximum block_count;
+    # classify_blocks iterates range(block_count), so an unchecked value
+    # hangs the offline planner before any later layer limit could apply
+    # (round-42 A-1). Bound it here, before classification, with a stable
+    # error code.
+    if block_count > 100000:
+        _fail("MODEL_METADATA_BLOCK_COUNT_EXCESSIVE", str(block_count))
     if type(embedding_length) is not int or embedding_length <= 0:
         _fail("MODEL_METADATA_INCOMPLETE", "embedding_length")
     if type(head_count) is not int or head_count <= 0:
