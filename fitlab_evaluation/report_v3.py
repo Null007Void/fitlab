@@ -413,7 +413,13 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
         },
         "evaluation_state": state,
         "capability_verdict": "OBSERVED_TOY_TASKS_ONLY" if eligible else "NOT_EVALUATED",
-        "evidence_class": evaluation_label(verified, historical=historical_campaign is not None),
+        # Round-29 A-1: the report-level historical MEASURED label gates on
+        # corroboration, not on the mere presence of a historical binding.
+        "evidence_class": evaluation_label(
+            verified,
+            historical=bool(historical_campaign)
+            and historical_campaign["evidence_corroborated"],
+        ),
         "evidence_class_vocabulary": {
             "owner": list(OWNER_EVIDENCE_CLASSES),
             "machine": sorted(_EVIDENCE_CLASSES),
@@ -615,11 +621,26 @@ def _render_html(report):
     historical = report.get("historical_campaign")
     historical_block = ""
     if historical:
+        if historical.get("evidence_corroborated"):
+            headline = "4b. Earlier measured campaign bound to this report"
+            prose = (
+                "These results were measured in an earlier campaign by the code at the "
+                "commit below. They are not evidence produced by this build, and they are never relabelled "
+                "as if they were."
+            )
+        else:
+            # Round-29 A-1: an uncorroborated historical binding is a
+            # declaration; the HTML must not claim a measurement occurred.
+            headline = "4b. Earlier campaign DECLARED for this report (unverified)"
+            prose = (
+                "The entries below describe an earlier campaign the owner "
+                "DECLARED alongside this report. No verified evidence in this "
+                "bundle corroborates that a measurement occurred, so this is "
+                "presented as a declaration, not as measured evidence."
+            )
         historical_block = (
-            "<section><h2>4b. Earlier measured campaign bound to this report</h2>"
-            "<p class=\"muted\">These results were measured in an earlier campaign by the code at the "
-            "commit below. They are not evidence produced by this build, and they are never relabelled "
-            "as if they were.</p>"
+            f"<section><h2>{headline}</h2>"
+            f"<p class=\"muted\">{prose}</p>"
             "<dl class=\"kv\">"
             f"<dt>Evidence</dt><dd><span class=\"kind historical\">{esc(historical['evidence_label'])}</span></dd>"
             f"<dt>Campaign</dt><dd>{esc(text(historical['campaign_id']))}</dd>"
