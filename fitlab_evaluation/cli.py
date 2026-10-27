@@ -322,7 +322,12 @@ def main(argv=None):
         if arguments.command == "plan":
             result = _publish_plan(arguments)
         elif arguments.command == "trust":
-            publish_bundle(arguments.output_dir, {"trust.json": stable_json(make_trust(arguments.commit))})
+            trust = make_trust(arguments.commit)
+            # Same publication boundary as the product CLI: the
+            # whole-trust privacy scan runs BEFORE trust.json is written
+            # (round-60 A-1).
+            validate_trust(trust)
+            publish_bundle(arguments.output_dir, {"trust.json": stable_json(trust)})
             result = {"status": "WRITTEN", "artifact_kind": "trust"}
         elif arguments.command == "verify":
             trust, _ = load_json(arguments.trust)

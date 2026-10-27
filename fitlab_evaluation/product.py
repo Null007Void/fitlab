@@ -11,7 +11,7 @@ from .artifacts import BoundedParser
 import sys
 from pathlib import Path
 from .artifacts import ArtifactError,load_json,stable_json,publish_bundle
-from .evidence import make_trust,verify_record
+from .evidence import make_trust,validate_trust,verify_record
 from .report import export_report
 
 
@@ -24,7 +24,14 @@ def main(argv=None):
     args=parser.parse_args(argv)
     try:
         if args.command=='trust':
-            publish_bundle(args.output_dir,{'trust.json':stable_json(make_trust(args.commit))})
+            trust=make_trust(args.commit)
+            # The trust bundle publishes trust.json verbatim: the
+            # whole-trust privacy scan must refuse an unsanitized document
+            # BEFORE publication, not only at later passport validation
+            # (round-60 A-1 - a tracked filename could carry a private
+            # fragment into source_sha256).
+            validate_trust(trust)
+            publish_bundle(args.output_dir,{'trust.json':stable_json(trust)})
         else:
             trust,_=load_json(args.trust)
             record=None if args.evaluation is None else load_json(args.evaluation)[0]

@@ -226,6 +226,58 @@ class PublicCliSurface(unittest.TestCase):
             self.assertEqual(code, 2, out_debug(code, text))
             self.assertFalse(out.exists())
 
+    def test_trust_publication_refuses_unsanitized_trust(self):
+        # Round-60 A-1: both trust commands published make_trust() output
+        # verbatim without the whole-trust privacy scan, so an unsanitized
+        # boundary rode trust.json at the earliest publication instead of
+        # being refused. The scan now runs BEFORE the bundle is written.
+        import tempfile
+        from unittest.mock import patch
+        from fitlab_evaluation import cli as cli_module
+        from fitlab_evaluation import product
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.artifacts import ArtifactError as _AE
+
+        unsanitized = make_trust("HEAD")
+        unsanitized["boundary"] = (
+            "private workspace C:\\Users\\sampleuser\\trust-notes")
+
+        class _TrustArgs:
+            command = "trust"
+            commit = "HEAD"
+            output_dir = None
+
+        class _ProductArgs:
+            command = "trust"
+            commit = "HEAD"
+            output_dir = None
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_cli = Path(tmp) / "cli-trust"
+            out_product = Path(tmp) / "product-trust"
+            _TrustArgs.output_dir = Path(out_cli)
+            _ProductArgs.output_dir = Path(out_product)
+            with patch.object(cli_module, "make_trust",
+                              lambda commit: dict(unsanitized)):
+                code_c = cli_module.main(["trust", "--output-dir",
+                                          str(out_cli)])
+            self.assertEqual(code_c, 2)
+            self.assertFalse(out_cli.exists())
+            with patch.object(product, "make_trust",
+                              lambda commit: dict(unsanitized)):
+                code_p = product.main(["trust", "--output-dir",
+                                       str(out_product)])
+            self.assertEqual(code_p, 2)
+            self.assertFalse(out_product.exists())
+            # The sanitized trust still publishes through the CLI route.
+            clean = make_trust("HEAD")
+            with patch.object(cli_module, "make_trust",
+                              lambda commit: clean):
+                code_ok = cli_module.main(["trust", "--output-dir",
+                                           str(out_cli)])
+            self.assertEqual(code_ok, 0)
+            self.assertTrue((out_cli / "trust.json").exists())
+
     def test_plan_publication_redacts_provenance_metadata(self):
         # Round-58 A-1: provenance embeds operator-supplied model metadata
         # (GGUF header strings, the registry revision); provenance.json was
