@@ -417,6 +417,16 @@ class RedactionTests(unittest.TestCase):
             # extended into a following suffixed prose token.
             ("C:\\models\\model.gguf notes.txt remain",
              "[redacted] notes.txt remain"),
+            # Round-19 A-1: the user-profile identity segment is consumed
+            # BEFORE generic path grammar, including ONE space inside the
+            # user name; ordinary prose ("the Users group") is untouched.
+            ("C:\\Users\\sampleuser sampleuser\\model.gguf", "[redacted]"),
+            ("/home/sampleuser sampleuser/model.gguf", "[redacted]"),
+            ("the Users group has 3 members", "the Users group has 3 members"),
+            # Round-19 A-1: user-profile rule runs before the suffix pass,
+            # so a POSIX home path keeps its full consumption shape.
+            ("host /home/sampleuser/.cache/huggingface",
+             "host /[redacted]/.cache/huggingface"),
             # The final filename segment is contiguous with its suffix; a
             # space inside it is consumed only for NON-suffixed pre-space
             # words ("My Model.gguf").

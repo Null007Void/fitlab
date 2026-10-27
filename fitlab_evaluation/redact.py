@@ -36,6 +36,18 @@ _WINDOWS_FILE_PATH = re.compile(
 )
 # UNC path, e.g. \\server\share\file.
 _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
+# User-profile identity segments are handled BEFORE generic path grammar:
+# the user name may itself contain one space, so consuming only to the first
+# whitespace would leave the rest of the identity ("sampleuser sampleuser")
+# exposed. The match is anchored on a following separator or whitespace so
+# ordinary prose ("the Users group") is never touched.
+_WINDOWS_USER = re.compile(
+    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+)?(?=[/\\]|\s|$)"
+)
+_POSIX_USER = re.compile(
+    r"/(?:home|Users)/(?![/\s])[^\s/\"'<>|]+(?: [^\s/\"'<>|]+)?(?=[/\s]|$)",
+    re.IGNORECASE,
+)
 # Absolute POSIX path under a system or home root. Two-pass design:
 #   1) suffix-anchored lazy grammar (_ANY_POSIX_FILE) runs first and consumes
 #      space-bearing and unknown-root paths whole, stopping at a file suffix;
@@ -78,8 +90,6 @@ _IPV6 = re.compile(
 )
 # Bare user-home fragment such as Users/name or home/name.
 _HOME_SEGMENT = re.compile(r"\b(?:Users|home)/[^\s\"'<>]+")
-# Windows user profile segment, e.g. \Users\name\.
-_WINDOWS_USER = re.compile(r"\\Users\\[^\\\s\"'<>]+")
 # Email address.
 _EMAIL = re.compile(r"\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b")
 # IPv4 address with an optional port.
@@ -117,10 +127,13 @@ def redact_text(value):
         return value
     result = value
     result = _UNC_PATH.sub(REDACTED, result)
+    # User-profile identity segments BEFORE generic path grammar: the user
+    # name itself may contain one space, and a generic path cut at the first
+    # whitespace would expose the remainder of the identity.
+    result = _WINDOWS_USER.sub(lambda match: "\\Users\\" + REDACTED, result)
+    result = _POSIX_USER.sub(lambda match: "/" + REDACTED, result)
     result = _WINDOWS_FILE_PATH.sub(REDACTED, result)
     result = _WINDOWS_PATH.sub(REDACTED, result)
-    # A lambda replacement avoids backslash-escape interpretation of "\Users".
-    result = _WINDOWS_USER.sub(lambda match: "\\Users\\" + REDACTED, result)
     # Two-pass POSIX handling, per the round-10 review direction: the
     # suffix-anchored lazy grammar runs FIRST and consumes space-bearing and
     # unknown-root paths whole. The known-root grammar then catches pure
