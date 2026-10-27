@@ -318,7 +318,7 @@ labels outside the owner vocabulary. Those fields are `MEASURED` **at
 historical qualifier is a property of the artifact's provenance, not a licence
 to relabel a value).
 
-### 5.2 Per-field audit — `reports/capability-passport-v2/passport.json`
+### 5.2 Per-field audit — the committed Phase A passport artifact
 
 Schema `fitlab-capability-passport-v2`, `evaluation_state NO_EVIDENCE`,
 `capability_verdict NOT_EVALUATED`: 13 fields (claims `tasks`, `latency`,
@@ -453,7 +453,7 @@ external spend. Stop before the owner-stated promotion deadline.
    as `HISTORICAL MEASURED EVIDENCE` alongside the new live run; the mechanism
    exists (`historical=` binding) but no submission artifact was regenerated
    here.
-4. Regenerate the committed judge-facing passport (`reports/capability-passport-v2/`)
+4. Regenerate the committed Phase A passport artifact
    only through the current generator, so its stored labels and `core_tasks`
    fields match the audited code — deliberately not done here.
 5. Owner-side only: publication/submission, and the portfolio session-stream

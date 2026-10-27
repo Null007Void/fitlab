@@ -14,11 +14,11 @@ without a license grant is not a valid open-source release.
 **Impact.** The submission could not be lawfully distributed, and the
 competition could treat the submission as unlicensed.
 
-**Mitigation.** The owner chooses a license and adds the `LICENSE` file with
-the correct copyright holder and year. `docs/RELEASE_READINESS.md` section 2.1
-records the position.
+**Mitigation.** RESOLVED for this release: MIT `LICENSE` included with the
+correct copyright holder and year; `NOTICE.md` records third-party
+provenance.
 
-**Owner action required.** Yes.
+**Owner action required.** No (for this release).
 
 ### R2 — Model license not established
 

@@ -142,8 +142,7 @@ examples/            runnable, offline examples
 fixtures/            frozen task packs (v1 historical, v2 accepted)
 docs/                architecture, evidence classes, reproduction, privacy
 evidence/            sealed LIVE-002 campaign + per-phase records
-reports/             rendered sample passports (synthetic previews)
-tests/               251 tests / 275 subtests, stdlib unittest + pytest-compatible
+tests/               257 tests / 276 subtests, stdlib unittest + pytest-compatible
 ```
 
 ## Prerequisites
@@ -175,11 +174,10 @@ tests/               251 tests / 275 subtests, stdlib unittest + pytest-compatib
 
 ## Sample passport
 
-A rendered, synthetic-preview Capability Passport (no live measurements —
-clearly labelled) is included at
-[`reports/capability-passport-preview/passport.html`](reports/capability-passport-preview/passport.html).
-The LIVE-002 campaign's real passport:
-[`evidence/phase-a/live-validation-001/passport/passport.html`](evidence/phase-a/live-validation-001/passport/passport.html).
+The shipped LIVE-002 Capability Passport (real recorded run; runtime cache
+paths redacted to placeholders) is at
+[`evidence/phase-a/live-validation-001/passport/passport.html`](evidence/phase-a/live-validation-001/passport/passport.html)
+— a fully offline, self-contained HTML document.
 
 ## License
 

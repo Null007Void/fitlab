@@ -1,9 +1,0 @@
-{
-  "files": {
-    "passport.html": "cfe1672ee010149c36f9b647b439f32ffb296a1caafed03c6340bb5b6e9a3a00",
-    "passport.json": "862888c0a5303a2d91ecb21dec41016a7cbcfbe5c2083e963d857412459dd923",
-    "planning-input.json": "e0afd3ae6e7c03f40fa890f4f5ea25c51b4b9b39fb7984c5d12c45b67284bcf9",
-    "trust.json": "0327117bd35f2b3a07e28d978b0369f23af7833cebda4674b4962036594e1751"
-  },
-  "schema_version": "fitlab-bundle-v1"
-}

@@ -29,8 +29,8 @@ are no third-party packages. Clone the repository and run from its root.
 python -W error -m unittest discover -s tests -v
 ```
 
-Expected result: `OK` with the current test count recorded in
-`SPRINT_STATUS.md`. Warnings are treated as errors, so a deprecation in any
+Expected result: `OK` (257 tests / 276 subtests as of this release).
+Warnings are treated as errors, so a deprecation in any
 dependency would fail the run rather than pass quietly.
 
 The suite is deterministic: it uses fixed seeds for the randomized numeric
