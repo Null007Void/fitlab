@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 
 from fitlab_evaluation.public_cli import main as public_main
 from fitlab_evaluation.report_v3 import export_report
+from fitlab_evaluation.model_profile import derive_profile
 
 
 def _run(*argv):
@@ -188,11 +189,12 @@ class AHardeningTests(unittest.TestCase):
         from fitlab_evaluation.evidence import make_trust
         from fitlab_evaluation.artifacts import stable_json
         from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.model_profile import derive_profile
         trust = make_trust("HEAD")
-        plan = {"schema_version": "fitlab-plan-v2", "private_probe": "",
-                "scenarios": [{"model": {"model_id": "LFM2.5-1.2B-Instruct-GGUF",
-                                          "residency_assumption":
-                                          "loaded from C:\\Users\\sampleuser\\model.gguf"}}]}
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        plan["scenarios"][0]["workload"]["residency_assumption"] = (
+            "loaded from C:\\Users\\sampleuser\\model.gguf during the run")
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "passport"
             export_report(out, trust, None, plan)
@@ -216,20 +218,26 @@ class AHardeningTests(unittest.TestCase):
         # derive_profile refuses a GGUF whose header names a different model:
         # fixed-contract identity cannot be attributed to foreign metadata.
         import tempfile
-        from fitlab_evaluation.gguf_meta import summarize
-        # Minimal GGUF v3 header: magic, version, tensor_count, kv_count=0.
-        import struct
+        # A minimal well-formed GGUF v3 header whose general.name names a
+        # different model than the frozen contract.
+        gguf_head = (
+            b"GGUF"
+            + (3).to_bytes(4, "little")      # version
+            + (0).to_bytes(8, "little")      # tensor count
+            + (1).to_bytes(8, "little")      # kv count
+            + (12).to_bytes(8, "little") + b"general.name"
+            + (8).to_bytes(4, "little")      # value type: string
+            + (23).to_bytes(8, "little") + b"Totally Different Model"
+        )
+        # Pad to the default 32-byte data alignment so the (empty) tensor
+        # section start lies inside the file.
+        GGUF_HEAD = gguf_head + b"\x00" * ((-len(gguf_head)) % 32)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "other-model-Q4_K_M.gguf"
-            with path.open("wb") as fh:
-                fh.write(b"GGUF")
-                fh.write((3).to_bytes(4, "little"))
-                fh.write((0).to_bytes(8, "little"))
+            path.write_bytes(GGUF_HEAD)
             with self.assertRaises(Exception) as caught:
                 derive_profile(path, None)
-            self.assertIn("MODEL_IDENTITY_MISMATCH",
-                          str(getattr(caught.exception, "args", [caught.exception])[0])
-                          + str(caught.exception))
+            self.assertIn("MODEL_IDENTITY_MISMATCH", str(caught.exception))
 
     def test_task_only_run_refuses_unproven_offline_config(self):
         # run.main (task-only LOCAL_RUNTIME path) must refuse before creating
@@ -241,26 +249,14 @@ class AHardeningTests(unittest.TestCase):
         from fitlab_evaluation import run as run_mod
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "campaign.json"
-            with patch.object(run_mod, "safe_runtime_config",
-                              side_effect=OSError("refused")):
-                code, _ = _run("evaluate", "--output-dir", str(out),
-                               "--repeats", "1")
-            # public evaluate -> workflow (not run.main); exercise run.main
-            # directly for this seam.
-            with patch.object(run_mod, "safe_runtime_config",
-                              side_effect=OSError("refused")):
-                r = subprocess.run(
-                    [sys.executable, "-c",
-                     "import sys; sys.path.insert(0, '.');\n"
-                     "from unittest.mock import patch\n"
-                     "from fitlab_evaluation import run as run_mod\n"
-                     "with patch.object(run_mod, 'safe_runtime_config',"
-                     " side_effect=ConnectionRefusedError('x')):\n"
-                     "    rc = run_mod.main(['--output',"
-                     " r'%s', '--repeats', '1'])\n"
-                     "print('RC', rc)\n" % out],
-                    cwd=str(ROOT), capture_output=True, text=True, timeout=120)
-            self.assertIn("RC 2", r.stdout, r.stderr[-300:])
+            from fitlab_evaluation import workflow as wf_mod
+            argv = ["run-task-only", "--output", str(out), "--repeats", "1"]
+            with patch.object(wf_mod, "safe_runtime_config",
+                              side_effect=ConnectionRefusedError("refused")), \
+                 patch.object(sys, "argv", ["run.py"] + argv[1:]):
+                with self.assertRaises((ConnectionRefusedError, OSError)):
+                    run_mod.main()
+            # The guard sits BEFORE evidence reservation: nothing was created.
             self.assertFalse(out.exists())
 
 

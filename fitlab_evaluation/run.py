@@ -129,6 +129,10 @@ def main():
     # prepared, offline, telemetry-disabled runtime contract is observable.
     # Refusal happens before any evidence path is created.
     from .artifacts import ArtifactError
+    # Late import: workflow imports this module (evaluate, identity), so the
+    # config seam is fetched at call time. Tests patch
+    # fitlab_evaluation.workflow.safe_runtime_config.
+    from .workflow import safe_runtime_config
     observed=safe_runtime_config()
     from .grader import exact_equal
     if not exact_equal(observed,{'offline':True,'no_fetch_executables':True}):
