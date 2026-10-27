@@ -144,10 +144,10 @@ class EvidenceClassMappingTests(unittest.TestCase):
         self.assertIn("69", html)
 
     def test_historical_measured_promotion_requires_corroboration(self):
-        # Round-30 A-1: a matching-source zero-observation record cannot
-        # promote a declared campaign to measured, and the request count is
-        # corroborated only against the shipped sealed campaign. The
-        # synthetic HISTORICAL fixture names a commit that is NOT this
+        # Round-30/31/32 A-1 chain: promotion requires a measurement-eligible
+        # verified LOCAL_RUNTIME record, verify_campaign-verified shipped
+        # bytes, and campaign identity bound through the verification record.
+        # The synthetic HISTORICAL fixture names a commit that is NOT this
         # checkout's, so without shipped-corroboration it stays DECLARED.
         record = self.synthetic_record()
         report = build_report(self.trust, record, historical=HISTORICAL)
@@ -158,6 +158,26 @@ class EvidenceClassMappingTests(unittest.TestCase):
             report["historical_campaign"]["evidence_class"], "DECLARED")
         self.assertEqual(
             report["evidence_class"], SYNTHETIC_TEST_EVIDENCE)
+
+    def test_declared_campaign_id_mismatch_keeps_declared(self):
+        # Round-32: an invented campaign_id must NOT receive measured
+        # corroboration even when other fields look plausible. The shipped
+        # verification record has no free-text campaign identity, so any
+        # campaign_id that cannot be bound to the shipped verified campaign
+        # stays DECLARED — including a fabricated id.
+        from fitlab_evaluation.report_v3 import EXPORT_EVIDENCE
+        record_path = EXPORT_EVIDENCE / "phase-a/live-validation-public-verification.json"
+        if not record_path.exists():
+            self.skipTest("verification record not shipped in this checkout")
+        impostor = dict(HISTORICAL)
+        impostor["campaign_id"] = "invented-campaign-20261022"
+        impostor["source_commit"] = self.trust["source_commit"]
+        impostor["source_tree"] = self.trust["source_tree"]
+        report = build_report(self.trust, historical=impostor)
+        self.assertFalse(
+            report["historical_campaign"]["evidence_corroborated"])
+        self.assertEqual(
+            report["historical_campaign"]["evidence_class"], "DECLARED")
 
     def test_incomplete_or_forged_historical_binding_is_rejected(self):
         variants = []
