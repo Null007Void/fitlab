@@ -392,6 +392,15 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
             self.assertIn("EVALUATION_RECORD_NOT_SANITIZED",
                           str(caught.exception))
             self.assertFalse(out.exists())
+        # The JSON-escaping evasion must not work either: a non-ASCII email
+        # is scanned in its DECODED form, not its json.dumps escape form.
+        record["planning_input"]["scenarios"][0]["workload"][
+            "residency_assumption"] = "contact sampleuser@éxample.org now"
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "passport"
+            with self.assertRaises(ArtifactError):
+                export_report(out, trust, record=record)
+            self.assertFalse(out.exists())
 
     def test_host_identity_companion_is_redacted(self):
         # The host-identity companion satisfies the same privacy contract

@@ -32,7 +32,13 @@ from pathlib import Path
 from .artifacts import ArtifactError, digest, stable_json, publish_bundle, source_digest
 from .evidence import validate_trust, verify_record, source_binding
 from .grader import exact_equal
-from .redact import redact_text, redact_value, redact_with_distinct_identities, contains_private_detail
+from .redact import (
+    contains_private_detail,
+    redact_structure,
+    redact_text,
+    redact_value,
+    redact_with_distinct_identities,
+)
 from fitlab_foundation.planner_cli import run_document
 from fitlab_foundation.serialization import to_primitive
 
@@ -756,9 +762,21 @@ def export_report(directory, trust, record=None, plan=None, advisory=None, prove
     # (its hashes bind the bytes that were written) while predating a
     # redaction rule. Such a record must not reach the shareable bundle in
     # its raw form, and silently rewriting verified evidence is not allowed
-    # either — so an unsanitized record FAILS the export instead.
-    if record is not None and contains_private_detail(json.dumps(record)):
-        raise ArtifactError("EVALUATION_RECORD_NOT_SANITIZED")
+    # either — so an unsanitized record FAILS the export instead. The scan
+    # walks the DECODED string values recursively (a json.dumps scan would
+    # miss non-ASCII payloads like "user@\u00e9xample.org"; a bare dict
+    # argument would scan nothing at all).
+    if record is not None:
+        _private_hits = []
+
+        def _scan(value):
+            if contains_private_detail(value):
+                _private_hits.append(True)
+            return value
+
+        redact_structure(record, _scan)
+        if _private_hits:
+            raise ArtifactError("EVALUATION_RECORD_NOT_SANITIZED")
     report = build_report(trust, record, plan, advisory, provenance, host, historical)
     rendered = render_report(report, trust, record, plan, advisory, provenance, host, historical)
     files = {
