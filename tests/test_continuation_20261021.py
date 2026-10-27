@@ -417,6 +417,12 @@ class RedactionTests(unittest.TestCase):
             # extended into a following suffixed prose token.
             ("C:\\models\\model.gguf notes.txt remain",
              "[redacted] notes.txt remain"),
+            # Round-35 A-1: root-level single-segment POSIX files are
+            # redacted when contiguous ("/confidential.gguf"); a space inside
+            # a root-level filename is isomorphic to prose ("my secret
+            # notes.md"), so per the prose-preservation contract it stays.
+            ("/confidential.gguf", "[redacted]"),
+            ("/my secret.gguf", "/my secret.gguf"),
             # Round-26 A-1: prose after a space-bearing username is NEVER
             # consumed ("cache" is not part of the identity); the optional
             # second word is taken only when a path separator follows.

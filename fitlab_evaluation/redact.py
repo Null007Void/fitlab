@@ -79,13 +79,23 @@ _POSIX_PATH = re.compile(
 # across a distant slash-anchored filename. A recognizable file suffix is
 # still required to avoid mangling prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
-    r"(?<![\w>/.])/[^\s\"'<>|/]+"
-    r"(?:/[^\s\"'<>|/]+)*"
-    r"(?:/"
+    r"(?<![\w>/.])/"
+    r"(?:"
+    r"[^\s\"'<>|/]+(?:/[^\s\"'<>|/]+)*"
+    r"|)"
+    r"/"
     r"(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/]+ [^\s\"'<>|/]+"
-    r"|/[^\s\"'<>|/]+"
-    r")\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"[^\s\"'<>|/]+(?: [^\s\"'<>|/]+)?"
+    r"\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    re.IGNORECASE,
+)
+# Root-level single-segment POSIX file ("/confidential.gguf"): no interior
+# segments, filename contiguous on its suffix — a space inside a root-level
+# filename is isomorphic to prose ("my secret notes.md"), so per the
+# prose-preservation contract only the contiguous form is taken.
+_ROOT_POSIX_FILE = re.compile(
+    r"(?<![\w>/.])/"
+    r"[^\s\"'<>|/]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # IPv6: full form (8 groups) or compressed form containing "::" (including
@@ -149,6 +159,7 @@ def redact_text(value):
     # unknown-root paths whole. The known-root grammar then catches pure
     # paths without suffixes; its word-boundary guard keeps /optional-style
     # prose intact and its stop-set keeps prose after the path intact.
+    result = _ROOT_POSIX_FILE.sub(REDACTED, result)
     result = _ANY_POSIX_FILE.sub(REDACTED, result)
     result = _POSIX_PATH.sub(REDACTED, result)
     result = _IPV6.sub(REDACTED, result)
