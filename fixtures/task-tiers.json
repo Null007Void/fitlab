@@ -1,0 +1,35 @@
+{
+  "schema_version": "fitlab-task-tiers-v1",
+  "task_pack": "fixtures/tasks-v2.json",
+  "freeze_note": "Tier assignment for the frozen task pack. The R2 approved baseline requires six core tasks with at least three measured repetitions each (18 core observations). The F3 grader implementation freezes eight tasks. All six core cases are preserved unchanged; the two additional cases are supplemental and do not alter the core denominator. Grading criteria are identical for every tier and are not modified by this file.",
+  "tiers": {
+    "core": {
+      "requirement": "R2 approved baseline: six core tasks, at least three measured repetitions per task.",
+      "required_observations": 18,
+      "case_ids": ["E1", "E2", "E3", "D1", "D2", "D3"]
+    },
+    "supplemental": {
+      "requirement": "Added before any sprint inference as extra invalid-argument negatives. Not part of the R2 core baseline and not required for baseline fulfilment.",
+      "required_observations": 0,
+      "case_ids": ["D4", "D5"]
+    }
+  },
+  "grading": {
+    "criteria": "Strict JSON types and keys; no duplicate keys, markdown, nonfinite values, tool calls or truncated completion. Text comparisons trim surrounding whitespace only.",
+    "identical_across_tiers": true,
+    "note": "The grader applies one frozen oracle to every case. This file classifies cases for reporting and denominators; it does not add, relax or modify any pass rule."
+  },
+  "denominator_policy": {
+    "core_denominator": 18,
+    "core_basis": "six core cases x three measured repetitions",
+    "total_planned_denominator": 24,
+    "total_basis": "all eight frozen cases x three measured repetitions",
+    "rule": "A stopped or interrupted run retains the full planned denominator for its tier. Unrun and failed cases are not successes. The core denominator is never reduced by a partial run and is never satisfied by supplemental observations."
+  },
+  "provenance": {
+    "core_cases": "Retained unchanged from the frozen six-case feasibility oracle. FEAS-01 through FEAS-04 evidence and that oracle were not modified.",
+    "supplemental_cases": "Two invalid-argument negatives (type and range) added to task pack v2 before any sprint inference, clarifying the D-series negative coverage.",
+    "task_pack_v1_note": "Task pack v1 remains history and is not the evaluated pack.",
+    "approval_status": "PROPOSED_CLASSIFICATION. The tier split is derived from the R2 baseline statement and the task pack v1 freeze note. It has not been separately approved by the owner and does not change any frozen grading criterion."
+  }
+}

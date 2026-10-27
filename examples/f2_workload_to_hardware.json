@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "direction": "workload_to_hardware",
+  "scenarios": [
+    {
+      "scenario_id": "synthetic-dense-planning",
+      "model": {
+        "model_id": "synthetic-dense-planning",
+        "total_parameters": 1000,
+        "layers": 2,
+        "query_heads": 8,
+        "kv_heads": 2,
+        "head_dimension": 4,
+        "architecture_kind": "DENSE_DECODER",
+        "attention_mechanism": "STANDARD_FULL"
+      },
+      "workload": {
+        "resident_sequences": 1,
+        "cached_tokens_per_sequence": 10,
+        "kv_bytes_per_element": 2,
+        "target_tokens_per_second": "5",
+        "declared_bytes_reloaded_per_token": 500,
+        "residency_assumption": "Synthetic fixture reloads 500 declared bytes per generated token."
+      },
+      "weight_bits_per_parameter": "4",
+      "explicit_runtime_overhead_bytes": 360,
+      "runtime_overhead_basis": "Synthetic measured runtime allowance for planner demonstration only."
+    }
+  ]
+}

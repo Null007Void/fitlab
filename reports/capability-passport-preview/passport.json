@@ -1,0 +1,77 @@
+{
+  "capability_verdict": "NOT_EVALUATED",
+  "facts": {
+    "evidence": [
+      "F2 acceptance: evidence/review2/f2/REVIEW.md; source hash preserved.",
+      "F3 corrected acceptance: evidence/review2/f3/CORRECTED_REVIEW.md; original rejection retained.",
+      "F4 offline corrected review: evidence/review2/f4/CORRECTED_REVIEW.md; genuine inference not covered.",
+      "Native Windows regression suite: 134 tests passed.",
+      "Resource-gated native run: 453,791,744 bytes available physical memory, 97% load; 4,811,437,114-byte floor failed.",
+      "No F5 completion, quality, latency, throughput or peak model RAM observation exists."
+    ],
+    "limitations": [
+      "Engineering test counts are not task success measurements or hardware-fit guarantees.",
+      "F3 is a small known-task benchmark. No held-out evaluation or general reliability claim.",
+      "Task-only execution leaves planning inputs and outputs unavailable; supplied planning metadata requires independent provenance.",
+      "F5 uses three sequential repeats, no hidden warmups, explicit cache-state uncertainty and bounded CPU requests.",
+      "Memory snapshots describe the whole host; attributable model peak memory and TTFT remain unavailable.",
+      "No new models, downloads, GPU work, provider upgrades, shared-system changes, publication or submission."
+    ],
+    "project": "Lemonade FitLab",
+    "schema_version": "fitlab-passport-facts-v1",
+    "source_commit": "172e297ae3e928124a24460ec62d2b904494346d",
+    "stages": [
+      {
+        "detail": "Foundation preserved byte-for-byte against the authoritative sprint baseline.",
+        "id": "F1",
+        "status": "ACCEPTED_BASELINE"
+      },
+      {
+        "detail": "Independent exact-source acceptance: 1,334 fresh adversarial executions and 71 selected regressions passed.",
+        "id": "F2",
+        "status": "OFFLINE_REVIEW_PASS"
+      },
+      {
+        "detail": "Eight known toy tasks, frozen v2 oracle. Independent review: 1,599 grader executions passed. No model capability claim.",
+        "id": "F3",
+        "status": "OFFLINE_REVIEW_PASS"
+      },
+      {
+        "detail": "CPU adapter and harness passed independent offline contract review. Genuine runtime integration remains unvalidated.",
+        "id": "F4",
+        "status": "OFFLINE_REVIEW_PASS"
+      },
+      {
+        "detail": "Protocol and task-only runner prepared. Native resource-gated run stopped with zero measured rows; all 24 planned observations remain unrun.",
+        "id": "F5",
+        "status": "READY_NOT_RUN"
+      },
+      {
+        "detail": "This deterministic offline prototype displays verified engineering facts and unavailable measurement placeholders. Not complete product acceptance.",
+        "id": "F6",
+        "status": "CANDIDATE"
+      },
+      {
+        "detail": "Independent end-to-end acceptance not performed.",
+        "id": "F7",
+        "status": "NOT_STARTED"
+      },
+      {
+        "detail": "No publication or submission.",
+        "id": "F8",
+        "status": "NOT_STARTED"
+      }
+    ]
+  },
+  "measurement_placeholders": {
+    "client_latency_seconds": null,
+    "decode_tokens_per_second": null,
+    "model_peak_ram_bytes": null,
+    "reliability": null,
+    "task_pass_rate": null,
+    "time_to_first_token_seconds": null
+  },
+  "measurement_status": "UNAVAILABLE",
+  "observations": null,
+  "schema_version": "fitlab-passport-v1"
+}

@@ -1,0 +1,19 @@
+{
+  "bytes_verified": 1737433,
+  "external_members": [
+    "history/fitlab-f5-multicampaign-blocked-20261022.zip",
+    "source/fitlab-f5-readiness-7cfc6d11e385.zip"
+  ],
+  "failures": [],
+  "index": "HANDOFF_INDEX.json",
+  "inference_requests": 69,
+  "members_declared": 72,
+  "members_failed": 0,
+  "members_verified": 72,
+  "mission_id": "FITLAB-F5-MULTICAMPAIGN-RETRY-20261022",
+  "schema_version": "fitlab-private-handoff-v2",
+  "source_commit": "7cfc6d11e385014d13a8ca0afffd3e763ed3d735",
+  "source_tree": "3596387cfbbe30f42613ebff1d68ebfb504ac7fa",
+  "unused_externals": [],
+  "verdict": "PASS"
+}

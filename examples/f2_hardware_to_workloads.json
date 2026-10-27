@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "direction": "hardware_to_workloads",
+  "scenarios": [
+    {
+      "scenario_id": "synthetic-roomy",
+      "model": {
+        "model_id": "synthetic-roomy",
+        "total_parameters": 1000,
+        "layers": 2,
+        "query_heads": 8,
+        "kv_heads": 2,
+        "head_dimension": 4,
+        "architecture_kind": "DENSE_DECODER",
+        "attention_mechanism": "STANDARD_FULL"
+      },
+      "workload": {
+        "resident_sequences": 1,
+        "cached_tokens_per_sequence": 10,
+        "kv_bytes_per_element": 2,
+        "target_tokens_per_second": "5",
+        "declared_bytes_reloaded_per_token": 500,
+        "residency_assumption": "Synthetic exact planner fixture."
+      },
+      "weight_bits_per_parameter": "4",
+      "explicit_runtime_overhead_bytes": 360,
+      "runtime_overhead_basis": "Synthetic measured runtime allowance.",
+      "planning_memory_budget_bytes": 2000
+    },
+    {
+      "scenario_id": "synthetic-too-small",
+      "model": {
+        "model_id": "synthetic-too-small",
+        "total_parameters": 1000,
+        "layers": 2,
+        "query_heads": 8,
+        "kv_heads": 2,
+        "head_dimension": 4,
+        "architecture_kind": "DENSE_DECODER",
+        "attention_mechanism": "STANDARD_FULL"
+      },
+      "workload": {
+        "resident_sequences": 1,
+        "cached_tokens_per_sequence": 10,
+        "kv_bytes_per_element": 2,
+        "target_tokens_per_second": "5",
+        "declared_bytes_reloaded_per_token": 500,
+        "residency_assumption": "Synthetic exact planner fixture."
+      },
+      "weight_bits_per_parameter": "4",
+      "explicit_runtime_overhead_bytes": 360,
+      "runtime_overhead_basis": "Synthetic measured runtime allowance.",
+      "planning_memory_budget_bytes": 1499
+    }
+  ]
+}

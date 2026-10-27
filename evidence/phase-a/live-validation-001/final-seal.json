@@ -1,0 +1,16 @@
+{
+  "files": {
+    "bootstrap.json": "4bbf48dbb481ff0332cf181672d512548ad90ebff3cd7a248f4272183f840362",
+    "evaluation.json": "dc7e04f862f33cac6c3555c07f62219c9b9b019b8311c586084c3f1cffe43926",
+    "manifest.json": "c2fe576ef1220b08a9c53089be57aafed12cd98e219e32fdf8d09ad899507424",
+    "passport/evaluation.json": "fc0bddbde22b930cd46ee0af9707826cfc0e9e026a19f8c4635df56ba65f78d4",
+    "passport/manifest.json": "23bdcfb198ec98ad6a5d749e0b6f577a0ed54fc321bf03dd94759b50f270c30e",
+    "passport/passport.html": "1fe041619cb718f1d985f4662cad581311408624261fc76646c93a2eb1cc36bc",
+    "passport/passport.json": "0a3248d9319d5ea091c2211bd8c2a4fcdd879c7d91ce67dbe5c866cb6b0ebff4",
+    "passport/trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc",
+    "session.json": "615c1f7990d6392e04e347639e6051a4f3da820185d8a3bf7cf01f1dc2a9f8a2",
+    "trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc"
+  },
+  "schema_version": "fitlab-final-seal-v1",
+  "status": "FINISHED"
+}

@@ -1,0 +1,14 @@
+# Sealed campaign evidence is byte-hashed, not text.
+#
+# `fitlab_evaluation.seal` hashes the exact bytes the product wrote and stores
+# those digests inside final-seal.json. The product's checkpoint and manifest
+# writers emit CRLF on Windows (text-mode newline translation), so any line
+# ending conversion at commit time changes the bytes a checkout materialises
+# and verify_campaign() reports SEAL_HASH_MISMATCH from an otherwise correct
+# tree.
+#
+# Mark this campaign directory as binary so Git preserves the produced bytes
+# byte-for-byte on every platform. Scope is deliberately narrow: the
+# repository-wide `* text=auto eol=lf` rule still governs source and the other
+# evidence files, which are not byte-hashed by a seal.
+phase-a/live-validation-001/** -text

@@ -1,0 +1,4097 @@
+[
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 12,
+      "UNKNOWN": 21
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 6,
+      "UNKNOWN": 17
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": null,
+    "fields": [],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {},
+    "schema_version": "fitlab-passport-v1",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 12,
+      "UNKNOWN": 21
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 6,
+      "UNKNOWN": 17
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-roomy:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-too-small:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 12,
+      "UNKNOWN": 21
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "SYNTHETIC_ONLY",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 6,
+      "UNKNOWN": 17
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "core_tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:known_memory_baseline",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:kv_cache",
+        "machine_class": "UNSUPPORTED",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:lfm25-1.2b-instruct-real:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 4,
+      "UNKNOWN": 20
+    },
+    "schema_version": "fitlab-capability-passport-v3",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": null,
+    "fields": [],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {},
+    "schema_version": "fitlab-passport-v1",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "UNKNOWN": 13
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  },
+  {
+    "artifact": "passport.json",
+    "capability_verdict": "NOT_EVALUATED",
+    "evaluation_state": "NO_EVIDENCE",
+    "fields": [
+      {
+        "group": "claims",
+        "id": "tasks",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "latency",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "peak_ram",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "ttft",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "decode",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:conditional_decode_bandwidth",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:decoder_flops_per_token",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:effective_bandwidth",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:idealized_weight_payload",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:independent_physical_capacity",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:known_memory_baseline",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:kv_cache",
+        "machine_class": "CALCULATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:runtime_overhead",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:target_compute_rate",
+        "machine_class": "ESTIMATED",
+        "owner_label": "ANALYTICAL ESTIMATE",
+        "value_present": true
+      },
+      {
+        "group": "claims",
+        "id": "plan:synthetic-dense-planning:whole_system_fit",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "E3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D1",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D2",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D3",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D4",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      },
+      {
+        "group": "tasks",
+        "id": "D5",
+        "machine_class": "UNKNOWN",
+        "owner_label": "UNKNOWN",
+        "value_present": false
+      }
+    ],
+    "labels_outside_owner_vocabulary": [],
+    "owner_label_counts": {
+      "ANALYTICAL ESTIMATE": 6,
+      "UNKNOWN": 17
+    },
+    "schema_version": "fitlab-capability-passport-v2",
+    "stored_historical_campaign": null,
+    "stored_label_field_present": false,
+    "stored_report_evidence_class": null
+  }
+]

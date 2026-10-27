@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-10-26T18:07:34.303411+00:00",
+  "model": "LFM2.5-1.2B-Instruct-GGUF",
+  "required_available_bytes": 4811437114,
+  "inference_requests": 0,
+  "server_start_attempted": false,
+  "model_load_attempted": false,
+  "installed_version": "lemonade version 2026.43.3",
+  "catalog_sha256": "2b3cb7011c67a73863cdb44462fb0a091a94e5aa2c97d2dc1ee1ac991f04a009",
+  "catalog_entry": {
+    "checkpoint": "LiquidAI/LFM2.5-1.2B-Instruct-GGUF:LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+    "recipe": "llamacpp",
+    "suggested": true,
+    "labels": [
+      "chat"
+    ],
+    "size": 0.731
+  },
+  "cached_models": [
+    {
+      "revision": "8ed288026e23958ad9dfa92d53ed773a8eee7125",
+      "file": "LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+      "bytes": 730895168
+    }
+  ],
+  "memory": {
+    "total_physical_bytes": 16665960448,
+    "available_physical_bytes": 5705691136,
+    "memory_load_percent": 65,
+    "available_commit_bytes": 25842700288
+  },
+  "resource_gate": "PASS"
+}

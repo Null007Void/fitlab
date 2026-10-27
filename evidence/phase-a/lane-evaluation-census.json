@@ -1,0 +1,312 @@
+[
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "2f992889-91e8-4741-9a1a-79b729c773d0",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 1,
+    "row_status_counts": {
+      "MEASURED": 8
+    },
+    "rows": 8,
+    "run_id": "0fe73454-08e5-4d65-8e3f-cab6636767a2",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "RUNNING",
+    "summary": {
+      "failed_or_unrun_count": null,
+      "measured_count": null,
+      "median_client_latency_seconds": null,
+      "passed_count": null,
+      "planned_count": null
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 1,
+    "row_status_counts": {
+      "MEASURED": 4,
+      "STARTED": 1
+    },
+    "rows": 5,
+    "run_id": "6e09f377-fc27-416a-9016-b347218db3fc",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "INTERRUPTED",
+    "summary": {
+      "failed_or_unrun_count": 4,
+      "measured_count": 4,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 4,
+      "planned_count": 8
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 5
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "2f992889-91e8-4741-9a1a-79b729c773d0",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "2f992889-91e8-4741-9a1a-79b729c773d0",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "2f992889-91e8-4741-9a1a-79b729c773d0",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "2f992889-91e8-4741-9a1a-79b729c773d0",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "9a5667ce-12a4-40f9-8d02-25a51b3a703b",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "9056a244-532e-48ab-9e94-3d2eea1e32dd",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 23,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "d35e54b7-6982-4345-9d88-09444eaec2f9",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 22,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 1,
+    "row_status_counts": {
+      "MEASURED": 8
+    },
+    "rows": 8,
+    "run_id": "5815bfd1-e674-47f4-b52e-4ec047ecd1e4",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 22,
+    "status": "RUNNING",
+    "summary": {
+      "failed_or_unrun_count": null,
+      "measured_count": null,
+      "median_client_latency_seconds": null,
+      "passed_count": null,
+      "planned_count": null
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 1,
+    "row_status_counts": {
+      "MEASURED": 4,
+      "STARTED": 1
+    },
+    "rows": 5,
+    "run_id": "23b761fe-bc5e-40bc-81eb-5a0b3689fc5e",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 22,
+    "status": "INTERRUPTED",
+    "summary": {
+      "failed_or_unrun_count": 4,
+      "measured_count": 4,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 4,
+      "planned_count": 8
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 5
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "d35e54b7-6982-4345-9d88-09444eaec2f9",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 22,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  },
+  {
+    "artifact": "evaluation.json",
+    "execution_kind": "SYNTHETIC_TEST",
+    "requested_repeats": 3,
+    "row_status_counts": {
+      "MEASURED": 24
+    },
+    "rows": 24,
+    "run_id": "d35e54b7-6982-4345-9d88-09444eaec2f9",
+    "schema_version": "fitlab-evaluation-v2",
+    "source_sha256_files": 22,
+    "status": "COMPLETED",
+    "summary": {
+      "failed_or_unrun_count": 0,
+      "measured_count": 24,
+      "median_client_latency_seconds": 0.001,
+      "passed_count": 24,
+      "planned_count": 24
+    },
+    "task_pack_sha256": "99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552",
+    "unique_case_ids": 8
+  }
+]

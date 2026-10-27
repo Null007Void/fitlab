@@ -1,0 +1,62 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ SealSecurityTests.test_real_passport_exporter_seal ______________
+
+self = <test_f5_seal_security.SealSecurityTests testMethod=test_real_passport_exporter_seal>
+
+    def test_real_passport_exporter_seal(self):
+        """Real V3 export, synthetic evaluation, no model contacted."""
+        from fitlab_evaluation.artifacts import publish_bundle, stable_json
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.report_v3 import export_report
+        from fitlab_evaluation.run import evaluate
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+    
+        trust = make_trust("HEAD")
+        record = evaluate(
+            None, 1,
+            client=FakeClient(),
+            memory=lambda: GOOD_MEMORY,
+            pause=lambda _: None,
+        )
+        self.assertEqual(record["status"], "COMPLETED")
+        self.assertEqual(record["execution_kind"], "SYNTHETIC_TEST")
+    
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "campaign"
+            publish_bundle(root, {
+                "trust.json": stable_json(trust),
+                "bootstrap.json": stable_json({
+                    "schema_version": "fitlab-session-v1",
+                    "status": "PREPARING",
+                    "inference_requests": 0,
+                }),
+            })
+    
+            (root / "evaluation.json").write_text(
+                stable_json(record), encoding="utf-8"
+            )
+            session = {
+                "schema_version": "fitlab-session-v1",
+                "status": "FINISHED",
+                "evaluation_status": "COMPLETED",
+                "inference_requests": len(record["rows"]),
+            }
+            (root / "session.json").write_text(
+                stable_json(session), encoding="utf-8"
+            )
+    
+            export_report(root / "passport", trust, record)
+            _write_final_seal(root, session)
+    
+            from fitlab_evaluation.seal import verify_final_seal
+            seal = verify_final_seal(root)
+            self.assertEqual(seal["status"], "FINISHED")
+    
+>           from fitlab_evaluation.seal import verify_campaign
+E           ImportError: cannot import name 'verify_campaign' from 'fitlab_evaluation.seal' (C:\Users\Overh\AppData\Local\hermes\profiles\milo\workspace\fitlab-phase-a-closure-lane\fitlab_evaluation\seal.py)
+
+tests\test_f5_seal_security.py:218: ImportError
+=========================== short test summary info ===========================
+FAILED tests/test_f5_seal_security.py::SealSecurityTests::test_real_passport_exporter_seal
+1 failed in 6.04s

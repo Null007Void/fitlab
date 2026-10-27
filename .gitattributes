@@ -1,0 +1,24 @@
+# Canonical byte-stable line endings.
+#
+# The F5 evidence contract binds two independent hashes to the same source:
+#   * fitlab_evaluation.evidence.make_trust()  hashes GIT BLOB bytes
+#   * fitlab_evaluation.run.identity()          hashes WORKING TREE bytes
+# The workflow refuses to run unless those two agree exactly.
+#
+# With core.autocrlf=true and no .gitattributes, a fresh Windows checkout
+# materialises CRLF working-tree files while the repository stores LF blobs.
+# The two hash sets then disagree and every source file appears modified,
+# which makes the F5 workflow refuse to start with SOURCE_NOT_FROZEN.
+#
+# Declaring text files as LF keeps the checkout byte-identical to the blob on
+# every platform, so the source binding is reproducible anywhere.
+* text=auto eol=lf
+
+# Binary artifacts must never be line-ending converted.
+*.gguf binary
+*.zip binary
+*.exe binary
+*.dll binary
+*.png binary
+*.jpg binary
+*.pdf binary

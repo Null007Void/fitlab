@@ -1,0 +1,138 @@
+{
+  "evaluation_status": "COMPLETED",
+  "inference_requests": 8,
+  "measured_count": 8,
+  "preflight": {
+    "available_commit_bytes": 25881812992,
+    "available_physical_bytes": 5713485824,
+    "memory_load_percent": 65,
+    "total_physical_bytes": 16665960448
+  },
+  "request_count_basis": "durable attempted rows; an interrupted row may not have reached the server",
+  "runtime_compatibility": {
+    "model_discovery": {
+      "install_attempted": false,
+      "model": "LFM2.5-1.2B-Instruct-GGUF",
+      "pull_attempted": false,
+      "reason": "target present in model catalog",
+      "status": "AVAILABLE_LISTED"
+    },
+    "runtime_health": {
+      "all_models_loaded": [
+        {
+          "backend_alive": true,
+          "backend_health": "ready",
+          "backend_url": "http://127.0.0.1:8001/v1",
+          "checkpoint": "LiquidAI/LFM2.5-1.2B-Instruct-GGUF:LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+          "device": "cpu",
+          "is_busy": false,
+          "is_streaming": false,
+          "last_use": 1396235,
+          "launch_command": [
+            "C:\\Users\\Overh\\.cache\\lemonade\\bin\\llamacpp\\cpu\\llama-server.exe",
+            "-m",
+            "C:\\Users\\Overh\\.cache\\huggingface\\hub/models--LiquidAI--LFM2.5-1.2B-Instruct-GGUF\\snapshots\\8ed288026e23958ad9dfa92d53ed773a8eee7125\\LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+            "--ctx-size",
+            "2048",
+            "--port",
+            "8001",
+            "--jinja",
+            "--metrics",
+            "--parallel",
+            "1",
+            "--threads",
+            "2",
+            "--threads-batch",
+            "2"
+          ],
+          "loaded": true,
+          "max_context_window": 128000,
+          "model_name": "LFM2.5-1.2B-Instruct-GGUF",
+          "pid": 24140,
+          "pinned": false,
+          "recipe": "llamacpp",
+          "recipe_options": {
+            "ctx_size": 2048,
+            "llamacpp_args": "--parallel 1 --threads 2 --threads-batch 2",
+            "llamacpp_backend": "cpu"
+          },
+          "residency_class": "standard",
+          "slot_pool": "standard/llm",
+          "status": "ready",
+          "type": "llm",
+          "watchdog_reset": false
+        }
+      ],
+      "max_models": {
+        "classification": 1,
+        "embedding": 1,
+        "image": 1,
+        "llm": 1,
+        "reranking": 1,
+        "transcription": 1,
+        "tts": 1
+      },
+      "model_loaded": "LFM2.5-1.2B-Instruct-GGUF",
+      "pinned_helper_models": {
+        "classification": 0,
+        "embedding": 0,
+        "image": 0,
+        "llm": 0,
+        "reranking": 0,
+        "transcription": 0,
+        "tts": 0
+      },
+      "pinned_models": {
+        "classification": 0,
+        "embedding": 0,
+        "image": 0,
+        "llm": 0,
+        "reranking": 0,
+        "transcription": 0,
+        "tts": 0
+      },
+      "status": "ok",
+      "telemetry": {
+        "enabled": false
+      },
+      "update_check_done": true,
+      "version": "2026.43.3",
+      "websocket_port": 9000
+    },
+    "runtime_stats": {
+      "completed": {
+        "decode_measurement_kind": "completed_request_stat",
+        "decode_tokens_per_second": 0.0,
+        "prefill_measurement_kind": "unavailable",
+        "prefill_tokens_per_second": null,
+        "time_to_first_token_seconds": 0.0
+      },
+      "live": {
+        "active_requests": 0,
+        "estimated_tokens_per_second": 0.0,
+        "measurement_kind": "best_effort_stream_estimate"
+      }
+    },
+    "runtime_version": "2026.43.3",
+    "scope": "read-only loopback compatibility inspection; no pull or install",
+    "system_stats": {
+      "cpu_percent": 13.071895424836601,
+      "device_attribution": "unverified",
+      "gpu_percent": null,
+      "gpus": [],
+      "inference_device_verified": false,
+      "memory_gb": 10.2,
+      "npu_percent": null,
+      "primary_gpu": null,
+      "primary_gpu_id": null,
+      "vram_gb": null
+    }
+  },
+  "runtime_config": {
+    "no_fetch_executables": true,
+    "offline": true
+  },
+  "runtime_policy": "ready-only; no startup/load/download/configuration changes",
+  "schema_version": "fitlab-session-v1",
+  "status": "FINISHED"
+}

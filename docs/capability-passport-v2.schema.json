@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FitLab Capability Passport v2",
+  "description": "Structural interchange schema. Replay validation additionally checks source, grades, summaries, chronology, resource gates and determinism. Schema validation is not model evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "title",
+    "source",
+    "evaluation_state",
+    "capability_verdict",
+    "complete_protocol",
+    "claims",
+    "tasks",
+    "planning",
+    "provenance_limit",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "fitlab-capability-passport-v2"
+    },
+    "title": {
+      "const": "Lemonade FitLab"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "commit",
+        "tree",
+        "trust_sha256",
+        "task_pack_sha256",
+        "evaluation_sha256",
+        "planning_sha256"
+      ],
+      "properties": {
+        "binding": {
+          "enum": [
+            "LOCAL_GIT_VERIFIED",
+            "EXTERNALLY_SUPPLIED_SNAPSHOT"
+          ]
+        },
+        "commit": {
+          "type": "string"
+        },
+        "tree": {
+          "type": "string"
+        },
+        "trust_sha256": {
+          "type": "string"
+        },
+        "task_pack_sha256": {
+          "type": "string"
+        },
+        "evaluation_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "planning_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "evaluation_state": {
+      "enum": [
+        "NO_EVIDENCE",
+        "SYNTHETIC_ONLY",
+        "RUNNING",
+        "COMPLETED",
+        "STOPPED",
+        "INTERRUPTED"
+      ]
+    },
+    "capability_verdict": {
+      "enum": [
+        "NOT_EVALUATED",
+        "OBSERVED_TOY_TASKS_ONLY"
+      ]
+    },
+    "complete_protocol": {
+      "type": "boolean"
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "evidence_class",
+          "value",
+          "unit",
+          "basis",
+          "limitation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "evidence_class": {
+            "enum": [
+              "MEASURED",
+              "ESTIMATED",
+              "CALCULATED",
+              "UNSUPPORTED",
+              "UNKNOWN"
+            ]
+          },
+          "value": {
+            "type": [
+              "number",
+              "string",
+              "object",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "basis": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limitation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "category",
+          "observed",
+          "passed",
+          "planned",
+          "evidence_class"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "E1",
+              "E2",
+              "E3",
+              "D1",
+              "D2",
+              "D3",
+              "D4",
+              "D5"
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "observed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "passed": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "planned": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 3
+          },
+          "evidence_class": {
+            "enum": [
+              "MEASURED",
+              "UNKNOWN"
+            ]
+          }
+        }
+      }
+    },
+    "planning": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "provenance_limit": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "capability_verdict": {
+            "const": "NOT_EVALUATED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "complete_protocol": {
+            "const": false
+          },
+          "claims": {
+            "items": {
+              "properties": {
+                "evidence_class": {
+                  "not": {
+                    "const": "MEASURED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FitLab evaluation v2 normal run record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "execution_kind",
+    "run_id",
+    "started_at",
+    "source_sha256",
+    "task_pack_sha256",
+    "requested_repeats",
+    "model",
+    "planning_input",
+    "planning_output",
+    "protocol",
+    "rows",
+    "resource_samples",
+    "status",
+    "limitations",
+    "planning_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "fitlab-evaluation-v2"
+    },
+    "execution_kind": {
+      "enum": [
+        "LOCAL_RUNTIME",
+        "SYNTHETIC_TEST"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_sha256": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "task_pack_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "requested_repeats": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "model": {
+      "const": "LFM2.5-1.2B-Instruct-GGUF"
+    },
+    "planning_input": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "planning_output": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "protocol": {
+      "type": "object",
+      "required": [
+        "id",
+        "warmup_requests",
+        "concurrency",
+        "cold_load_measured"
+      ],
+      "properties": {
+        "id": {
+          "const": "fitlab-f5-v1"
+        },
+        "warmup_requests": {
+          "const": 0
+        },
+        "concurrency": {
+          "const": 1
+        },
+        "cold_load_measured": {
+          "const": false
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "RUNNING",
+        "STOPPED",
+        "COMPLETED",
+        "INTERRUPTED"
+      ]
+    },
+    "stop_reason": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resource_samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "total_physical_bytes",
+          "available_physical_bytes",
+          "memory_load_percent",
+          "available_commit_bytes"
+        ],
+        "properties": {
+          "total_physical_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "available_physical_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "memory_load_percent": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "available_commit_bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rows": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "repeat",
+          "status",
+          "runtime",
+          "started_at",
+          "sequence_label"
+        ],
+        "properties": {
+          "case_id": {
+            "enum": [
+              "E1",
+              "E2",
+              "E3",
+              "D1",
+              "D2",
+              "D3",
+              "D4",
+              "D5"
+            ]
+          },
+          "repeat": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "status": {
+            "enum": [
+              "STARTED",
+              "MEASURED",
+              "FAILED"
+            ]
+          },
+          "runtime": {
+            "type": "object"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sequence_label": {
+            "enum": [
+              "first_observed_request",
+              "subsequent_request"
+            ]
+          },
+          "elapsed_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 60
+          },
+          "request": {
+            "type": "object"
+          },
+          "response": {
+            "type": "object"
+          },
+          "grade": {
+            "type": "object",
+            "required": [
+              "case_id",
+              "passed",
+              "reason"
+            ],
+            "properties": {
+              "case_id": {
+                "type": "string"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "MEASURED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "request",
+                "response",
+                "elapsed_seconds",
+                "grade",
+                "completed_at"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "planned_count",
+        "measured_count",
+        "passed_count",
+        "failed_or_unrun_count",
+        "median_client_latency_seconds"
+      ],
+      "properties": {
+        "planned_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "measured_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed_or_unrun_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "median_client_latency_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "planning_status": {
+      "enum": [
+        "UNAVAILABLE",
+        "CALCULATED_FROM_DECLARATIONS"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "COMPLETED",
+              "STOPPED",
+              "INTERRUPTED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "summary",
+          "completed_at"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "planning_status": {
+            "const": "UNAVAILABLE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "planning_input": {
+            "type": "null"
+          },
+          "planning_output": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "planning_input": {
+            "type": "object"
+          },
+          "planning_output": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "$comment": "Structural contract only; cross-field counts, exact row order, source authenticity and grade recomputation require independent semantic checks. Never treat schema conformance as measurement authenticity."
+}
