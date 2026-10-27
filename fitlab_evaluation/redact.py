@@ -18,18 +18,15 @@ REDACTED = "[redacted]"
 # Windows drive-letter path without spaces.
 _WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
 # Windows file paths: drive-anchored, final filename CONTIGUOUS with its
-# suffix. Interior path segments may contain at most TWO words (real
-# space-bearing directory names are overwhelmingly 1-2 words); a space-bearing
-# interior run may not itself contain a suffixed filename token, and no
-# segment may span toward a distant slash-anchored filename
-# ("...then consult docs/README.md") — longer runs fall through to the
-# conservative known-root pass, which preserves the trailing prose.
+# suffix. Interior segments are space-free single tokens; the filename tail
+# directly before the anchor suffix may contain ONE space (real model files
+# are often named "My Model.gguf"), never crossing a segment boundary. A
+# space-bearing interior run can therefore never span toward a distant
+# slash-anchored filename ("...consult docs/README.md") or trailing prose.
 _WINDOWS_FILE_PATH = re.compile(
     r"[A-Za-z]:[/\\][^\s\"'<>|/\\]+"
-    r"(?:[/\\][^\s\"'<>|/\\]+"
-    r"|[/\\](?![^\s\"'<>|/\\]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)?)*"
-    r"[/\\][^\s\"'<>|/\\]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?:[/\\][^\s\"'<>|/\\]+)*"
+    r"[/\\][^\s\"'<>|/\\]+(?: [^\s\"'<>|/\\]+)?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # UNC path, e.g. \\server\share\file.
@@ -46,19 +43,16 @@ _POSIX_PATH = re.compile(
     re.IGNORECASE,
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
-# /srv2/..., custom mounts). Interior segments may contain at most TWO words
-# (real space-bearing directory names are overwhelmingly 1-2 words); a
-# space-bearing interior run may not contain a suffixed filename token, and
-# the final filename is CONTIGUOUS with its suffix — so prose can never be
-# consumed across a distant filename ("...consult docs/README.md" or an
-# extensionless path followed by trailing prose); longer runs fall through to
-# the conservative known-root pass, which stops at the first whitespace.
+# /srv2/..., custom mounts). Interior segments are space-free single tokens;
+# the filename tail directly before the anchor suffix may contain ONE space
+# ("My Model.gguf" style), never crossing a segment boundary. Prose can
+# therefore never be consumed across a distant filename
+# ("...consult docs/README.md") or trailing prose. A recognizable file suffix
+# is still required to avoid mangling prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
     r"(?<![\w>/.])/[^\s\"'<>|/]+"
-    r"(?:/[^\s\"'<>|/]+"
-    r"|/(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)?)*"
-    r"/[^\s\"'<>|/]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?:/[^\s\"'<>|/]+)*"
+    r"/[^\s\"'<>|/]+(?: [^\s\"'<>|/]+)?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # IPv6: full form (8 groups) or compressed form containing "::" (including
