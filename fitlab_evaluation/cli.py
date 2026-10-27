@@ -139,19 +139,24 @@ def _publish_plan(arguments):
 
     built = _plan(arguments)
     document = built["document"]
-    # The document must survive the strict F2 boundary before it is published.
-    run_document(document)
-    # Publication privacy boundary: provenance embeds operator-supplied
-    # model metadata (GGUF header strings, the registry revision string),
-    # so a private path, username or email could ride the shareable
-    # provenance.json verbatim (round-58 A-1). The publication copy passes
-    # through the same distinct-identity redaction engine as the passport
-    # companions; report_v3 re-validates the stored provenance at passport
-    # time against the redacted form, so replay stays consistent.
+    # Publication privacy boundary: BOTH the plan document and the
+    # provenance embed owner declarations (workload residency assumptions,
+    # overhead basis) and operator-supplied model metadata (GGUF header
+    # strings, the registry revision), so a private path, username or
+    # email could ride the shareable plan.json or provenance.json verbatim
+    # (rounds 58/59 A-1). The publication copies pass through the same
+    # distinct-identity redaction engine as the passport companions, and
+    # the PUBLISHED document is the validated one: run_document replays
+    # against the redacted document, so the bundle and the validation
+    # cover the same bytes. Redaction is idempotent; report_v3 re-redacts
+    # the stored plan at passport time without marker drift.
+    document_public, _ = redact_with_distinct_identities(
+        to_primitive(document))
     provenance_public, _ = redact_with_distinct_identities(
         to_primitive(built["provenance"]))
+    run_document(document_public)
     files = {
-        "plan.json": stable_json(document),
+        "plan.json": stable_json(document_public),
         "provenance.json": stable_json(provenance_public),
         "advisory.json": stable_json(built["advisory"]),
     }

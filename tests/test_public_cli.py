@@ -266,7 +266,12 @@ class PublicCliSurface(unittest.TestCase):
                     "scenarios": [{
                         "scenario_id": "s1",
                         "model": {"model_id": "LFM2.5-1.2B-Instruct-GGUF"},
-                    }]}
+                        "workload": {
+                            "residency_assumption":
+                                "weights at /data/private/model.gguf"},
+                    }],
+                    "runtime_overhead_basis":
+                        "operator box C:\\Users\\sampleuser\\notes"}
 
         summary = {
             "source": "GGUF_HEADER_METADATA", "file_bytes": 1,
@@ -311,6 +316,14 @@ class PublicCliSurface(unittest.TestCase):
             self.assertIn("[redacted", body)
             plan_body = (destination / "plan.json").read_text("utf-8")
             self.assertNotIn("sampleuser", plan_body)
+            # The document's own owner declarations are redacted too:
+            # residency assumptions and overhead basis carry private detail
+            # (round-59 A-1).
+            self.assertNotIn("/data/private/model.gguf", plan_body)
+            self.assertNotIn("notes", plan_body.split("[redacted")[0]
+                             if "[redacted" in plan_body else plan_body)
+            self.assertNotIn("sampleuser", plan_body)
+            self.assertIn("[redacted", plan_body)
         # The public passport entry, driven exactly as an installed user
         # would drive it (fresh trust from THIS checkout's HEAD), must
         # render the passport and produce byte-identical output on a second
