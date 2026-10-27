@@ -230,6 +230,23 @@ class EvidenceClassMappingTests(unittest.TestCase):
             # Idempotency: the second pass must not change the marker.
             self.assertEqual(redact_value(token), token)
 
+    def test_nul_placeholder_ids_stay_distinct(self):
+        # Round-39: distinct ids containing literal NUL-delimited placeholder
+        # text must not collapse through marker stashing (the reviewer's
+        # probe with "\x000\x00" inside [redacted:7]-bearing ids).
+        from fitlab_evaluation.redact import (
+            redact_value, redact_with_distinct_identities)
+        from fitlab_foundation.serialization import to_primitive
+        doc = {"direction": "workload_to_hardware",
+               "scenarios": [
+                   {"scenario_id": "[redacted:7] \x000\x00"},
+                   {"scenario_id": "[redacted:7] [redacted:7]"},
+               ],
+               "schema_version": 1}
+        sanitized, _ = redact_with_distinct_identities(to_primitive(doc))
+        ids = [s["scenario_id"] for s in sanitized["scenarios"]]
+        self.assertEqual(len(set(ids)), 2, ids)
+
     def test_marker_bearing_strings_still_redact_surroundings(self):
         # Round-38: a generated marker inside a longer string must protect
         # ONLY the marker; unrelated private detail in the same string is

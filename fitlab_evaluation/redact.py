@@ -50,11 +50,11 @@ _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
 # The root must be followed by a separator first, so ordinary prose
 # ("the Users group") is untouched.
 _WINDOWS_USER = re.compile(
-    r"[/\\]Users[/\\](?!\x00)[^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)",
+    r"[/\\]Users[/\\](?!\x01)[^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)",
     re.IGNORECASE,
 )
 _POSIX_USER = re.compile(
-    r"/(?:home|Users)/(?!\x00)(?![/\s])"
+    r"/(?:home|Users)/(?!\x01)(?![/\s])"
     r"[^\s/\"'<>|]+(?: [^\s/\"'<>|]+(?=[/]))?(?=[/\s]|$)",
     re.IGNORECASE,
 )
@@ -149,22 +149,25 @@ def redact_text(value):
     """
     if type(value) is not str or not value:
         return value
+    markers_found = []
     if "[redacted:" in value:
         # This string carries at least one generated marker from a previous
-        # pass in THIS pipeline (round-37 A-1 / round-38 A-1). Redacting the
-        # WHOLE string blindly here rewrites unrelated identity-bearing
-        # markers; instead, protect only the generated marker tokens
-        # ("[redacted:k]") via placeholders, run the normal redaction, and
-        # restore them — unrelated private detail around the marker is
-        # still redacted.
+        # pass in THIS pipeline (round-37/38 A-1). Protect ONLY the marker
+        # tokens via placeholders. Placeholder collision handling
+        # (round-39 A-1): markers are stashed into \x01-delimited slots, but
+        # if \x01 already occurs in the input, the placeholder would be
+        # ambiguous — in that case redact NOTHING in this string (fail-safe)
+        # and let the publication privacy scan judge it. \x01 cannot appear
+        # in strict JSON input, but imported records are not guaranteed.
         import re as _re
+        if "\x01" in value:
+            return value
         markers_found = []
         def _stash(match):
             markers_found.append(match.group(0))
-            return "\x00" + str(len(markers_found) - 1) + "\x00"
+            return "\x01" + str(len(markers_found) - 1) + "\x01"
         stash_pattern = _re.compile(r"\[redacted:\d+\]")
-        stashed = stash_pattern.sub(_stash, value)
-        result = stashed
+        result = stash_pattern.sub(_stash, value)
     else:
         result = value
     result = _UNC_PATH.sub(REDACTED, result)
@@ -189,9 +192,8 @@ def redact_text(value):
     result = _MAC.sub(REDACTED, result)
     result = _IPV4.sub(REDACTED, result)
     result = _RESERVED_HOSTNAME.sub(REDACTED, result)
-    if "[redacted:" in value:
-        for index, token in enumerate(markers_found):
-            result = result.replace("\x00" + str(index) + "\x00", token)
+    for index, token in enumerate(markers_found):
+        result = result.replace("\x01" + str(index) + "\x01", token)
     return result
 
 
