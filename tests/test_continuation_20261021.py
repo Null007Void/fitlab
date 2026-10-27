@@ -350,9 +350,25 @@ class HybridArchitectureTests(unittest.TestCase):
                     ("blk.0.shortconv.in_proj.weight", [64, 192], 12),
                 ],
             )
-            with self.assertRaisesRegex(
-                    ProfileError, "MODEL_METADATA_BLOCK_COUNT_EXCESSIVE"):
+            # The refusal must happen BEFORE block classification, with an
+            # EXACTLY stable error code: the declared value must not ride
+            # the code, which cli.main publishes verbatim into the
+            # evaluation record.
+            with self.assertRaises(ProfileError) as refused:
                 derive_profile(path, "r")
+            self.assertEqual(
+                refused.exception.code, "MODEL_METADATA_BLOCK_COUNT_EXCESSIVE")
+            self.assertEqual(
+                str(refused.exception), "MODEL_METADATA_BLOCK_COUNT_EXCESSIVE")
+            from unittest.mock import patch
+            import fitlab_evaluation.model_profile as module
+            with patch.object(module, "classify_blocks",
+                              side_effect=AssertionError("classification reached")):
+                with self.assertRaises(ProfileError) as still_refused:
+                    derive_profile(path, "r")
+            self.assertEqual(
+                still_refused.exception.code,
+                "MODEL_METADATA_BLOCK_COUNT_EXCESSIVE")
             # A modest block count still passes the same gate.
             ok_dir = Path(directory) / "ok"
             ok_dir.mkdir()

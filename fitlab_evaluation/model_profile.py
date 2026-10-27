@@ -138,9 +138,12 @@ def derive_profile(model_path, revision=None):
     # classify_blocks iterates range(block_count), so an unchecked value
     # hangs the offline planner before any later layer limit could apply
     # (round-42 A-1). Bound it here, before classification, with a stable
-    # error code.
+    # error code. The declared value MUST NOT ride the code: cli.main
+    # publishes exc.code verbatim into the evaluation record, so the code
+    # alone is the stable contract and the exact value is deliberately
+    # dropped.
     if block_count > 100000:
-        _fail("MODEL_METADATA_BLOCK_COUNT_EXCESSIVE", str(block_count))
+        _fail("MODEL_METADATA_BLOCK_COUNT_EXCESSIVE")
     if type(embedding_length) is not int or embedding_length <= 0:
         _fail("MODEL_METADATA_INCOMPLETE", "embedding_length")
     if type(head_count) is not int or head_count <= 0:
