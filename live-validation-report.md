@@ -109,7 +109,7 @@ does not stop later tasks; all 8 rows were therefore attempted.
 24 native Windows memory snapshots were recorded by the run
 (`resource_samples`), taken before health, immediately before inference and
 after each completion. Available physical bytes ranged 5,701,672,960 →
-5,720,793,088 (minimum ≈ 5.31 GiB), always above the 4,481,437,114-byte gate.
+5,720,793,088 (minimum ≈ 5.31 GiB), always above the 4,811,437,114-byte gate.
 Session preflight sample: total 16,665,960,448 B, available 5,713,485,824 B,
 memory load 65 %, available commit 25,881,812,992 B.
 

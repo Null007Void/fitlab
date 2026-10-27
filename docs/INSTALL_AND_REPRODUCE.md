@@ -61,8 +61,11 @@ dependency would fail the run rather than pass quietly.
 
 The suite is deterministic: it uses fixed seeds for the randomized numeric
 fixtures and synthetic replies for the evaluation harness. It contacts no
-model and no external service. The only sockets it opens are ephemeral
-loopback listeners for transport tests.
+model and no external service. The only sockets it opens are (a) ephemeral
+loopback listeners for transport tests and (b) read-only connections to the
+local machine's own runtime-config/memory gates — the offline guard probes
+described in the security boundary section above, which never leave the
+machine.
 
 ## Reproducing a Capability Passport
 

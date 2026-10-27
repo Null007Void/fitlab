@@ -8,9 +8,11 @@ workload needs, measures what a local model actually delivers, and publishes
 both as a single offline **Capability Passport** — an HTML document that
 tells the truth about what was measured and what remains unknown.
 
-Python ≥ 3.12 (demonstrated on CPython 3.13), standard library only.
-No installation dependencies, no account, no network, no GPU required for
-planning; the evaluation path talks only to a local runtime you already run.
+Python ≥ 3.12 (demonstrated on CPython 3.13). The runtime dependency set is
+the Python standard library only — no account, no network, no GPU required
+for planning; the evaluation path talks only to a local runtime you already
+run. (Installing the optional `fitlab` console script from a clone uses the
+standard editable-install build backend; see Installing below.)
 
 ## The user journey
 
