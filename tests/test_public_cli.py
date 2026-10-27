@@ -216,9 +216,13 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
                 self.assertNotIn("fd00::1234", pub)
 
     def test_distinct_private_scenario_ids_stay_distinct_after_redaction(self):
-        # Two scenarios whose identities redact to the same marker must not
+        # Scenario identities that redact to the same marker must not
         # collapse: replay re-validates the stored input with run_document,
-        # which rejects duplicate scenario identities.
+        # which rejects duplicate scenario identities. An owner-supplied
+        # literal marker-shaped id ("[redacted]#1") must survive unchanged
+        # while generated tokens use a distinct namespaced shape
+        # ("[redacted:k]") so a generated token can never collide with a
+        # literal the owner actually shipped.
         import tempfile
         from unittest.mock import patch
         from fitlab_evaluation.run import evaluate
@@ -229,16 +233,15 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
         plan = json.loads((ROOT / "examples" /
                            "f2_workload_to_hardware.json").read_text("utf-8"))
         from fitlab_evaluation.lemonade import MODEL
-        first = json.loads(json.dumps(plan))
-        first["direction"] = "workload_to_hardware"
-        first["scenarios"][0]["model"]["model_id"] = MODEL
-        first["scenarios"][0]["scenario_id"] = "/data/private/alpha"
-        second = json.loads(json.dumps(plan))
-        second["direction"] = "workload_to_hardware"
-        second["scenarios"][0]["model"]["model_id"] = MODEL
-        second["scenarios"][0]["scenario_id"] = "/data/private/beta"
+        document_ids = ["[redacted]#1", "/data/private/a", "/data/private/b"]
+        scenarios = []
+        for sid in document_ids:
+            scenario = json.loads(json.dumps(plan["scenarios"][0]))
+            scenario["model"]["model_id"] = MODEL
+            scenario["scenario_id"] = sid
+            scenarios.append(scenario)
         document = {"direction": "workload_to_hardware",
-                    "scenarios": [first["scenarios"][0], second["scenarios"][0]],
+                    "scenarios": scenarios,
                     "schema_version": plan.get("schema_version", 1)}
         trust = make_trust("HEAD")
         with patch("fitlab_evaluation.run.identity", return_value=trust["source_sha256"]):
@@ -247,13 +250,56 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
                                   memory=lambda: dict(GOOD_MEMORY),
                                   pause=lambda _s: None, checkpoint=None)
         stored = record["planning_input"]
-        ids = sorted(s["scenario_id"] for s in stored["scenarios"])
-        self.assertNotIn("/data/private", ids[0] + ids[1])
-        self.assertNotEqual(ids[0], ids[1])
+        ids = [s["scenario_id"] for s in stored["scenarios"]]
+        self.assertEqual(len(ids), 3)
+        # All three identities stay distinct after redaction.
+        self.assertEqual(len(set(ids)), 3)
+        # The unchanged literal marker-shaped id survives byte-exact.
+        self.assertIn("[redacted]#1", ids)
+        # Generated tokens are namespaced: never "#"-suffixed ordinals,
+        # never equal to an owner-supplied literal.
+        generated = [i for i in ids if i not in document_ids]
+        self.assertEqual(len(generated), 2)
+        for token in generated:
+            self.assertTrue(token.startswith("[redacted:"), token)
+            self.assertNotIn("#", token)
         # Replay: the sanitized input must still validate through the planner.
         from fitlab_foundation.planner_cli import run_document
         validated = run_document(stored)
-        self.assertEqual(len(validated["results"]), 2)
+        self.assertEqual(len(validated["results"]), 3)
+
+    def test_planning_rederivation_failure_propagates(self):
+        # The stored planning output must come from a verified re-derivation
+        # against the stored input. A failing re-derivation must FAIL the
+        # run; silently falling back to an unverifiable stored copy is
+        # forbidden.
+        import tempfile
+        from unittest.mock import patch
+        import fitlab_evaluation.run as run_module
+        from fitlab_evaluation.run import evaluate
+        from fitlab_evaluation.evidence import make_trust
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        plan["scenarios"][0]["model"]["model_id"] = MODEL
+        real = run_module.run_document
+        calls = {"n": 0}
+
+        def flaky_rederivation(document):
+            calls["n"] += 1
+            if calls["n"] == 2:
+                raise ValueError("synthetic re-derivation failure")
+            return real(document)
+
+        with patch.object(run_module, "run_document", side_effect=flaky_rederivation):
+            with tempfile.TemporaryDirectory() as tmp:
+                with self.assertRaises(ValueError):
+                    evaluate(plan, 1, client=FakeClient(),
+                             memory=lambda: dict(GOOD_MEMORY),
+                             pause=lambda _s: None, checkpoint=None)
+        self.assertEqual(calls["n"], 2)
 
 
 class AHardeningTests(unittest.TestCase):

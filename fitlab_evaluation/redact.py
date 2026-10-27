@@ -24,9 +24,16 @@ _WINDOWS_FILE_PATH = re.compile(
 )
 # UNC path, e.g. \\server\share\file.
 _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
-# Absolute POSIX path under a system or home root.
+# Absolute POSIX path under a system or home root. Two-pass design:
+#   1) suffix-anchored lazy grammar (_ANY_POSIX_FILE) runs first and consumes
+#      space-bearing and unknown-root paths whole, stopping at a file suffix;
+#   2) the known-root grammar then runs with a word-boundary guard so the
+#      root word can not be a prefix of a longer word (/opt vs /optional),
+#      and its own charset stops the match at the next whitespace.
 _POSIX_PATH = re.compile(
-    r"/(?:home|Users|usr|var|opt|etc|mnt|media|srv|root|tmp|private|data|Volumes|snap|flatpak)(?:/[^\s\"'<>]*)*"
+    r"(?<![\w>/.])/(?:home|Users|usr|var|opt|etc|mnt|media|srv|root|tmp|private|data|Volumes|snap|flatpak)"
+    r"(?=[/\s\"'<>|]|$)(?:/[^\s\"'<>|]+)*",
+    re.IGNORECASE,
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
 # /srv2/..., custom mounts) — require a recognizable file suffix to avoid
@@ -90,8 +97,13 @@ def redact_text(value):
     result = _WINDOWS_PATH.sub(REDACTED, result)
     # A lambda replacement avoids backslash-escape interpretation of "\Users".
     result = _WINDOWS_USER.sub(lambda match: "\\Users\\" + REDACTED, result)
-    result = _POSIX_PATH.sub(REDACTED, result)
+    # Two-pass POSIX handling, per the round-10 review direction: the
+    # suffix-anchored lazy grammar runs FIRST and consumes space-bearing and
+    # unknown-root paths whole. The known-root grammar then catches pure
+    # paths without suffixes; its word-boundary guard keeps /optional-style
+    # prose intact and its stop-set keeps prose after the path intact.
     result = _ANY_POSIX_FILE.sub(REDACTED, result)
+    result = _POSIX_PATH.sub(REDACTED, result)
     result = _IPV6.sub(REDACTED, result)
     result = _HOME_SEGMENT.sub(REDACTED, result)
     result = _EMAIL.sub(REDACTED, result)

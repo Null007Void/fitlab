@@ -72,25 +72,51 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
     stored_input = None
     stored_plan = None
     if plan_document is not None:
-        seen = {}
+        primitive = to_primitive(plan_document)
+        # Pre-reserve strings that survive redaction unchanged yet already
+        # look like redaction markers, so a generated token can never
+        # collide with an owner-supplied literal in the same record.
+        reserved = set()
+
+        def _reserve(value):
+            if type(value) is str and _REDACTION_MARKER in value \
+                    and redact_value(value) == value:
+                reserved.add(value)
+            return value
+
+        redact_structure(primitive, _reserve)
+        used = set()
+        markers = {}
+
+        def _namespaced(text, k):
+            i = text.rfind(_REDACTION_MARKER)
+            return text[:i] + '[redacted:' + str(k) + ']' + text[i + len(_REDACTION_MARKER):]
+
         def _uniquify(value):
             sanitized = redact_value(value)
             if sanitized == value or _REDACTION_MARKER not in sanitized:
                 return sanitized
             # Distinct originals must stay distinct after redaction so
-            # identity validation during replay still holds.
-            if value not in seen:
-                seen[value] = len(seen)
-            return sanitized if seen[value] == 0 else f"{sanitized}#{seen[value]}"
-        stored_input = redact_structure(to_primitive(plan_document), _uniquify)
+            # identity validation during replay still holds. Generated
+            # markers are namespaced and skip reserved/prior tokens.
+            if value not in markers:
+                k = 0
+                candidate = _namespaced(sanitized, k)
+                while candidate in reserved or candidate in used:
+                    k += 1
+                    candidate = _namespaced(sanitized, k)
+                markers[value] = candidate
+                used.add(candidate)
+            return markers[value]
+        stored_input = redact_structure(primitive, _uniquify)
         if plan is not None:
-            stored_plan = redact_structure(plan, _uniquify)
             # Re-derive the plan output from the sanitized input so any
             # assumption strings echoed into results match the stored input.
-            try:
-                stored_plan = redact_structure(to_primitive(run_document(stored_input)), _uniquify)
-            except Exception:
-                stored_plan = redact_structure(plan, _uniquify)
+            # A failed re-derivation must FAIL the run: replay verifies
+            # against the stored input and never silently falls back to a
+            # stored copy that cannot be re-checked.
+            stored_plan = redact_structure(
+                to_primitive(run_document(stored_input)), _uniquify)
     record = {'schema_version':'fitlab-evaluation-v2','execution_kind':execution_kind,'run_id':str(uuid.uuid4()),
               'started_at':datetime.now(timezone.utc).isoformat(),'source_sha256':identity(),
               'task_pack_sha256':pack_hash,'requested_repeats':repeats,'model':MODEL,

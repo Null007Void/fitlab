@@ -358,6 +358,35 @@ class RedactionTests(unittest.TestCase):
         self.assertNotIn("workstation.internal.example", result)
         self.assertFalse(contains_private_detail(result))
 
+    def test_posix_two_pass_grammar_discriminating_cases(self):
+        # Regression for the round-10 correction: the suffix-anchored lazy
+        # grammar runs first (space-bearing paths consumed whole), then the
+        # known-root grammar with a proper root word boundary. Both prior
+        # failure shapes must be impossible: prose after a path must survive
+        # AND bare slash-prefixed words ("/optional") must survive.
+        cases = [
+            # (input, exact expected output)
+            ("/data/private/alpha", "[redacted]"),
+            ("/data/private/model bin file", "[redacted] bin file"),
+            ("see /etc/config for details", "see [redacted] for details"),
+            ("path /srv/deploy tool", "path [redacted] tool"),
+            ("/opt/cache/model.gguf with notes", "[redacted] with notes"),
+            ("/Volumes/Backup Drive/model.gguf", "[redacted]"),
+            # Prose must never be eaten after a space-bearing path.
+            ("/data/private/model bin file and more prose", "[redacted] bin file and more prose"),
+            ("/Volumes/Drive/models and files/model.gguf kept prose", "[redacted] kept prose"),
+            # Overmatch guards: slash-prefixed prose must survive.
+            ("/optional feature flag remains enabled",
+             "/optional feature flag remains enabled"),
+            ("/option for verbose output", "/option for verbose output"),
+            ("/etcetera and /ethanol stay prose", "/etcetera and /ethanol stay prose"),
+        ]
+        for value, expected in cases:
+            with self.subTest(value=value):
+                result = redact_text(value)
+                self.assertEqual(result, expected)
+                self.assertFalse(contains_private_detail(result))
+
     def test_preserves_scientific_and_product_identifiers(self):
         for value in (
             "formula fitlab.kv.standard_full_cache v1.0.0",
