@@ -1,7 +1,7 @@
 # LIVE-002 — authorized 8-request FitLab campaign (fitlab-f5-v1)
 
 Campaign directory: `evidence/phase-a/live-validation-001`
-Task: FITLAB-PHASEA-002 (executed under an internal governed-dispatch work order, build phase)
+Task: FITLAB-PHASEA-002 (executed once under the owner's written campaign authorization)
 Report authored: 2026-10-26
 
 ## 1. Verdict summary
@@ -271,13 +271,12 @@ raw response, per-row `elapsed_seconds`, `response_sha256`, grade, runtime
 identity and 24 memory snapshots — is preserved verbatim inside
 `evidence/phase-a/live-validation-001/evaluation.json` (sealed and committed
 above), with the summary rows transcribed in §4. No file was written outside
-this authorized lane, so any portfolio-level sessions directory was left
-untouched by this task.
+this campaign's working directory.
 
 ## 11. Reproducibility finding: sealed bytes vs. Git line-ending normalisation
 
 This is a real finding discovered by verifying the committed artifact from a
-fresh checkout, not from the lane where it was produced.
+fresh checkout, not from the directory where it was produced.
 
 ### Observation
 
@@ -286,7 +285,7 @@ checkout in which `verify_campaign('evidence/phase-a/live-validation-001')`
 raised `ArtifactError: SEAL_HASH_MISMATCH` (from `verify_final_seal`), even
 though the tree was otherwise correct. Byte audit against the seal:
 
-| File | lane bytes == seal | checkout bytes == seal | seal bytes are CRLF |
+| File | run-time bytes == seal | checkout bytes == seal | seal bytes are CRLF |
 |---|---|---|---|
 | `bootstrap.json` | true | true | no |
 | `evaluation.json` | true | **false** | yes |
@@ -296,7 +295,7 @@ though the tree was otherwise correct. Byte audit against the seal:
 | `passport/evaluation.json`, `passport/passport.html`, `passport/passport.json`, `passport/trust.json`, `trust.json` | true | true | no |
 
 Exactly 4 of 10 sealed files differed, and in each case the checkout content
-equalled the LF-normalised lane content.
+equalled the LF-normalised run-time content.
 
 ### Root cause
 

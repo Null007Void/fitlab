@@ -63,6 +63,10 @@ class PublicCliSurface(unittest.TestCase):
         # regression can never reach the model on any machine (with or
         # without a prepared runtime), and the public evaluate entry must
         # produce durable sealed BLOCKED evidence with zero requests.
+        # Read-only loopback interactions that the guard chain performs
+        # before readiness (memory sampling, the local offline-config GET)
+        # stay engine-real by design; the failure injected here is only the
+        # runtime adapter gate, deterministically.
         import tempfile
         from unittest.mock import patch
         from fitlab_evaluation import workflow as wf

@@ -33,7 +33,7 @@ because those commands bind to the frozen checkout layout by design.
 From a clone of this repository:
 
 ```powershell
-python -m pip install .
+python -m pip install -e .
 fitlab --help
 ```
 
@@ -42,8 +42,10 @@ fitlab --help
 metadata in `pyproject.toml` — while keeping the repository layout that the
 engine's frozen source/fixture binding requires. Without installing, the
 same commands work as modules:
-`python -m fitlab_evaluation.public_cli inspect|evaluate|passport`. No
-third-party packages are required either way. (`inspect`/`passport` also
+`python -m fitlab_evaluation.public_cli inspect|evaluate|passport`. The
+RUNTIME dependency set is the Python standard library only; building the
+editable install additionally declares `setuptools` as the build backend
+(declared, not a runtime dependency). (`inspect`/`passport` also
 work from a non-editable install; `evaluate`/`trust` require the editable
 checkout.
 
@@ -65,7 +67,9 @@ loopback listeners for transport tests.
 ## Reproducing a Capability Passport
 
 ```powershell
-mkdir out\source, out\passport  # output parents must exist; publication never creates them (no-overwrite contract)
+mkdir out                        # create ONLY the container directory 'out'.
+                                   # The publication destinations out\source and out\passport must NOT
+                                   # pre-exist: publication is atomic and never overwrites (OUTPUT_EXISTS).
 python -m fitlab_evaluation.cli trust --output-dir out\source
 python -m fitlab_evaluation.cli passport --trust out\source\trust.json --output-dir out\passport
 ```

@@ -110,7 +110,7 @@ Note on the shipped LIVE-002 record: it is bound to the historical source
 commit it ran against (recorded in its `trust.json` `source` fields). The
 public repository deliberately carries a fresh commit history, so a
 git-resolution of that historical hash is expected to fail here — that is
-the fail-closed design, not a defect. Use `verify_campaign` (Layer 7) for
+the fail-closed design, not a defect. Use `verify_campaign` (Layer 5b) for
 byte-level verification of the sealed historical campaign, and
 `fitlab evaluate` produces fresh campaigns whose trust resolves against
 your own checkout's HEAD.
