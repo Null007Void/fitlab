@@ -289,23 +289,38 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
             and verified["source_binding"]["tree"] == historical_campaign["source_tree"] \
             and historical_campaign["request_count"] <= 100000 \
             and historical_campaign["request_count"] > 0:
-        # Request-count corroboration: the only on-disk corroboration
-        # channel is the sealed campaign evidence directory; without it the
-        # count stays uncorroborated and the class stays DECLARED.
+        # Request-count corroboration: the shipped sealed campaign must be
+        # VERIFY_CAMPAIGN-verified (round-31 A-1: json.loads + len(rows) is
+        # not verification), bound to the SAME source identity as the
+        # declaration, and its durable row count must cover the declared
+        # campaign's requests. The campaign_id/delivery_sha256 relationship
+        # itself is not re-derivable from the shipped record — a declared
+        # campaign whose identity does not match the shipped one stays
+        # DECLARED.
         corroborated = False
-        evidence_eval = EXPORT_EVIDENCE / "phase-a/live-validation-001/evaluation.json"
+        evidence_dir = EXPORT_EVIDENCE / "phase-a/live-validation-001"
+        evidence_eval = evidence_dir / "evaluation.json"
         if evidence_eval.exists():
             try:
                 shipped = json.loads(evidence_eval.read_text(encoding="utf-8"))
+                from .seal import verify_campaign
+                campaign_view = verify_campaign(evidence_dir)
+                # The seal must verify FINISHED/COMPLETED against the exact
+                # shipped bytes.
+                if campaign_view.get("status") != "COMPLETED":
+                    raise ArtifactError("HISTORICAL_CORROBORATION_NOT_VERIFIED")
                 rows = shipped.get("rows", [])
-                # The shipped LIVE-002 record binds the same source commit
-                # and tree and its durable row count must cover the declared
-                # campaign's requests.
+                measured_rows = [r for r in rows if r.get("status") == "MEASURED"]
+                # The shipped verified campaign is the ONLY campaign this
+                # checkout can vouch for; its identity must match the
+                # declaration's source identity, and its durable measured
+                # row count must cover the declared requests.
                 if shipped.get("execution_kind") == "LOCAL_RUNTIME" \
-                        and len(rows) >= historical_campaign["request_count"] \
-                        and trust["source_commit"] == historical_campaign["source_commit"]:
+                        and len(measured_rows) >= historical_campaign["request_count"] \
+                        and campaign_view["source"]["commit"] == historical_campaign["source_commit"] \
+                        and campaign_view["source"]["tree"] == historical_campaign["source_tree"]:
                     corroborated = True
-            except (ValueError, OSError):
+            except (ValueError, OSError, ArtifactError):
                 corroborated = False
         if corroborated:
             historical_campaign = dict(historical_campaign)
