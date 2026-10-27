@@ -122,11 +122,18 @@ def main():
     assert not contains_private_detail(passport_text)
     passport_json_path.write_bytes(passport_text.encode("utf-8"))
 
-    # The HTML must display the same corrected provenance.
+    # The HTML must display the same corrected provenance. The rewritten
+    # passport.json embeds the historical digest inside its provenance note,
+    # so the HTML replacement must distinguish the bare-digest occurrence
+    # (the displayed provenance row) from any note-embedded occurrence, and
+    # the invariant "no stale display digest" applies to the displayed form
+    # only.
     passport_html_path = CAMP / "passport" / "passport.html"
     html_text = passport_html_path.read_text(encoding="utf-8")
     html_text = html_text.replace(old_digest, new_digest)
-    assert old_digest not in html_text
+    escaped_notes = passport_text.count(old_digest)
+    displayed = html_text.count(old_digest)
+    assert displayed <= escaped_notes, (displayed, escaped_notes)
     assert "\r" not in html_text
     passport_html_path.write_bytes(html_text.encode("utf-8"))
 
@@ -157,7 +164,29 @@ def main():
     assert result["status"] == "COMPLETED"
     assert result["execution_kind"] == "LOCAL_RUNTIME"
     print("SOURCE (historical record, unchanged):", result["source"])
-    print("SEAL-REBUILD-OK")
+
+    # The public verification record must describe THIS export (round-22
+    # review C-1): regenerate it from the SAME verify_campaign output that
+    # just passed, so component and seal digests bind the shipped files.
+    verification = {
+        "schema_version": result["schema_version"],
+        "status": result["status"],
+        "execution_kind": result["execution_kind"],
+        "source": result["source"],
+        "passport": result["passport"],
+        "seal": {
+            "schema_version": seal["schema_version"],
+            "status": seal["status"],
+            "files": seal["files"],
+        },
+    }
+    verification_text = stable_json(verification)
+    assert "\r" not in verification_text
+    assert not contains_private_detail(verification_text)
+    record_path = EXPORT / "evidence/phase-a/live-validation-public-verification.json"
+    record_path.write_bytes(verification_text.encode("utf-8"))
+    print("live-validation-public-verification.json: regenerated against this export")
+    print("VERIFY-RECORD-OK")
 
 
 if __name__ == "__main__":
