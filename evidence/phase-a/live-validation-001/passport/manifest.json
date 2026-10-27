@@ -1,8 +1,8 @@
 {
   "files": {
     "evaluation.json": "2927a6d06ba9324276b3ef149afcecead04d419bd8fec4f25e781a4887ab550c",
-    "passport.html": "1fe041619cb718f1d985f4662cad581311408624261fc76646c93a2eb1cc36bc",
-    "passport.json": "0a3248d9319d5ea091c2211bd8c2a4fcdd879c7d91ce67dbe5c866cb6b0ebff4",
+    "passport.html": "95040633ab38fe2a4c9f6546fc25a60eb95ef1d17985737f6f469460f3992a0a",
+    "passport.json": "ffd6fa3e52de0a52918af186a15f8804e4d0d076f9d857d502b1e35ecb56f97c",
     "trust.json": "2b10421d02e54690209fc2a85b69c0184245b915b644d415e26923f5277858dc"
   },
   "schema_version": "fitlab-bundle-v1"

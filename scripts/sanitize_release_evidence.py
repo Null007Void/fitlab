@@ -97,6 +97,39 @@ def main():
     campaign_eval = (CAMP / "evaluation.json").read_bytes()
     (CAMP / "passport" / "evaluation.json").write_bytes(campaign_eval)
     from fitlab_evaluation.artifacts import digest
+    # passport.json's displayed evaluation provenance must identify the
+    # Sanitized evaluation that actually ships in this bundle (round-21
+    # review C-1): rewrite source.evaluation_sha256 to the bundled bytes'
+    # digest while preserving every other field. The ORIGINAL historical
+    # digest remains disclosed inside the note below, so no provenance is
+    # silently replaced.
+    import re as _re
+    passport_json_path = CAMP / "passport" / "passport.json"
+    passport_text = passport_json_path.read_text(encoding="utf-8")
+    passport = json.loads(passport_text)
+    old_digest = passport["source"]["evaluation_sha256"]
+    new_digest = digest(campaign_eval)
+    passport["source"]["evaluation_sha256"] = new_digest
+    passport_text = stable_json(passport)
+    # Disclose the historical digest rewrite inside the JSON itself.
+    passport_text = passport_text.replace(
+        '"evaluation_sha256": "' + new_digest + '"',
+        '"evaluation_sha256": "' + new_digest + '", "note": "digest of the '
+        'sanitized evaluation copy shipped in this bundle; original '
+        'historical digest was ' + old_digest + '"',
+        1)
+    assert "\r" not in passport_text
+    assert not contains_private_detail(passport_text)
+    passport_json_path.write_bytes(passport_text.encode("utf-8"))
+
+    # The HTML must display the same corrected provenance.
+    passport_html_path = CAMP / "passport" / "passport.html"
+    html_text = passport_html_path.read_text(encoding="utf-8")
+    html_text = html_text.replace(old_digest, new_digest)
+    assert old_digest not in html_text
+    assert "\r" not in html_text
+    passport_html_path.write_bytes(html_text.encode("utf-8"))
+
     components = {}
     for component in sorted((CAMP / "passport").iterdir()):
         if component.is_file() and component.name != "manifest.json":
