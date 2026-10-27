@@ -84,8 +84,12 @@ _ANY_POSIX_FILE = re.compile(
     r"[^\s\"'<>|/]+(?:/[^\s\"'<>|/]+)*"
     r"|)"
     r"/"
+    r"(?:"
+    r"[^\s\"'<>|/]+"  # unguarded contiguous filename alternative (round-36 A-1)
+    r"|"
     r"(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/]+(?: [^\s\"'<>|/]+)?"
+    r"[^\s\"'<>|/]+ [^\s\"'<>|/]+"
+    r")"
     r"\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
@@ -277,6 +281,7 @@ def contains_private_detail(value):
         _POSIX_USER,
         _POSIX_PATH,
         _ANY_POSIX_FILE,
+        _ROOT_POSIX_FILE,
         _IPV6,
         _HOME_SEGMENT,
         _EMAIL,

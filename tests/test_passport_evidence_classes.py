@@ -206,6 +206,15 @@ class EvidenceClassMappingTests(unittest.TestCase):
             ):
                 build_report(self.trust, historical=binding)
 
+    def test_root_level_posix_file_redacted_and_scanned(self):
+        # Round-36: unknown-root contiguous files ("/custom/model.gguf") are
+        # redacted; the scanner includes the root-level rule.
+        from fitlab_evaluation.redact import (
+            contains_private_detail, redact_text)
+        self.assertEqual(redact_text("/custom/model.gguf"), "[redacted]")
+        self.assertTrue(contains_private_detail("/custom/model.gguf"))
+        self.assertTrue(contains_private_detail("/confidential.gguf"))
+
     def test_publication_scanner_sees_user_profile_patterns(self):
         # Round-34 A-1: contains_private_detail must include the dedicated
         # user-profile patterns, otherwise a single-backslash
