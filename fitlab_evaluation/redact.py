@@ -16,7 +16,7 @@ import re
 REDACTED = "[redacted]"
 
 # Windows drive-letter path without spaces.
-_WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
+_WINDOWS_PATH = re.compile(r"[A-Za-z]:[/\\][^\s\"'<>|]*", re.IGNORECASE)
 # Windows file paths: drive-anchored, final filename CONTIGUOUS with its
 # suffix. Interior segments are space-free single tokens; the filename tail
 # directly before the anchor suffix may contain ONE space, ONLY when the
@@ -50,7 +50,8 @@ _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
 # The root must be followed by a separator first, so ordinary prose
 # ("the Users group") is untouched.
 _WINDOWS_USER = re.compile(
-    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)"
+    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)",
+    re.IGNORECASE,
 )
 _POSIX_USER = re.compile(
     r"/(?:home|Users)/(?![/\s])"

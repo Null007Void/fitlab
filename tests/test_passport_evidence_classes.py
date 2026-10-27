@@ -125,19 +125,21 @@ class EvidenceClassMappingTests(unittest.TestCase):
         self.assertIn(SYNTHETIC_TEST_EVIDENCE, html)
 
     def test_historical_binding_is_explicit_and_labelled(self):
+        # Round-28 A-2: shape-valid history alone is a DECLARATION, not
+        # HISTORICAL MEASURED EVIDENCE; the measured class requires
+        # corroborating verified LOCAL_RUNTIME evidence bound to the same
+        # source identity.
         report = build_report(self.trust, historical=HISTORICAL)
         bound = report["historical_campaign"]
         self.assertEqual(bound["request_count"], 69)
         self.assertEqual(bound["source_commit"], HISTORICAL["source_commit"])
         self.assertEqual(bound["source_tree"], HISTORICAL["source_tree"])
-        self.assertEqual(bound["evidence_class"], "MEASURED")
-        self.assertEqual(bound["evidence_label"], HISTORICAL_MEASURED_EVIDENCE)
-        self.assertEqual(report["evidence_class"], HISTORICAL_MEASURED_EVIDENCE)
+        self.assertEqual(bound["evidence_class"], "DECLARED")
+        self.assertFalse(bound["evidence_corroborated"])
         # Binding earlier evidence never measures anything in this report.
         self.assertEqual(report["capability_verdict"], "NOT_EVALUATED")
         self.assertNotIn("MEASURED", {claim["evidence_label"] for claim in report["claims"]})
         html = render_report(report, self.trust, historical=HISTORICAL)
-        self.assertIn(HISTORICAL_MEASURED_EVIDENCE, html)
         self.assertIn(HISTORICAL["source_commit"], html)
         self.assertIn("69", html)
 
@@ -193,14 +195,14 @@ class EvidenceClassMappingTests(unittest.TestCase):
             export_report(destination, self.trust, historical=HISTORICAL)
             payload = json.loads((destination / "passport.json").read_text("utf-8"))
             self.assertEqual(payload["historical_campaign"]["request_count"], 69)
+            # Round-28 A-2: without a corroborating verified record, the
+            # binding is a declaration, not measured evidence.
             self.assertEqual(
-                payload["historical_campaign"]["evidence_label"],
-                HISTORICAL_MEASURED_EVIDENCE,
-            )
+                payload["historical_campaign"]["evidence_class"], "DECLARED")
+            self.assertFalse(
+                payload["historical_campaign"]["evidence_corroborated"])
             self.assertEqual(payload["evaluation_state"], "NO_EVIDENCE")
-            self.assertEqual(payload["evidence_class"], HISTORICAL_MEASURED_EVIDENCE)
             html = (destination / "passport.html").read_text("utf-8")
-            self.assertIn(HISTORICAL_MEASURED_EVIDENCE, html)
             self.assertIn(HISTORICAL["delivery_sha256"], html)
 
 

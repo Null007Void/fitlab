@@ -285,4 +285,5 @@ def _verify(r,trust,pack):
             'planning_input':r['planning_input'],'planning_output':r['planning_output'],
             'measurement_eligible':r['execution_kind']=='LOCAL_RUNTIME' and summary['measured_count']>0,
             'complete_protocol':status=='COMPLETED' and repeats==3,
-            'run_id':r['run_id'],'origin':'Execution origin is declared, not cryptographically authenticated.'}
+            'run_id':r['run_id'],'origin':'Execution origin is declared, not cryptographically authenticated.',
+            'source_binding':{'commit':trust['source_commit'],'tree':trust['source_tree']}}

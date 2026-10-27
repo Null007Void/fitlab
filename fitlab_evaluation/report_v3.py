@@ -142,6 +142,14 @@ def _validate_historical(binding):
         raise ArtifactError("INVALID_HISTORICAL_BINDING")
     if type(note) is not str or not 0 < len(note) <= 512:
         raise ArtifactError("INVALID_HISTORICAL_BINDING")
+    # HISTORICAL MEASURED EVIDENCE is a strong claim: shape validity alone
+    # does not make a synthetic campaign identifier "measured" (round-28
+    # A-2). The binding is accepted as an identified DECLARATION of an
+    # earlier campaign; the measured class is assigned ONLY with a verified
+    # LOCAL_RUNTIME record whose source binding matches the campaign's
+    # source identity, or when the caller separately vouches (the
+    # acceptance-lane path). Without that corroboration the metadata is
+    # presented as DECLARED (an assertion, not a measurement).
     return {
         "campaign_id": campaign,
         "request_count": requests,
@@ -149,9 +157,33 @@ def _validate_historical(binding):
         "source_tree": tree,
         "delivery_sha256": delivery,
         "note": note,
-        "evidence_class": MEASURED,
-        "evidence_label": evidence_label(MEASURED, historical=True),
+        "evidence_class": DECLARED,
+        "evidence_label": evidence_label(DECLARED),
+        "evidence_corroborated": False,
     }
+
+
+def _corroborate_historical(binding, verified):
+    """Promote a historical binding to MEASURED only with matching verified
+    LOCAL_RUNTIME evidence bound to the same source identity."""
+    if binding is None or verified is None:
+        return binding
+    record = verified.get("_record") if isinstance(verified, dict) else None
+    if record is None:
+        return binding
+    if record.get("execution_kind") != "LOCAL_RUNTIME":
+        return binding
+    sources = record.get("source_sha256")
+    if type(sources) is not dict:
+        return binding
+    normalized = {k.replace("\\", "/"): v for k, v in sources.items()}
+    if normalized.get("fitlab_evaluation/run.py") is None:
+        return binding
+    binding = dict(binding)
+    binding["evidence_class"] = MEASURED
+    binding["evidence_label"] = evidence_label(MEASURED, historical=True)
+    binding["evidence_corroborated"] = True
+    return binding
 
 # The task tiers, used to separate the R2 core requirement from the
 # supplemental cases without ever changing a frozen grading criterion.
@@ -241,6 +273,19 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
     tiers = _load_tiers(trust)
     record_kind = None if verified is None else verified["execution_kind"]
     historical_campaign = _validate_historical(historical)
+    # Measured promotion requires corroborating verified LOCAL_RUNTIME
+    # evidence bound to the same source identity (round-28 A-2). The
+    # verified mapping carries the source binding; a historical declaration
+    # without corroboration stays DECLARED.
+    if historical_campaign is not None and verified is not None \
+            and verified.get("execution_kind") == "LOCAL_RUNTIME" \
+            and verified["source_binding"]["commit"] == historical_campaign["source_commit"] \
+            and verified["source_binding"]["tree"] == historical_campaign["source_tree"]:
+        historical_campaign = dict(historical_campaign)
+        historical_campaign["evidence_class"] = MEASURED
+        historical_campaign["evidence_label"] = evidence_label(
+            MEASURED, historical=True)
+        historical_campaign["evidence_corroborated"] = True
 
     claims = []
 
