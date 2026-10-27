@@ -149,6 +149,13 @@ def redact_text(value):
     """
     if type(value) is not str or not value:
         return value
+    # A previous redaction in THIS pipeline already namespaced the marker
+    #("[redacted:k]"); treat any generated marker as inert (redaction is
+    # idempotent for values produced by redact_with_distinct_identities —
+    # round-37 A-1) so double-pass flows (evaluate → stored_input →
+    # re-derived output) cannot rewrite the same identity twice.
+    if "[redacted:" in value:
+        return value
     result = value
     result = _UNC_PATH.sub(REDACTED, result)
     # User-profile identity segments BEFORE generic path grammar: the user

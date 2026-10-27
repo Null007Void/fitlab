@@ -206,6 +206,30 @@ class EvidenceClassMappingTests(unittest.TestCase):
             ):
                 build_report(self.trust, historical=binding)
 
+    def test_generated_user_profile_ids_are_idempotent(self):
+        # Round-37: a scenario_id that redacts to a namespaced user-profile
+        # marker ('\Users\[redacted:0]') must stay byte-exact on a second
+        # redaction pass, so the stored planning output and the
+        # re-derivation from stored input agree (verify_record requires this
+        # equality). Both Windows and POSIX roots are covered, plus multiple
+        # distinct ids.
+        doc = {"direction": "workload_to_hardware",
+               "scenarios": [
+                   {"scenario_id": chr(92) + "Users" + chr(92) + "sampleuser"},
+                   {"scenario_id": "/Users/otheruser"},
+               ],
+               "schema_version": 1}
+        from fitlab_evaluation.redact import (
+            redact_value, redact_with_distinct_identities)
+        from fitlab_foundation.serialization import to_primitive
+        sanitized, markers = redact_with_distinct_identities(to_primitive(doc))
+        first = [s["scenario_id"] for s in sanitized["scenarios"]]
+        self.assertEqual(len(set(first)), 2, first)
+        for token in first:
+            self.assertTrue("[redacted:" in token, token)
+            # Idempotency: the second pass must not change the marker.
+            self.assertEqual(redact_value(token), token)
+
     def test_root_level_posix_file_redacted_and_scanned(self):
         # Round-36: unknown-root contiguous files ("/custom/model.gguf") are
         # redacted; the scanner includes the root-level rule.
