@@ -144,9 +144,12 @@ def derive_profile(model_path, revision=None):
     if type(declared_name) is str and declared_name and \
             core.lower() not in declared_name.lower():
         # A header that NAMES a different model must never receive the frozen
-        # contract identity — that would forge provenance.
-        _fail("MODEL_IDENTITY_MISMATCH",
-              f"header declares {declared_name!r}, contract is {core!r}")
+        # contract identity — that would forge provenance. The supplied
+        # name is operator data and NEVER rides the code: cli.main
+        # publishes exc.code verbatim into stderr JSON and the doctor's
+        # model.reason, so an arbitrary GGUF name could otherwise inject
+        # unredacted content into error output (round-53 A-1).
+        _fail("MODEL_IDENTITY_MISMATCH")
 
     def meta(name):
         return metadata.get(prefix + name)

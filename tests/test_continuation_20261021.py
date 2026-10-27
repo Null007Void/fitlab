@@ -606,6 +606,32 @@ class HybridArchitectureTests(unittest.TestCase):
         )
         self.assertEqual((convolution, attention), ([], []))
 
+    def test_identity_mismatch_code_carries_no_header_content(self):
+        # Round-53 A-1: a mismatching general.name is operator data and
+        # must never ride the error code - cli.main publishes exc.code
+        # verbatim into stderr JSON and the doctor's model.reason, so the
+        # supplied name string is dropped entirely.
+        from fitlab_evaluation.model_profile import derive_profile
+        from fitlab_evaluation.artifacts import ArtifactError as ProfileError
+        with tempfile.TemporaryDirectory() as directory:
+            path = _write_gguf(
+                directory,
+                {
+                    "general.architecture": (8, "lfm2"),
+                    "general.name": (8, "hostile C:/Users/sampleuser/leak.gguf"),
+                    "general.file_type": (4, 15),
+                    "lfm2.block_count": (4, 4),
+                    "lfm2.embedding_length": (4, 64),
+                    "lfm2.attention.head_count": (4, 4),
+                },
+                [("blk.0.shortconv.in_proj.weight", [64, 192], 12)],
+            )
+            with self.assertRaises(ProfileError) as refused:
+                derive_profile(path, "r")
+            self.assertEqual(refused.exception.code, "MODEL_IDENTITY_MISMATCH")
+            self.assertNotIn("sampleuser", str(refused.exception))
+            self.assertNotIn("leak.gguf", str(refused.exception))
+
     def test_excessive_block_count_is_refused_before_classification(self):
         # Round-42: a structurally valid GGUF can declare a UINT64-maximum
         # block_count; classify_blocks would iterate range(block_count) and
