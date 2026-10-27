@@ -42,7 +42,14 @@ MAX_QUANTIZATION_NAME = 64
 MAX_METADATA_RESIDENCY_BYTES = 64 * 1024 * 1024
 MAX_DISCARDED_BYTES = 512 * 1024 * 1024
 _SCALAR_ITEM_RESIDENCY_BYTES = 32
-_DESCRIPTOR_DIMENSION_RESIDENCY_BYTES = 64
+# Tensor descriptors: the retained cost is dominated by container objects,
+# not the parsed bytes - on 64-bit CPython a six-entry descriptor dict, the
+# outer-list slot, shape list and the offset/elements integer objects cost
+# hundreds of bytes per descriptor (round-48 A-1), so a conservative fixed
+# footprint plus per-dimension list-slot/int-object cost is charged BEFORE
+# allocation instead of charging only the parsed field widths.
+_DESCRIPTOR_FIXED_RESIDENCY_BYTES = 384
+_DESCRIPTOR_DIMENSION_RESIDENCY_BYTES = 96
 
 # GGUF value type identifiers.
 UINT8, INT8, UINT16, INT16, UINT32, INT32, FLOAT32, BOOL, STRING, ARRAY, UINT64, INT64, FLOAT64 = range(13)
@@ -265,9 +272,13 @@ def _read_tensor_descriptors(reader, tensor_count):
         dimensions = reader.unpack("<I", 4)
         if dimensions > MAX_TENSOR_DIMS:
             _fail("GGUF_TOO_MANY_DIMENSIONS")
-        # Charge the descriptor's retained footprint (shape ints + dict)
-        # BEFORE unpacking the dimensions.
-        reader.charge(dimensions * _DESCRIPTOR_DIMENSION_RESIDENCY_BYTES)
+        # Charge the descriptor's retained footprint BEFORE unpacking the
+        # dimensions: a conservative fixed container cost (dict, outer
+        # list slot, numeric objects) plus per-dimension object costs.
+        reader.charge(
+            _DESCRIPTOR_FIXED_RESIDENCY_BYTES
+            + dimensions * _DESCRIPTOR_DIMENSION_RESIDENCY_BYTES
+        )
         shape = [reader.unpack("<Q", 8) for _ in range(dimensions)]
         quantized_type = reader.unpack("<I", 4)
         offset = reader.unpack("<Q", 8)

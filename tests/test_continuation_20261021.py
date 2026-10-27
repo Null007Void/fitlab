@@ -298,6 +298,37 @@ class GgufParserTests(unittest.TestCase):
             with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
                 read_metadata(path2)
 
+    def test_descriptor_container_footprint_enforces_retained_budget(self):
+        # Round-48 A-1: descriptors charge a conservative fixed container
+        # footprint plus per-dimension object costs BEFORE allocation. A
+        # structurally valid file of many small one-dimensional tensors
+        # (~424 bytes actual residency each, formerly charged only name +
+        # dims*64) must be refused once the retained budget is crossed -
+        # 200k such descriptors retain ~85 MB while formerly charging
+        # only ~32 MB.
+        with tempfile.TemporaryDirectory() as directory:
+            count = 200000
+            parts = [
+                b"GGUF", struct.pack("<I", 3),
+                struct.pack("<Q", count),
+                struct.pack("<Q", 1),
+                struct.pack("<Q", 20), b"general.architecture",
+                struct.pack("<I", 8), struct.pack("<Q", 4), b"lfm2",
+            ]
+            # t399999-style six-digit names, 1 dimension, F32 (type 0),
+            # one-byte offsets; required payload fits in MAX_FILE_BYTES.
+            for index in range(count):
+                name = b"t%06d" % index
+                parts.append(struct.pack("<Q", len(name)) + name)
+                parts.append(struct.pack("<I", 1))
+                parts.append(struct.pack("<Q", 2))
+                parts.append(struct.pack("<I", 0))
+                parts.append(struct.pack("<Q", index))
+            path = Path(directory) / "descriptor-flood.gguf"
+            path.write_bytes(b"".join(parts))
+            with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
+                read_metadata(path)
+
     def test_repeated_discarded_keys_refused_and_numeric_items_charged(self):
         # Round-47 A-1: the reported trigger - repeated
         # tokenizer.ggml.token_type arrays of 1,048,576 UINT64 items each,
