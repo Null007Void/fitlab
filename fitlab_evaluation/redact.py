@@ -154,18 +154,24 @@ def redact_text(value):
         # This string carries at least one generated marker from a previous
         # pass in THIS pipeline (round-37/38 A-1). Protect ONLY the marker
         # tokens via placeholders. Placeholder collision handling
-        # (round-39 A-1): markers are stashed into \x01-delimited slots, but
-        # if \x01 already occurs in the input, the placeholder would be
-        # ambiguous — in that case redact NOTHING in this string (fail-safe)
-        # and let the publication privacy scan judge it. \x01 cannot appear
-        # in strict JSON input, but imported records are not guaranteed.
+        # (round-39/40 A-1): each marker is stashed into a placeholder slot
+        # that is verified NOT to occur anywhere in the input (bump the
+        # slot index until unique) and NOT to collide with earlier slots
+        # (\x01-delimited numeric slots cannot cross boundaries). Redaction
+        # is therefore NEVER skipped, and restore is unambiguous.
         import re as _re
-        if "\x01" in value:
-            return value
-        markers_found = []
         def _stash(match):
-            markers_found.append(match.group(0))
-            return "\x01" + str(len(markers_found) - 1) + "\x01"
+            token = match.group(0)
+            idx = 0
+            while True:
+                ph = "\x01" + str(idx) + "\x01"
+                if ph in value or any(ph in existing_ph
+                                      for existing_ph, _ in markers_found):
+                    idx += 1
+                    continue
+                break
+            markers_found.append((ph, token))
+            return ph
         stash_pattern = _re.compile(r"\[redacted:\d+\]")
         result = stash_pattern.sub(_stash, value)
     else:
@@ -192,8 +198,8 @@ def redact_text(value):
     result = _MAC.sub(REDACTED, result)
     result = _IPV4.sub(REDACTED, result)
     result = _RESERVED_HOSTNAME.sub(REDACTED, result)
-    for index, token in enumerate(markers_found):
-        result = result.replace("\x01" + str(index) + "\x01", token)
+    for ph, token in markers_found:
+        result = result.replace(ph, token)
     return result
 
 

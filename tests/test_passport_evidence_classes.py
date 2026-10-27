@@ -267,6 +267,18 @@ class EvidenceClassMappingTests(unittest.TestCase):
         self.assertTrue(contains_private_detail("/custom/model.gguf"))
         self.assertTrue(contains_private_detail("/confidential.gguf"))
 
+    def test_marker_plus_escaped_control_still_redacts_path(self):
+        # Round-40: a marker followed by a U+0001 control char and a private
+        # path must still lose the path — collision-free placeholder
+        # allocation means redaction is never skipped.
+        from fitlab_evaluation.redact import redact_value
+        out = redact_value(
+            "[redacted:0]\x01 " + chr(92) + "Users" + chr(92)
+            + "sampleuser" + chr(92) + "secret.txt")
+        self.assertIn("[redacted:0]", out)
+        self.assertNotIn("sampleuser", out)
+        self.assertNotIn("secret.txt", out)
+
     def test_publication_scanner_sees_user_profile_patterns(self):
         # Round-34 A-1: contains_private_detail must include the dedicated
         # user-profile patterns, otherwise a single-backslash
