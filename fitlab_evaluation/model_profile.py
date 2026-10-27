@@ -107,6 +107,17 @@ def derive_profile(model_path, revision=None):
     architecture = summary.get("architecture")
     prefix = f"{architecture}." if architecture else ""
 
+    # An operator-supplied GGUF must actually be the frozen contract model:
+    # attributing arbitrary header metadata to the fixed checkpoint identity
+    # would forge provenance. Accept header names that carry the model
+    # token (case-insensitive); refuse anything explicitly different.
+    declared_name = summary.get("name")
+    if type(declared_name) is str and declared_name:
+        core = MODEL.split("/")[-1].replace(".gguf", "").split(":")[0]
+        if core.lower() not in declared_name.lower():
+            _fail("MODEL_IDENTITY_MISMATCH",
+                  f"header declares {declared_name!r}, contract is {core!r}")
+
     def meta(name):
         return metadata.get(prefix + name)
 
@@ -125,17 +136,6 @@ def derive_profile(model_path, revision=None):
         _fail("MODEL_METADATA_INCOMPLETE", "embedding_length")
     if type(head_count) is not int or head_count <= 0:
         _fail("MODEL_METADATA_INCOMPLETE", "attention.head_count")
-
-    # An operator-supplied GGUF must actually be the frozen contract model:
-    # attributing arbitrary header metadata to the fixed checkpoint identity
-    # would forge provenance. Accept header names that carry the model
-    # token (case-insensitive); refuse anything explicitly different.
-    declared_name = summary.get("name")
-    if type(declared_name) is str and declared_name:
-        core = MODEL.split("/")[-1].replace(".gguf", "").split(":")[0]
-        if core.lower() not in declared_name.lower():
-            _fail("MODEL_IDENTITY_MISMATCH",
-                  f"header declares {declared_name!r}, contract is {core!r}")
 
     convolution_blocks, attention_blocks = classify_blocks(
         summary["tensors"], block_count
