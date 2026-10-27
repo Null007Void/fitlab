@@ -22,6 +22,20 @@ MAX_ARRAY_ITEMS = 1 << 20
 MAX_TENSOR_DIMS = 8
 MAX_QUANTIZATION_NAME = 64
 
+# Cumulative retained-residency budget for everything the parser builds
+# (metadata strings, array items and tensor descriptors). Per-field limits
+# alone permit hostile combinations - e.g. thousands of 1 MiB retained
+# strings - whose aggregate allocation exhausts memory before any later
+# gate runs (round-45 A-1). Every component is charged BEFORE it is
+# allocated: strings from their declared byte length, scalar array items
+# and descriptor dimensions at fixed footprints. 64 MiB is roughly three
+# orders of magnitude above the largest metadata any planner-relevant
+# model carries (vocab arrays are counted but discarded) and caps the
+# former multi-gigabyte exposure.
+MAX_METADATA_RESIDENCY_BYTES = 64 * 1024 * 1024
+_SCALAR_ITEM_RESIDENCY_BYTES = 32
+_DESCRIPTOR_DIMENSION_RESIDENCY_BYTES = 64
+
 # GGUF value type identifiers.
 UINT8, INT8, UINT16, INT16, UINT32, INT32, FLOAT32, BOOL, STRING, ARRAY, UINT64, INT64, FLOAT64 = range(13)
 
@@ -95,14 +109,27 @@ def _fail(code, detail=""):
 class _Reader:
     """Sequential, length-bounded reader over a file handle."""
 
-    def __init__(self, handle, limit):
+    def __init__(self, handle, limit, residency_budget):
         self._handle = handle
         self._limit = limit
         self._offset = 0
+        self._residency_budget = residency_budget
+        self._residency = 0
 
     @property
     def offset(self):
         return self._offset
+
+    def charge(self, amount):
+        """Charge declared parse residency BEFORE the allocation happens.
+
+        A charge that crosses the budget fails with a stable code, so a
+        hostile declaration can never drive the parser into unbounded
+        allocation or a MemoryError at process scale.
+        """
+        if self._residency + amount > self._residency_budget:
+            _fail("GGUF_METADATA_BUDGET_EXCEEDED")
+        self._residency += amount
 
     def read(self, count):
         if count < 0 or self._offset + count > self._limit:
@@ -136,6 +163,8 @@ class _Reader:
         length = self.unpack("<Q", 8)
         if length > MAX_STRING_BYTES:
             _fail("GGUF_STRING_TOO_LARGE")
+        # Charge the declared payload BEFORE reading or decoding it.
+        self.charge(length)
         raw = self.read(length)
         try:
             return raw.decode("utf-8")
@@ -149,6 +178,8 @@ class _Reader:
             _fail("GGUF_ARRAY_TOO_LARGE")
         if element_type == ARRAY:
             _fail("GGUF_UNSUPPORTED_VALUE_TYPE")
+        # Charge the declared item footprint BEFORE building the list.
+        self.charge(count * _SCALAR_ITEM_RESIDENCY_BYTES)
         return [self.scalar(element_type) for _ in range(count)]
 
 
@@ -193,6 +224,9 @@ def _read_tensor_descriptors(reader, tensor_count):
         dimensions = reader.unpack("<I", 4)
         if dimensions > MAX_TENSOR_DIMS:
             _fail("GGUF_TOO_MANY_DIMENSIONS")
+        # Charge the descriptor's retained footprint (shape ints + dict)
+        # BEFORE unpacking the dimensions.
+        reader.charge(dimensions * _DESCRIPTOR_DIMENSION_RESIDENCY_BYTES)
         shape = [reader.unpack("<Q", 8) for _ in range(dimensions)]
         quantized_type = reader.unpack("<I", 4)
         offset = reader.unpack("<Q", 8)
@@ -222,7 +256,7 @@ def read_metadata(path):
         _fail("GGUF_UNUSABLE_SIZE")
     try:
         with source.open("rb") as handle:
-            reader = _Reader(handle, size)
+            reader = _Reader(handle, size, MAX_METADATA_RESIDENCY_BYTES)
             if reader.read(4) != MAGIC:
                 _fail("GGUF_BAD_MAGIC")
             version = reader.unpack("<I", 4)

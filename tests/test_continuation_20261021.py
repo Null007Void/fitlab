@@ -197,6 +197,44 @@ class GgufParserTests(unittest.TestCase):
             with self.assertRaisesRegex(ArtifactError, "GGUF_TENSOR_OFFSET_OUT_OF_RANGE"):
                 read_metadata(path)
 
+    def test_retained_metadata_residency_is_capped_before_allocation(self):
+        # Round-45 A-1: per-field limits alone allowed retained metadata
+        # arrays whose aggregate allocation exhausts memory before any
+        # later gate runs; the cumulative budget must refuse the crossing
+        # charge BEFORE allocation, with a stable error code. 65 declared
+        # 1 MiB strings charge 65 MiB > the 64 MiB budget, so the 65th
+        # string is refused at its pre-charge with ~64 MiB peak residency.
+        with tempfile.TemporaryDirectory() as directory:
+            header = b"GGUF" + struct.pack("<I", 3)
+            header += struct.pack("<Q", 1)
+            header += struct.pack("<Q", 2)
+            header += struct.pack("<Q", 20) + b"general.architecture"
+            header += struct.pack("<I", 8) + struct.pack("<Q", 4) + b"lfm2"
+            header += struct.pack("<Q", 14) + b"attacker.array"
+            header += struct.pack("<I", 9) + struct.pack("<I", 8)
+            header += struct.pack("<Q", 65)
+            piece = b"p" * (1 << 20)
+            payload = b"".join([struct.pack("<Q", 1 << 20) + piece] * 65)
+            path = Path(directory) / "model.gguf"
+            path.write_bytes(header + payload)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
+                read_metadata(path)
+            # Normal models stay far below the budget and parse cleanly.
+            ok = _write_gguf(
+                directory,
+                {
+                    "general.architecture": (8, "lfm2"),
+                    "lfm2.block_count": (4, 4),
+                    "lfm2.embedding_length": (4, 64),
+                    "lfm2.attention.head_count": (4, 4),
+                    "tokenizer.ggml.tokens": (9, (8, [f"tok{i}" for i in range(2000)])),
+                },
+                [("blk.0.attn_q.weight", [64, 64], 12)],
+            )
+            raw = read_metadata(ok)
+            self.assertEqual(raw["metadata"]["lfm2.block_count"], 4)
+            self.assertEqual(raw["metadata"]["token_count"], 2000)
+
     def test_rejects_missing_tensor_payload(self):
         with tempfile.TemporaryDirectory() as directory:
             path = _write_gguf(directory, {}, [("weight", [8], 0)], include_tensor_data=False)
