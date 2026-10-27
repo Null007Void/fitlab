@@ -31,9 +31,10 @@ oracle. They are retained, not retried, per the protocol failure policy.
 
 ## 2. Source, campaign identity and scope
 
-- Lane HEAD at start and after the run: `c3d72d72d93e35ea6963c3f3fdaa34c39a7e3ca5`
-  (tree `88c6bfef5183548e39447f82e5dd3b3786a4e89e`), branch
-  `work/fitlab-f5-corrective-20261022`, working tree clean before the run.
+- Source HEAD at start and after the run: `c3d72d72d93e35ea6963c3f3fdaa34c39a7e3ca5`
+  (tree `88c6bfef5183548e39447f82e5dd3b3786a4e89e`), working tree clean
+  before the run. (The branch name is an internal engineering label and is
+  not part of this release.)
 - Protocol: `fitlab-f5-v1`; order "round-major, frozen case order"; first row is
   labelled `first_observed_request` on an already-loaded model
   (`cold_load_measured: false`, cache state unknown); no warmup requests.
@@ -206,19 +207,16 @@ Both counts match the expected 248 for this repository, and both runs exit 0.
 The suite is deterministic and contacts no model or external service
 (documented in docs/INSTALL_AND_REPRODUCE.md:36-39).
 
-### Deviation from the dispatched procedure (recorded honestly)
+### Note on the test environment (recorded honestly)
 
-The internal dispatch (project record, not part of this repository) referenced a `TEST_REPORT.md` and a
-`requirements-dev.lock`/`pip install --require-hashes` step. Neither file
-exists in this repository: it is standard-library-only with no third-party
-dependencies, and docs/INSTALL_AND_REPRODUCE.md:14-15 states explicitly that
-there is "no `pip install` step, no build step and no lockfile". No lockfile
-was invented, no network install was attempted, and no existing file was
-modified. A `py -3.13 -m venv` environment was created outside the repository
-(`--system-site-packages`, so the already-installed pytest 9.1.1 is visible),
-and both suites were run with that interpreter. This preserves the intent
-(isolated Python 3.13 interpreter, no downloads) without fabricating a lock
-step the product does not have.
+The product has no lockfile and no third-party dependencies (stdlib-only;
+see docs/INSTALL_AND_REPRODUCE.md). No lockfile was invented, no network
+install was attempted, and no existing file was modified. A `py -3.13 -m
+venv` environment was created outside the repository (`--system-site-packages`,
+so the already-installed pytest 9.1.1 is visible), and both suites were run
+with that interpreter. This preserves the intent (isolated Python 3.13
+interpreter, no downloads) without fabricating a lock step the product does
+not have.
 
 ## 9. Evidence class and limits
 

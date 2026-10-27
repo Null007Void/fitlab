@@ -23,13 +23,28 @@ are no third-party packages. Clone the repository and run from its root.
 | WSL | Partial | A DrvFS mount rejects the required non-replacing rename and the export fails explicitly with `ATOMIC_PUBLICATION_UNSUPPORTED`. Do not substitute a replacing rename. |
 | macOS | Unverified | The native memory reader is Windows-specific. The `gate` command requires Windows. |
 
+## Installing the `fitlab` command
+
+From a clone of this repository:
+
+```powershell
+python -m pip install .
+fitlab --help
+```
+
+`pip install .` exposes the console script `fitlab` (entry point
+`fitlab_evaluation.public_cli:main`; packaging metadata in
+`pyproject.toml`). Without installing, the same commands work as modules:
+`python -m fitlab_evaluation.public_cli inspect|evaluate|passport`. No
+third-party packages are required either way.
+
 ## Reproducing the offline results
 
 ```powershell
 python -W error -m unittest discover -s tests -v
 ```
 
-Expected result: `OK` (257 tests / 276 subtests as of this release).
+Expected result: `OK` (258 tests / 276 subtests as of this release).
 Warnings are treated as errors, so a deprecation in any
 dependency would fail the run rather than pass quietly.
 
@@ -41,8 +56,9 @@ loopback listeners for transport tests.
 ## Reproducing a Capability Passport
 
 ```powershell
-python -m fitlab_evaluation.cli trust --output-dir out/source
-python -m fitlab_evaluation.cli passport --trust out/source/trust.json --output-dir out/passport
+mkdir out\source, out\passport  # output parents must exist; publication never creates them (no-overwrite contract)
+python -m fitlab_evaluation.cli trust --output-dir out\source
+python -m fitlab_evaluation.cli passport --trust out\source\trust.json --output-dir out\passport
 ```
 
 The output is byte-for-byte deterministic for identical inputs and the same

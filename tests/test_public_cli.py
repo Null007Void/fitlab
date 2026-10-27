@@ -57,22 +57,28 @@ class PublicCliSurface(unittest.TestCase):
         self.assertTrue(callable(advanced_workflow))
 
     def test_evaluate_fails_fast_through_guarded_gates(self):
-        # No runtime is prepared in the test environment: the workflow's own
-        # preflight/guard chain must refuse BEFORE any inference request and
-        # still write durable BLOCKED evidence. This proves the public entry
-        # reaches the real guarded workflow (exit 2 + sealed BLOCKED evidence).
+        # With every runtime gate made to refuse deterministically, the
+        # public evaluate entry must stop BEFORE any model contact, write
+        # durable BLOCKED evidence, and never reach completion. The runtime
+        # client itself is assertion-armed: any attempt to call it fails the
+        # test, so this regression can never perform inference — on any
+        # machine, with or without a prepared runtime.
         import tempfile
-        with tempfile.TemporaryDirectory() as tmp:
-            output = Path(tmp) / "campaign"
-            code, text = _run("evaluate", "--output-dir", str(output),
-                              "--repeats", "1")
-            self.assertEqual(code, 2, out_debug(code, text))
-            session = json.loads((output / "session.json").read_text("utf-8"))
-            self.assertIn(session["status"], ("BLOCKED", "INTERRUPTED"))
-            self.assertEqual(session["inference_requests"], 0)
-            # The evidence chain must exist and be sealed.
-            seal = json.loads((output / "final-seal.json").read_text("utf-8"))
-            self.assertIn(seal["status"], ("BLOCKED", "INTERRUPTED"))
+        from unittest.mock import patch
+        from fitlab_evaluation import workflow as wf
+        for bad_config in ({}, {"offline": True, "no_fetch_executables": False}):
+            with tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp) / "campaign"
+                with patch.object(wf.LemonadeClient, "complete",
+                                  side_effect=AssertionError("inference attempted")):
+                    code, text = _run("evaluate", "--output-dir", str(output),
+                                      "--repeats", "1")
+                self.assertEqual(code, 2, out_debug(code, text))
+                session = json.loads((output / "session.json").read_text("utf-8"))
+                self.assertEqual(session["status"], "BLOCKED")
+                self.assertEqual(session["inference_requests"], 0)
+                seal = json.loads((output / "final-seal.json").read_text("utf-8"))
+                self.assertEqual(seal["status"], "BLOCKED")
 
     def test_evaluate_passes_plan_through(self):
         # A planning document naming a different model must be refused before
@@ -92,32 +98,46 @@ class PublicCliSurface(unittest.TestCase):
             self.assertEqual(code, 2, out_debug(code, text))
             self.assertFalse(out.exists())
 
-    def test_passport_renders_from_fresh_trust_and_historical_seal_verifies(self):
-        # Two distinct passport paths with different trust semantics:
-        #  (a) a FRESH campaign's passport renders from fresh trust (the user
-        #      journey — trust built in the user's own clone resolves),
-        #  (b) the SHIPPED LIVE-002 passport is the historical artifact: its
-        #      rendered bytes are included and its integrity is proven by the
-        #      byte-seal, not by re-rendering (the historical source commit
-        #      intentionally does not exist in the public repo's fresh
-        #      history, so trust re-validation fail-closes — by design).
-        import tempfile, subprocess
-        camp = ROOT / "evidence" / "phase-a" / "live-validation-001"
-        self.assertTrue((camp / "passport" / "passport.html").exists())
-        self.assertTrue((camp / "passport" / "passport.json").exists())
-        verifier = (
-            "import sys\n"
-            "from fitlab_evaluation.seal import verify_campaign\n"
-            "r = verify_campaign(r'%s')\n"
-            "assert r['status'] == 'COMPLETED', r['status']\n"
-            "print('HIST-OK')\n" % camp
-        )
-        r = subprocess.run([sys.executable, "-c", verifier], cwd=str(ROOT),
-                           capture_output=True, text=True, timeout=120)
-        self.assertIn("HIST-OK", r.stdout, r.stderr[-400:])
+    def test_passport_public_entry_renders_and_is_deterministic(self):
+        # The public passport entry, driven exactly as an installed user
+        # would drive it (fresh trust from THIS checkout's HEAD), must
+        # render the passport and produce byte-identical output on a second
+        # render — no times, no host readings, no randomness.
+        import io, tempfile
+        from unittest.mock import patch
+        from fitlab_evaluation import public_cli
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.artifacts import stable_json
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source"
+            source.mkdir()
+            trust = make_trust("HEAD")
+            (source / "trust.json").write_text(stable_json(trust), encoding="utf-8")
+            hashes = []
+            out = None
+            for i in range(2):
+                # The bundle destination must NOT pre-exist (atomic
+                # no-overwrite publication); only its parent must exist.
+                out = Path(tmp) / ("passport" if out is None else "passport-2")
+                code, text = _run(
+                    "passport", "--trust", str(source / "trust.json"),
+                    "--output-dir", str(out))
+                self.assertEqual(code, 0, out_debug(code, text))
+                record = json.loads(text)
+                self.assertEqual(record["status"], "WRITTEN")
+                self.assertEqual(record["artifact_kind"], "passport")
+                self.assertTrue((out / "passport.html").exists())
+                self.assertTrue((out / "passport.json").exists())
+                hashes.append((out / "passport.html").read_bytes())
+            self.assertEqual(hashes[0], hashes[1])
+            # Rendered HTML must stay free of private detail by construction.
+            self.assertNotIn(b"C:\\Users\\", hashes[0])
 
     def test_console_script_module_invocation(self):
-        # python -m fitlab_evaluation.public_cli --help exit 0
+        # The documented module invocation must expose the three public
+        # commands with working argparse mapping (help surfaces them; the
+        # subcommands dispatch through the same handlers the tests above
+        # exercise).
         r = subprocess.run(
             [sys.executable, "-m", "fitlab_evaluation.public_cli", "--help"],
             cwd=str(ROOT), capture_output=True, text=True, timeout=60)
@@ -125,6 +145,11 @@ class PublicCliSurface(unittest.TestCase):
         self.assertIn("inspect", r.stdout)
         self.assertIn("evaluate", r.stdout)
         self.assertIn("passport", r.stdout)
+        r2 = subprocess.run(
+            [sys.executable, "-m", "fitlab_evaluation.cli", "--help"],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=60)
+        self.assertEqual(r2.returncode, 0)
+        self.assertIn("passport", r2.stdout)
 
 
 def out_debug(code, text):

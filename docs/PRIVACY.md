@@ -101,11 +101,11 @@ signature. The report says so in its own provenance limit.
 
 ## Reporting a vulnerability
 
-This is a private pre-release project. Report a suspected issue to the owner
-through the existing private channel. Do not open a public issue for a
-security finding in a project that has not been published.
+Report suspected security issues privately to the repository owner via
+GitHub's private security-advisory feature for this repository rather than
+opening a public issue.
 
-## Not yet done
+## Known limitations
 
 - No third-party security audit has been performed.
 - The F1/F2/F3 scientific contracts have independent review from the

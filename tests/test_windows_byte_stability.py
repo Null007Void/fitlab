@@ -179,6 +179,14 @@ class AcceptedLIVE002EvidenceStillVerifies(unittest.TestCase):
         attributes = (ROOT / "evidence" / ".gitattributes").read_text("utf-8")
         self.assertIn("phase-a/live-validation-001/** -text", attributes)
 
+    def test_shipped_sealed_campaign_verifies(self):
+        # The shipped LIVE-002 qualification re-verifies byte-for-byte.
+        from fitlab_evaluation.seal import verify_campaign
+        result = verify_campaign(
+            ROOT / "evidence" / "phase-a" / "live-validation-001")
+        self.assertEqual(result["status"], "COMPLETED")
+        self.assertEqual(result["execution_kind"], "LOCAL_RUNTIME")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -28,6 +28,14 @@ to a canonical SHA-256. To verify a single file:
 git show HEAD:fitlab_evaluation/grader.py | git hash-object --stdin
 ```
 
+The bound digest is not a Git blob hash: it is the canonical source digest
+(line-ending-normalized content SHA-256, no Git object header). Compare with
+the product's own function:
+
+```powershell
+python -c "from fitlab_evaluation.artifacts import source_digest; from pathlib import Path; print(source_digest(Path('fitlab_evaluation/grader.py').read_bytes()))"
+```
+
 Compare against the value in `trust.json`.
 
 ## Layer 2 — the task pack is the frozen one
@@ -47,10 +55,13 @@ denominators.
 ## Layer 3 — the report is byte-reproducible
 
 ```powershell
-python -m fitlab_evaluation.cli trust --output-dir v1/source
-python -m fitlab_evaluation.cli passport --trust v1/source/trust.json --output-dir v1/passport
-python -m fitlab_evaluation.cli trust --output-dir v2/source
-python -m fitlab_evaluation.cli passport --trust v2/source/trust.json --output-dir v2/passport
+# Output parents must exist first: publication never creates them (atomic
+# no-overwrite contract). Non-Windows shells: use forward slashes.
+mkdir v1\source, v1\passport, v2\source, v2\passport
+python -m fitlab_evaluation.cli trust --output-dir v1\source
+python -m fitlab_evaluation.cli passport --trust v1\source\trust.json --output-dir v1\passport
+python -m fitlab_evaluation.cli trust --output-dir v2\source
+python -m fitlab_evaluation.cli passport --trust v2\source\trust.json --output-dir v2\passport
 
 (Get-FileHash v1/passport/passport.html -Algorithm SHA256).Hash
 (Get-FileHash v2/passport/passport.html -Algorithm SHA256).Hash
