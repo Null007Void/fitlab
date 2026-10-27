@@ -1,12 +1,18 @@
 # F5 live execution — one operation
 
-**Status: READY, NOT EXECUTED. Zero genuine inference requests have been made
-in this project. Genuine F5 acceptance requires a separately authorized safe
-window.**
+**Status: EXECUTED in the sealed LIVE-002 qualification (Lemonade 2026.43.3,
+8/8 authorized requests once: 6 pass / 2 retained model-output failures,
+`COMPLETED`, `complete_protocol=false` because this turnkey protocol runs 1
+repetition instead of the full 3). Its engine is the demonstrated live
+integration. A new run of this wrapper starts a NEW session directory
+(fresh evidence, never overwritten)
+in this project. LIVE-002 executed this procedure once under the owner's
+written authorization; any further full-protocol run (3 repetitions)
+requires its own fresh authorization.**
 
-This document is the complete procedure for the first genuine F5 run. It
-contains exactly one command. Everything else is preparation the owner
-performs before that command and verification the owner performs after it.
+This document is the complete procedure for one turnkey run. Its workflow
+command is the single operation that executes inference; everything else is
+preparation performed before it and verification performed after it.
 
 ## 1. The single operation
 
@@ -69,7 +75,8 @@ refuses to proceed on any mismatch. It never repairs, reloads or substitutes.
 
 | Field | Required value |
 |---|---|
-| Runtime version | `2026.42.1` |
+| Runtime version | tested with both `2026.42.1` (historical campaign) and
+`2026.43.3` (LIVE-002 qualification); both accepted by the compat check |
 | Model name | `LFM2.5-1.2B-Instruct-GGUF` |
 | Checkpoint | `LiquidAI/LFM2.5-1.2B-Instruct-GGUF:LFM2.5-1.2B-Instruct-Q4_K_M.gguf` |
 | Device | `cpu` |

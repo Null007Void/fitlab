@@ -115,6 +115,8 @@ opening a public issue.
   Q4_K_M on CPU, 8/8 authorized requests once, 6 pass / 2 retained
   model-output failures, `COMPLETED`/`FINISHED`; `complete_protocol=false`
   because the full protocol specifies 3 repetitions — bounded qualification,
-  not a general reliability claim). The live-only defences listed here are
-  therefore verified both by synthetic tests and by one sealed live run;
-  broader live coverage remains future work.
+  not a general reliability claim). That run exercised the compliant
+  execution path end-to-end at runtime; the refusal behaviours in the table
+  above (remote routing, enabled telemetry, dirty source, malformed records,
+  resource-gate failures) are verified by synthetic tests, not by live
+  refusal observations. Broader live coverage remains future work.

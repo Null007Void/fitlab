@@ -427,8 +427,9 @@ def _render_html(report):
     if verdict == "NOT_EVALUATED":
         headline = "No model capability has been measured yet."
         detail = (
-            "This report proves the engineering is sound and the evidence chain is honest. "
-            "It does not yet prove that this model runs well on this machine."
+            "This report records the completed planning and verification checks "
+            "listed below; no model capability has been measured, so it makes no "
+            "claim about how this model runs on this machine."
         )
     else:
         headline = "Measured outcomes exist for a fixed toy-task suite."
@@ -587,11 +588,14 @@ def _render_html(report):
         f"<li>{esc(text(x))}</li>" for x in report["limitations"]
     )
 
+    # Placeholders are written raw here and escaped once by esc() below;
+    # planning input and the passport output are distinct directories
+    # (publication is atomic and never overwrites).
     repro_steps = [
         "python -m fitlab_evaluation.cli doctor",
-        "python -m fitlab_evaluation.cli plan workload_to_hardware --output-dir &lt;new-dir&gt;",
-        "python -m fitlab_evaluation.cli trust --output-dir &lt;new-dir&gt;",
-        "python -m fitlab_evaluation.cli passport --trust &lt;new-dir&gt;/trust.json --output-dir &lt;new-dir&gt;",
+        "python -m fitlab_evaluation.cli plan workload_to_hardware --output-dir <plan-dir>",
+        "python -m fitlab_evaluation.cli trust --output-dir <trust-dir>",
+        "python -m fitlab_evaluation.cli passport --trust <trust-dir>/trust.json --output-dir <passport-dir>",
     ]
     repro = "".join(f"<li><code>{esc(step)}</code></li>" for step in repro_steps)
 

@@ -10,9 +10,19 @@ One entry point for the whole offline product surface:
     doctor     report the offline environment and source identity
 
 Every command is bounded, deterministic and offline. ``plan`` reads the local
-model's GGUF header; it never loads a model and never performs inference. Only
-``fitlab_evaluation.workflow run`` may issue inference requests, and only
-under an explicit owner-authorized safe window.
+model's GGUF header; it never loads a model and never performs inference.
+
+Inference entry points (two, both guarded, each under the same frozen task
+pack, grader and resource gates):
+  * ``python -m fitlab_evaluation.workflow run`` — the full orchestrated
+    campaign runner (ready-only runtime contract, sealed evidence).
+  * ``python -m fitlab_evaluation.run`` — the task-only evaluation loop with
+    the same frozen grader and gates (used by tests and harnesses); records
+    are validated by the same verifier.
+
+Neither entry issues a request unless a prepared, offline, already-running
+local runtime answers; without one they fail fast. Never retry failed model
+outputs.
 
 Errors are machine-readable JSON on stderr with exit status 2. Successful
 commands print a single JSON object on stdout.

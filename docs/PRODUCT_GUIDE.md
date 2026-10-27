@@ -1,6 +1,6 @@
 # Private offline product guide
 
-Python 3.11+ and the standard library are sufficient. No installation, dependency download, account or credential step is required. Run modules from the repository root. Native Windows Python is the supported MSI execution route. Linux ext4 supports offline exports; WSL DrvFS can reject atomic no-overwrite publication and returns ATOMIC_PUBLICATION_UNSUPPORTED. Do not substitute a replacing rename.
+Python 3.12+ (demonstrated on 3.13; 3.11 is incompatible — the seal integrity checks use pathlib.Path.is_junction) and the standard library are sufficient. No dependency download, account or credential step is required. Run modules from the repository root. Native Windows Python is the supported MSI execution route. Linux ext4 supports offline exports; WSL DrvFS can reject atomic no-overwrite publication and returns ATOMIC_PUBLICATION_UNSUPPORTED. Do not substitute a replacing rename.
 
 ## Deterministic Passport, with no model observations
 

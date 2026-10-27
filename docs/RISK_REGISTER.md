@@ -37,21 +37,20 @@ eligibility claim has been made anywhere in this project.
 
 **Owner action required.** Yes.
 
-### R3 — Zero genuine F5 measurements
+### R3 — Zero genuine F5 measurements — RESOLVED FOR THIS RELEASE (bounded)
 
-**Risk.** The defining scientific deliverable has no live observation. Every
-measurement in every current report is null, and the capability verdict is
-`NOT_EVALUATED`.
+**Risk (historical).** The offline engine alone could not demonstrate the
+central claim.
 
-**Impact.** A submission without measured evidence cannot demonstrate the
-central claim. The offline engineering is strong, but it is not the
-measurement.
+**Resolution.** The sealed LIVE-002 campaign executed the documented
+procedure under the owner's written authorization: 8/8 protocol requests
+once (6 pass / 2 retained model-output failures), `LOCAL_RUNTIME`,
+`COMPLETED`, seal `FINISHED`; `complete_protocol=false` because the full
+protocol specifies 3 repetitions — a bounded qualification, not a general
+reliability claim. Full-protocol coverage remains open future work.
 
-**Mitigation.** Execute the documented single-operation procedure in an
-authorized safe window (`docs/F5_TURNKEY.md`), then independently corroborate
-the execution origin.
-
-**Owner action required.** Yes.
+**Owner action required.** No for this release (bounded qualification is
+shipped); yes for any claim beyond it.
 
 ### R4 — Execution origin is declared, not authenticated
 
@@ -230,19 +229,19 @@ proposed package scope. The release inventory classifies every tracked file.
 
 ## Risk summary
 
-| ID | Risk | Severity | Owner action |
+| ID | Risk | Severity | Status for this release |
 |---|---|---|---|
-| R1 | No source license | Blocking | Yes |
-| R2 | Model license not established | Blocking | Yes |
-| R3 | Zero genuine F5 measurements | Blocking | Yes |
-| R4 | Execution origin unauthenticated | Blocking | Yes, for acceptance |
-| R5 | No destination or publication authorization | Blocking | Yes |
-| R6 | Engine does not model the hybrid architecture | High | Decision |
-| R7 | Single-host validation | High | No |
-| R8 | Resource floor blocks measurement | High | No |
-| R9 | Declared workload assumptions | Medium | No |
-| R10 | Known, not held-out tasks | Medium | No |
-| R11 | Cache state and cold start unknown | Medium | No |
-| R12 | No third-party security audit | Medium | No |
-| R13 | New GGUF reader | Low | No |
-| R14 | Growing evidence tree | Low | No |
+| R1 | No source license | Blocking | RESOLVED (MIT LICENSE + NOTICE) |
+| R2 | Model license not established | Blocking | Mitigated (external artifacts declared, not redistributed — NOTICE) |
+| R3 | Zero genuine F5 measurements | Blocking | RESOLVED, bounded (LIVE-002 sealed qualification; full protocol still open) |
+| R4 | Execution origin unauthenticated | Blocking | Open for acceptance beyond the recorded campaign (execution-origin corroboration) |
+| R5 | No destination or publication authorization | Blocking | RESOLVED (owner authorization for this release obtained) |
+| R6 | Engine does not model the hybrid architecture | High | Decision (documented; UNKNOWN by design) |
+| R7 | Single-host validation | High | Open (documented) |
+| R8 | Resource floor blocks measurement | High | Accepted (safety floor, not negotiable) |
+| R9 | Declared workload assumptions | Medium | Open (DECLARED class semantics) |
+| R10 | Known, not held-out tasks | Medium | Open (documented) |
+| R11 | Cache state and cold start unknown | Medium | Open (documented) |
+| R12 | No third-party security audit | Medium | Open (documented) |
+| R13 | New GGUF reader | Low | Open (header-only reads) |
+| R14 | Growing evidence tree | Low | RESOLVED for this release (curated allowlist export) |

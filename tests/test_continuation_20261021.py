@@ -338,7 +338,7 @@ class RedactionTests(unittest.TestCase):
             "Model at C:\\Users\\sampleuser\\models\\LFM.gguf",
             "Path C:/Users/sampleuser/AppData/Local/lemonade",
             "host /home/sampleuser/.cache/huggingface",
-            "mail owner@example.com",
+            "mail researcher@fitlab.invalid",
             "server 192.168.1.44:13305 running",
             "mac 00:1A:2B:3C:4D:5E",
             "\\\\FILESRV\\share\\model.gguf",
@@ -351,9 +351,9 @@ class RedactionTests(unittest.TestCase):
                 self.assertFalse(contains_private_detail(result))
 
     def test_redacts_paths_with_spaces_and_reserved_internal_hostnames(self):
-        value = "loaded from C:\\Users\\Alice Smith\\Secret Project\\model.gguf on workstation.internal.example"
+        value = "loaded from C:\\Users\\sampleuser\\Redacted Project\\model.gguf on host.redacted.invalid"
         result = redact_text(value)
-        self.assertNotIn("Alice Smith", result)
+        self.assertNotIn("Sample User", result)
         self.assertNotIn("Secret Project", result)
         self.assertNotIn("workstation.internal.example", result)
         self.assertFalse(contains_private_detail(result))
@@ -373,14 +373,14 @@ class RedactionTests(unittest.TestCase):
     def test_redacts_nested_structures(self):
         payload = {
             "label": "host at C:\\Users\\sampleuser\\x",
-            "items": ["mail a@b.co", {"deep": "/home/sampleuser/y"}],
+            "items": ["mail x@y.invalid", {"deep": "/home/sampleuser/y"}],
             "number": 7,
             "flag": True,
             "none": None,
         }
         result = redact_value(payload)
         self.assertNotIn("sampleuser", json.dumps(result))
-        self.assertNotIn("a@b.co", json.dumps(result))
+        self.assertNotIn("x@y.invalid", json.dumps(result))
         self.assertEqual(result["number"], 7)
         self.assertIs(result["flag"], True)
         self.assertIsNone(result["none"])

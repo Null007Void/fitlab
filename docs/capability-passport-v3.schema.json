@@ -101,7 +101,8 @@
           "value",
           "unit",
           "basis",
-          "limitation"
+          "limitation",
+          "evidence_label"
         ],
         "properties": {
           "id": {
@@ -142,6 +143,16 @@
           },
           "limitation": {
             "type": "string"
+          },
+          "evidence_label": {
+            "type": "string",
+            "enum": [
+              "MEASURED",
+              "ANALYTICAL ESTIMATE",
+              "SYNTHETIC TEST EVIDENCE",
+              "HISTORICAL MEASURED EVIDENCE",
+              "UNKNOWN"
+            ]
           }
         }
       }
@@ -160,7 +171,8 @@
           "observed",
           "passed",
           "planned",
-          "evidence_class"
+          "evidence_class",
+          "evidence_label"
         ],
         "properties": {
           "id": {
@@ -209,6 +221,16 @@
           "evidence_class": {
             "enum": [
               "MEASURED",
+              "UNKNOWN"
+            ]
+          },
+          "evidence_label": {
+            "type": "string",
+            "enum": [
+              "MEASURED",
+              "ANALYTICAL ESTIMATE",
+              "SYNTHETIC TEST EVIDENCE",
+              "HISTORICAL MEASURED EVIDENCE",
               "UNKNOWN"
             ]
           }
@@ -271,6 +293,60 @@
       "items": {
         "type": "string"
       }
+    },
+    "evidence_class": {
+      "type": "string"
+    },
+    "evidence_class_vocabulary": {
+      "type": "object",
+      "required": [
+        "analytical_estimate_from",
+        "machine",
+        "owner",
+        "unchanged",
+        "unsupported_presents_as"
+      ],
+      "properties": {
+        "analytical_estimate_from": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "machine": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unchanged": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsupported_presents_as": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "historical_campaign": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": true
+        }
+      ]
     }
   },
   "allOf": [

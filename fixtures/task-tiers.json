@@ -1,17 +1,27 @@
 {
   "schema_version": "fitlab-task-tiers-v1",
   "task_pack": "fixtures/tasks-v2.json",
-  "freeze_note": "Tier assignment for the frozen task pack. The R2 approved baseline requires six core tasks with at least three measured repetitions each (18 core observations). The F3 grader implementation freezes eight tasks. All six core cases are preserved unchanged; the two additional cases are supplemental and do not alter the core denominator. Grading criteria are identical for every tier and are not modified by this file.",
+  "freeze_note": "Tier assignment for the frozen task pack. The R2 approved baseline requires six core tasks with at least three measured repetitions each (18 core observations). The F3 grader implementation freezes eight tasks. Case identities, expected answers and grading criteria for the six core cases carry over unchanged from tasks-v1 to tasks-v2; the v2 pack additionally clarifies some prompt wording (disclosed inside tasks-v2.json). The two additional cases are supplemental and do not alter the core denominator. Grading criteria are identical for every tier and are not modified by this file.",
   "tiers": {
     "core": {
       "requirement": "R2 approved baseline: six core tasks, at least three measured repetitions per task.",
       "required_observations": 18,
-      "case_ids": ["E1", "E2", "E3", "D1", "D2", "D3"]
+      "case_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "D1",
+        "D2",
+        "D3"
+      ]
     },
     "supplemental": {
       "requirement": "Added before any sprint inference as extra invalid-argument negatives. Not part of the R2 core baseline and not required for baseline fulfilment.",
       "required_observations": 0,
-      "case_ids": ["D4", "D5"]
+      "case_ids": [
+        "D4",
+        "D5"
+      ]
     }
   },
   "grading": {

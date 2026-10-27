@@ -47,7 +47,7 @@ RUNTIME dependency set is the Python standard library only; building the
 editable install additionally declares `setuptools` as the build backend
 (declared, not a runtime dependency). (`inspect`/`passport` also
 work from a non-editable install; `evaluate`/`trust` require the editable
-checkout.
+checkout.)
 
 ## Reproducing the offline results
 

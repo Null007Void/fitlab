@@ -119,7 +119,7 @@ class SealedEvidenceCheckoutStability(unittest.TestCase):
                 else:
                     shutil.copy2(src, dst)
             _git("init", "-q", cwd=work)
-            _git("config", "user.email", "fixture@example.invalid", cwd=work)
+            _git("config", "user.email", "fixture@fitlab.invalid", cwd=work)
             _git("config", "user.name", "Byte Stability Fixture", cwd=work)
             _git("config", "core.autocrlf", "true", cwd=work)
             # Commit the product FIRST so make_trust("HEAD") resolves and the

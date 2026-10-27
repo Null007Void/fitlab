@@ -10,8 +10,10 @@ Pipeline per file (evaluation.json, session.json):
 Then: rebuild final-seal.json via the product's _write_final_seal-equivalent
 (inventory + FINISHED gates) and verify with verify_campaign().
 
- passport/* bundle files are byte-UNTOUCHED (their bundle hashes are inside
- manifest/final-seal and the passport already redacts shared prose).
+ passport/evaluation.json and passport/manifest.json ARE rewritten (the
+ passport's evaluation copy must carry the same redacted content, and the
+ bundle manifest must hash the current components). passport.html,
+ passport.json and passport/trust.json remain byte-untouched.
 """
 import hashlib
 import json

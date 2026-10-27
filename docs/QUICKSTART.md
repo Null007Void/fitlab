@@ -8,7 +8,7 @@ Everything below runs offline on a standard Python install.
 ```powershell
 git clone <repository-url> fitlab
 cd fitlab
-python --version          # 3.11 or newer
+python --version          # 3.12 or newer (3.13 demonstrated)
 ```
 
 There are no third-party dependencies. The standard library is enough.
@@ -66,8 +66,11 @@ estimate is constrained, what was actually demonstrated, what failed, what is
 unknown, and how to reproduce it.
 
 **If you have not run a genuine measurement, the Passport says so.** Every
-measurement reads "Unavailable" and the verdict reads "Not evaluated". That is
-the honest state, and it is the state this project has been in so far.
+measurement reads "Unavailable" and the verdict reads "Not evaluated" until
+you run `fitlab evaluate`. The shipped LIVE-002 campaign
+(`evidence/phase-a/live-validation-001/`) is the recorded bounded
+qualification: 8/8 protocol requests once, 6 pass / 2 retained failures,
+`complete_protocol=false` at one repetition.
 
 ## 6. Run the tests (60 seconds)
 

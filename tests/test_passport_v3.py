@@ -169,13 +169,13 @@ class PassportV3Tests(unittest.TestCase):
     def test_private_detail_is_redacted_from_rendered_output(self):
         provenance = {
             "model_id": "LFM2.5-1.2B-Instruct-GGUF",
-            "residency_assumption": "loaded from C:\\Users\\sampleuser\\model.gguf by owner@example.com",
+            "residency_assumption": "loaded from C:\\Users\\sampleuser\\model.gguf by researcher@fitlab.invalid",
         }
         host = {"cpu_brand": "Intel(R) Core(TM) Ultra 7 155H"}
         report = build_report(self.trust, None, None, None, provenance, host)
         serialized = json.dumps(report)
         self.assertNotIn("sampleuser", serialized)
-        self.assertNotIn("owner@example.com", serialized)
+        self.assertNotIn("researcher@fitlab.invalid", serialized)
         self.assertNotIn("C:\\\\Users", serialized)
         html = render_report(report, self.trust, None, None, None, provenance, host)
         self.assertNotIn("sampleuser", html)
