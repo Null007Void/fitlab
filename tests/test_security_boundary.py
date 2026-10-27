@@ -11,6 +11,7 @@ scientific contracts are not touched by this module.
 
 import copy
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -78,6 +79,60 @@ class RevisionArgumentTests(unittest.TestCase):
             with patch("fitlab_evaluation.evidence.ROOT", snapshot):
                 with self.assertRaisesRegex(ArtifactError, "SOURCE_SNAPSHOT_MISMATCH"):
                     validate_trust(trust)
+
+    def test_externally_supplied_trust_cannot_carry_private_detail(self):
+        # Round-51 A-1: in a non-Git installation the trust snapshot is
+        # externally supplied and validate_trust accepted a boundary field
+        # carrying private detail; export_report then published trust.json
+        # verbatim. The whole trust document is now scanned before
+        # validation accepts it: unsanitized trust is refused with a
+        # stable error and NOTHING is published; sanitized trust
+        # (including the frozen boundary) is unaffected. The scenario is
+        # driven against a .git-less snapshot whose bytes verifiably match
+        # the trust hashes - the exact non-Git execution environment.
+        if not (ROOT / ".git").exists():
+            self.skipTest("requires a Git trust source")
+        from fitlab_evaluation import evidence as evidence_module
+        from fitlab_evaluation.report_v3 import export_report
+        trust = make_trust("HEAD")
+        with tempfile.TemporaryDirectory() as snapshot_dir:
+            snapshot = Path(snapshot_dir)
+            # Snapshot bytes come from the COMMITTED source (git show),
+            # not the possibly-dirty worktree: on a checkout with line-
+            # ending translation the worktree bytes differ from the git
+            # blob bytes, and a mid-edit tree would misbind the hashes.
+            for relative in trust["source_sha256"]:
+                raw = subprocess.run(
+                    ["git", "show", f"HEAD:{relative}"],
+                    cwd=ROOT, check=True,
+                    stdout=subprocess.PIPE).stdout
+                target = snapshot / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+            with patch.object(evidence_module, "ROOT", snapshot):
+                private_email = "researcher@fitlab.invalid"
+                for boundary in (
+                    f"Contact {private_email} for the private dataset.",
+                    "Built on C:\\Users\\sampleuser\\machine before review.",
+                ):
+                    with self.subTest(boundary=boundary):
+                        unsanitized = dict(trust)
+                        unsanitized["boundary"] = boundary
+                        with self.assertRaisesRegex(ArtifactError, "TRUST_NOT_SANITIZED"):
+                            validate_trust(unsanitized)
+                        with tempfile.TemporaryDirectory() as out:
+                            with self.assertRaisesRegex(ArtifactError, "TRUST_NOT_SANITIZED"):
+                                export_report(out, unsanitized)
+                            self.assertEqual(list(Path(out).iterdir()), [])
+                # A private source-path key is equally refused.
+                path_key = "C:/Users/sampleuser/fitlab_evaluation/run.py"
+                path_trust = dict(trust)
+                path_trust["source_sha256"] = dict(trust["source_sha256"])
+                path_trust["source_sha256"][path_key] = trust["source_sha256"]["fitlab_evaluation/run.py"]
+                with self.assertRaisesRegex(ArtifactError, "TRUST_NOT_SANITIZED"):
+                    validate_trust(path_trust)
+        # The frozen trust (boundary included) still validates cleanly.
+        validate_trust(make_trust("HEAD"))
 
 
 class RemoteRoutingTests(unittest.TestCase):

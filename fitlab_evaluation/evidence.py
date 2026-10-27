@@ -15,6 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from .artifacts import ArtifactError,stable_json,digest,source_digest,load_json
 from .grader import strict_json,grade,exact_equal
+from .redact import contains_private_detail
 from .lemonade import MODEL,validate_health,validate_result,validate_memory,require_resources,IntegrationError
 from fitlab_foundation.planner_cli import run_document
 from fitlab_foundation.serialization import to_primitive
@@ -120,6 +121,18 @@ def _validate_trust(trust):
     if type(files) is not dict or not files or any(type(k) is not str or type(v) is not str or not HASH.fullmatch(v) for k,v in files.items()):reject('INVALID_TRUST')
     if not {'fitlab_evaluation/run.py','fitlab_evaluation/lemonade.py'}<=files.keys():reject('INCOMPLETE_SOURCE_IDENTITY')
     if any('\\' in p or p.startswith('/') or '..' in p.split('/') for p in files):reject('INVALID_TRUST')
+
+    # The whole trust document is scanned BEFORE any snapshot path is
+    # touched: every trust string is published verbatim (trust.json rides
+    # every bundle and the passport) and in a non-Git installation the
+    # snapshot is EXTERNALLY SUPPLIED, so private detail must be refused
+    # with a stable error at the earliest possible point - never silently
+    # rewritten (round-51 A-1).
+    if contains_private_detail(trust['boundary']) or contains_private_detail(trust['task_pack_text']):
+        reject('TRUST_NOT_SANITIZED')
+    for relative in files:
+        if contains_private_detail(relative):
+            reject('TRUST_NOT_SANITIZED')
     if (ROOT/'.git').exists():
         frozen=_committed_trust(trust['source_commit'])
         if not exact_equal(trust,frozen):reject('SOURCE_COMMIT_MISMATCH')
