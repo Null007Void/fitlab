@@ -230,6 +230,17 @@ class EvidenceClassMappingTests(unittest.TestCase):
             # Idempotency: the second pass must not change the marker.
             self.assertEqual(redact_value(token), token)
 
+    def test_marker_bearing_strings_still_redact_surroundings(self):
+        # Round-38: a generated marker inside a longer string must protect
+        # ONLY the marker; unrelated private detail in the same string is
+        # still redacted (the round-37 whole-string skip was too broad).
+        from fitlab_evaluation.redact import redact_value
+        out = redact_value(
+            "[redacted:0] with mail owner@private.invalid at /data/private/x.bin")
+        self.assertIn("[redacted:0]", out)
+        self.assertNotIn("owner@private.invalid", out)
+        self.assertNotIn("/data/private", out)
+
     def test_root_level_posix_file_redacted_and_scanned(self):
         # Round-36: unknown-root contiguous files ("/custom/model.gguf") are
         # redacted; the scanner includes the root-level rule.

@@ -50,11 +50,11 @@ _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
 # The root must be followed by a separator first, so ordinary prose
 # ("the Users group") is untouched.
 _WINDOWS_USER = re.compile(
-    r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)",
+    r"[/\\]Users[/\\](?!\x00)[^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)",
     re.IGNORECASE,
 )
 _POSIX_USER = re.compile(
-    r"/(?:home|Users)/(?![/\s])"
+    r"/(?:home|Users)/(?!\x00)(?![/\s])"
     r"[^\s/\"'<>|]+(?: [^\s/\"'<>|]+(?=[/]))?(?=[/\s]|$)",
     re.IGNORECASE,
 )
@@ -149,14 +149,24 @@ def redact_text(value):
     """
     if type(value) is not str or not value:
         return value
-    # A previous redaction in THIS pipeline already namespaced the marker
-    #("[redacted:k]"); treat any generated marker as inert (redaction is
-    # idempotent for values produced by redact_with_distinct_identities —
-    # round-37 A-1) so double-pass flows (evaluate → stored_input →
-    # re-derived output) cannot rewrite the same identity twice.
     if "[redacted:" in value:
-        return value
-    result = value
+        # This string carries at least one generated marker from a previous
+        # pass in THIS pipeline (round-37 A-1 / round-38 A-1). Redacting the
+        # WHOLE string blindly here rewrites unrelated identity-bearing
+        # markers; instead, protect only the generated marker tokens
+        # ("[redacted:k]") via placeholders, run the normal redaction, and
+        # restore them — unrelated private detail around the marker is
+        # still redacted.
+        import re as _re
+        markers_found = []
+        def _stash(match):
+            markers_found.append(match.group(0))
+            return "\x00" + str(len(markers_found) - 1) + "\x00"
+        stash_pattern = _re.compile(r"\[redacted:\d+\]")
+        stashed = stash_pattern.sub(_stash, value)
+        result = stashed
+    else:
+        result = value
     result = _UNC_PATH.sub(REDACTED, result)
     # User-profile identity segments BEFORE generic path grammar: the user
     # name itself may contain one space, and a generic path cut at the first
@@ -179,6 +189,9 @@ def redact_text(value):
     result = _MAC.sub(REDACTED, result)
     result = _IPV4.sub(REDACTED, result)
     result = _RESERVED_HOSTNAME.sub(REDACTED, result)
+    if "[redacted:" in value:
+        for index, token in enumerate(markers_found):
+            result = result.replace("\x00" + str(index) + "\x00", token)
     return result
 
 
