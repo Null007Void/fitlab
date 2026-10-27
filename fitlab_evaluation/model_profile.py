@@ -82,22 +82,36 @@ def locate_model_file():
 
 
 def classify_blocks(tensors, block_count):
-    """Split transformer blocks into convolution and attention blocks."""
-    names = {tensor["name"] for tensor in tensors}
-    convolution, attention = [], []
-    for index in range(block_count):
-        prefix = f"blk.{index}."
-        has_convolution = any(
-            name.startswith(prefix) and CONVOLUTION_BLOCK in name for name in names
-        )
-        has_attention = any(
-            name.startswith(prefix) and ATTENTION_BLOCK in name for name in names
-        )
-        if has_convolution:
-            convolution.append(index)
-        if has_attention:
-            attention.append(index)
-    return convolution, attention
+    """Split transformer blocks into convolution and attention blocks.
+
+    Single pass over the observed tensor names: the work is bounded by the
+    number of tensors actually present, never by block_count (a structurally
+    valid GGUF may declare up to the excessive-count gate many blocks whose
+    names match nothing; the former per-block scans cost block_count x names).
+    Only canonical decimal forms "blk.<index>." classify (leading zeros,
+    signs or unicode digits never matched the old "blk.<index>." prefixes and
+    must not fire now), and indexes at or beyond the declared block_count are
+    ignored exactly as range(block_count) excluded them.
+    """
+    convolution, attention = set(), set()
+    for name in {tensor["name"] for tensor in tensors}:
+        if not name.startswith("blk."):
+            continue
+        tail = name[len("blk."):]
+        dot = tail.find(".")
+        if dot <= 0:
+            continue
+        digits = tail[:dot]
+        if not digits.isdigit():
+            continue
+        index = int(digits)
+        if digits != str(index) or index >= block_count:
+            continue
+        if CONVOLUTION_BLOCK in name:
+            convolution.add(index)
+        if ATTENTION_BLOCK in name:
+            attention.add(index)
+    return sorted(convolution), sorted(attention)
 
 
 def derive_profile(model_path, revision=None):

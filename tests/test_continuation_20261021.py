@@ -329,6 +329,42 @@ class HybridArchitectureTests(unittest.TestCase):
                 advisory["bytes"], sum(c["bytes"] for c in advisory["components"])
             )
 
+    def test_classify_blocks_work_is_bounded_and_matches_prefix_semantics(self):
+        # Round-43 A-1: classification work must be bounded by the number of
+        # OBSERVED tensor names, never by block_count — a structurally valid
+        # GGUF below the excessive-count gate may declare many blocks whose
+        # names match nothing.
+        unrelated = [{"name": f"tensor.{i}.weight"} for i in range(500)]
+        convolution, attention = classify_blocks(unrelated, 99999)
+        self.assertEqual((convolution, attention), ([], []))
+        mixed = []
+        for index in range(2000):
+            kind = "shortconv.in_proj.weight" if index % 2 else "attn_q.weight"
+            mixed.append({"name": f"blk.{index}.{kind}"})
+        convolution, attention = classify_blocks(mixed, 99999)
+        self.assertEqual(len(convolution), 1000)
+        self.assertEqual(len(attention), 1000)
+        self.assertEqual(
+            convolution, [index for index in range(1, 2000, 2)])
+        self.assertEqual(attention, [index for index in range(0, 2000, 2)])
+        # Indexes at or beyond the declared block_count are ignored exactly
+        # as range(block_count) excluded them.
+        convolution, attention = classify_blocks(
+            [{"name": "blk.3.attn_q.weight"}], 3)
+        self.assertEqual((convolution, attention), ([], []))
+        # Only canonical decimal indexes classify: leading zeros, signs and
+        # non-decimal digits never matched the old f"blk.{index}." prefix.
+        convolution, attention = classify_blocks(
+            [
+                {"name": "blk.007.attn_q.weight"},
+                {"name": "blk.-1.attn_q.weight"},
+                {"name": "blk..attn_q.weight"},
+                {"name": "blk.1X.attn_q.weight"},
+            ],
+            1000,
+        )
+        self.assertEqual((convolution, attention), ([], []))
+
     def test_excessive_block_count_is_refused_before_classification(self):
         # Round-42: a structurally valid GGUF can declare a UINT64-maximum
         # block_count; classify_blocks would iterate range(block_count) and
