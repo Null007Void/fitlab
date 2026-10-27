@@ -268,6 +268,51 @@ class PlanningDeclarationRedactionTests(unittest.TestCase):
         validated = run_document(stored)
         self.assertEqual(len(validated["results"]), 3)
 
+    def test_generated_tokens_avoid_colliding_with_unchanged_literals(self):
+        # An owner-supplied literal that ALREADY uses the generated-token
+        # namespace ("[redacted:0]") must be pre-reserved: the allocator may
+        # not hand the same token to a redacted id, or replay dies on a
+        # duplicate identity.
+        import tempfile
+        from unittest.mock import patch
+        from fitlab_evaluation.run import evaluate
+        from fitlab_evaluation.evidence import make_trust
+        from fitlab_evaluation.workflow import identity
+        from test_f4_integration import FakeClient, GOOD_MEMORY
+
+        plan = json.loads((ROOT / "examples" /
+                           "f2_workload_to_hardware.json").read_text("utf-8"))
+        from fitlab_evaluation.lemonade import MODEL
+        document_ids = ["[redacted:0]", "/data/private/a"]
+        scenarios = []
+        for sid in document_ids:
+            scenario = json.loads(json.dumps(plan["scenarios"][0]))
+            scenario["model"]["model_id"] = MODEL
+            scenario["scenario_id"] = sid
+            scenarios.append(scenario)
+        document = {"direction": "workload_to_hardware",
+                    "scenarios": scenarios,
+                    "schema_version": plan.get("schema_version", 1)}
+        trust = make_trust("HEAD")
+        with patch("fitlab_evaluation.run.identity", return_value=trust["source_sha256"]):
+            with tempfile.TemporaryDirectory() as tmp:
+                record = evaluate(document, 1, client=FakeClient(),
+                                  memory=lambda: dict(GOOD_MEMORY),
+                                  pause=lambda _s: None, checkpoint=None)
+        stored = record["planning_input"]
+        ids = [s["scenario_id"] for s in stored["scenarios"]]
+        self.assertEqual(len(set(ids)), 2, ids)
+        # The namespace-shaped literal survives byte-exact.
+        self.assertIn("[redacted:0]", ids)
+        # The redacted id received a DIFFERENT generated token.
+        generated = [i for i in ids if i not in document_ids]
+        self.assertEqual(len(generated), 1)
+        self.assertNotEqual(generated[0], "[redacted:0]")
+        # Replay still validates through the planner.
+        from fitlab_foundation.planner_cli import run_document
+        validated = run_document(stored)
+        self.assertEqual(len(validated["results"]), 2)
+
     def test_planning_rederivation_failure_propagates(self):
         # The stored planning output must come from a verified re-derivation
         # against the stored input. A failing re-derivation must FAIL the

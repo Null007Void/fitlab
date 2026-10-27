@@ -79,8 +79,11 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
         reserved = set()
 
         def _reserve(value):
-            if type(value) is str and _REDACTION_MARKER in value \
-                    and redact_value(value) == value:
+            # Reserve EVERY unchanged string, not only marker-shaped ones:
+            # a literal such as "[redacted:0]" survives redaction unchanged
+            # and yet collides with the generated-token namespace, so the
+            # allocator must treat it as taken before generating anything.
+            if type(value) is str and redact_value(value) == value:
                 reserved.add(value)
             return value
 

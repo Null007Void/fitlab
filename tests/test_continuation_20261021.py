@@ -380,6 +380,20 @@ class RedactionTests(unittest.TestCase):
              "/optional feature flag remains enabled"),
             ("/option for verbose output", "/option for verbose output"),
             ("/etcetera and /ethanol stay prose", "/etcetera and /ethanol stay prose"),
+            # Round-11 reviewer cases: a distant filename in prose must never
+            # extend a path match across the sentence.
+            ("/tmp/cache contains results described in README.md",
+             "[redacted] contains results described in README.md"),
+            ("/optional means consult README.md",
+             "/optional means consult README.md"),
+            # Drive-path prefix redacts conservatively; prose after it
+            # survives (the old grammar consumed the whole sentence).
+            ("C:\\tmp folder holds notes about readme.md",
+             "[redacted] folder holds notes about readme.md"),
+            # The final filename segment is contiguous with its suffix; a
+            # space inside it is not consumed (conservative leak of the
+            # filename tail beats eating prose).
+            ("/data/private/my model.gguf", "[redacted] model.gguf"),
         ]
         for value, expected in cases:
             with self.subTest(value=value):

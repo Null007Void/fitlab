@@ -17,9 +17,15 @@ REDACTED = "[redacted]"
 
 # Windows drive-letter path without spaces.
 _WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
-# Windows file paths may contain spaces; stop at a bounded, recognisable file suffix.
+# Windows file paths: drive-anchored with a CONTIGUOUS final filename
+# anchored directly on its suffix. Interior segments may contain spaces
+# (whole-segment tokens), but the final segment may not, so a path match can
+# never extend across prose to a distant filename later in the sentence.
 _WINDOWS_FILE_PATH = re.compile(
-    r"[A-Za-z]:[\\/][^\"'<>|\r\n]*?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"[A-Za-z]:[/\\]"
+    r"(?:[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*)"
+    r"(?:[/\\](?:[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*))*"
+    r"[/\\][^\s\"'<>|/\\]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # UNC path, e.g. \\server\share\file.
@@ -36,10 +42,16 @@ _POSIX_PATH = re.compile(
     re.IGNORECASE,
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
-# /srv2/..., custom mounts) — require a recognizable file suffix to avoid
-# mangling ordinary prose that merely starts with a slash.
+# /srv2/..., custom mounts). Interior segments may contain spaces
+# (whole-segment tokens), but the final filename is CONTIGUOUS with its
+# suffix, so ordinary prose containing a distant filename ("...consult
+# README.md") can never extend a path match. A recognizable file suffix is
+# still required to avoid mangling prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
-    r"(?<![\w>/])/(?:[^\"'<>|\r\n]*?/)*?[^\"'<>|\r\n]*?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?<![\w>/.])/"
+    r"(?:[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*)"
+    r"(?:/(?:[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*))*"
+    r"/[^\s\"'<>|/]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # IPv6: full form (8 groups) or compressed form containing "::" (including
