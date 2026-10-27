@@ -226,7 +226,91 @@ class PublicCliSurface(unittest.TestCase):
             self.assertEqual(code, 2, out_debug(code, text))
             self.assertFalse(out.exists())
 
-    def test_passport_public_entry_renders_and_is_deterministic(self):
+    def test_plan_publication_redacts_provenance_metadata(self):
+        # Round-58 A-1: provenance embeds operator-supplied model metadata
+        # (GGUF header strings, the registry revision); provenance.json was
+        # published verbatim, so a private path or email in the license
+        # name or revision string rode the shareable plan bundle. The
+        # publication copy is now redacted through the distinct-identity
+        # engine.
+        import tempfile
+        from unittest.mock import patch
+        from pathlib import Path as _RealPath
+        from fitlab_evaluation import cli as cli_module
+        from fitlab_evaluation import plan_builder
+
+        class _Args:
+            direction = "workload_to_hardware"
+            plan = None
+            output_dir = None
+            budget_bytes = None
+            model_file = "plain.gguf"
+            workload = None
+            overhead_bytes = None
+            overhead_basis = None
+
+        def poisoned_provenance(profile, workload, budget_bytes=None):
+            base = _original_provenance(profile, workload, budget_bytes)
+            base["declared_license_name"] = (
+                "contact admin@corp.invalid or C:\\Users\\sampleuser\\l.txt")
+            base["snapshot_revision"] = "snap C:/Users/sampleuser/rev"
+            return base
+
+        _original_provenance = plan_builder.provenance
+
+        def fake_build_plan(direction, workload=None, budget_bytes=None,
+                            overhead_bytes=None, overhead_basis=None,
+                            model_path=None, revision=None):
+            return {"schema_version": "fitlab-plan-v2",
+                    "direction": direction,
+                    "scenarios": [{
+                        "scenario_id": "s1",
+                        "model": {"model_id": "LFM2.5-1.2B-Instruct-GGUF"},
+                    }]}
+
+        summary = {
+            "source": "GGUF_HEADER_METADATA", "file_bytes": 1,
+            "gguf_version": 3,
+            "metadata": {
+                "lfm2.block_count": 4,
+                "lfm2.embedding_length": 64,
+                "lfm2.attention.head_count": 4,
+            },
+            "tensors": [], "name": "LFM2.5-1.2B-Instruct-GGUF",
+            "architecture": "lfm2", "file_type_id": 15,
+            "quantization": "Q4_K_M", "quantization_known": True,
+            "total_parameters": 0, "tensor_count": 0,
+            "block_count": 4, "head_count": 4, "head_count_kv": None,
+            "head_dimension": None, "embedding_length": 64,
+            "context_length": None, "vocab_size": None,
+            "expert_markers": [], "mixture_of_experts": False,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp) / "plan-bundle"
+            _Args.output_dir = Path(destination)
+            with patch.object(plan_builder, "provenance",
+                              poisoned_provenance), \
+                 patch("fitlab_evaluation.model_profile.summarize",
+                       lambda p: summary), \
+                 patch("fitlab_evaluation.model_profile.locate_model_file",
+                       lambda: (Path("plain.gguf"), None)), \
+                 patch.object(plan_builder, "build_plan", fake_build_plan), \
+                 patch.object(plan_builder, "memory_advisory",
+                              lambda *a, **k: {
+                                  "kind": "COMPOSITE_MEMORY_ADVISORY",
+                                  "bytes": 0, "components": []}), \
+                 patch("fitlab_foundation.planner_cli.run_document",
+                       lambda document: None), \
+                 patch.object(_RealPath, "is_file", lambda self: True):
+                cli_module._publish_plan(_Args)
+            body = (destination / "provenance.json").read_text("utf-8")
+            self.assertNotIn("sampleuser", body)
+            self.assertNotIn("admin@corp.invalid", body)
+            self.assertNotIn("corp.invalid", body)
+            self.assertIn("[redacted", body)
+            plan_body = (destination / "plan.json").read_text("utf-8")
+            self.assertNotIn("sampleuser", plan_body)
         # The public passport entry, driven exactly as an installed user
         # would drive it (fresh trust from THIS checkout's HEAD), must
         # render the passport and produce byte-identical output on a second

@@ -134,14 +134,25 @@ def _host_identity():
 def _publish_plan(arguments):
     """Write a planning document and its provenance as an atomic bundle."""
     from fitlab_foundation.planner_cli import run_document
+    from .redact import redact_with_distinct_identities
+    from fitlab_foundation.serialization import to_primitive
 
     built = _plan(arguments)
     document = built["document"]
     # The document must survive the strict F2 boundary before it is published.
     run_document(document)
+    # Publication privacy boundary: provenance embeds operator-supplied
+    # model metadata (GGUF header strings, the registry revision string),
+    # so a private path, username or email could ride the shareable
+    # provenance.json verbatim (round-58 A-1). The publication copy passes
+    # through the same distinct-identity redaction engine as the passport
+    # companions; report_v3 re-validates the stored provenance at passport
+    # time against the redacted form, so replay stays consistent.
+    provenance_public, _ = redact_with_distinct_identities(
+        to_primitive(built["provenance"]))
     files = {
         "plan.json": stable_json(document),
-        "provenance.json": stable_json(built["provenance"]),
+        "provenance.json": stable_json(provenance_public),
         "advisory.json": stable_json(built["advisory"]),
     }
     manifest = publish_bundle(arguments.output_dir, files)
