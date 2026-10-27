@@ -18,15 +18,17 @@ REDACTED = "[redacted]"
 # Windows drive-letter path without spaces.
 _WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'<>|]*")
 # Windows file paths: drive-anchored, final filename CONTIGUOUS with its
-# suffix. Interior path segments may contain spaces, but a space-bearing
-# interior run may not itself contain a suffixed filename token — otherwise a
-# space-joined prose run could cross the sentence to a distant
-# slash-anchored filename ("...then consult docs/README.md") and consume it.
+# suffix. Interior path segments may contain at most TWO words (real
+# space-bearing directory names are overwhelmingly 1-2 words); a space-bearing
+# interior run may not itself contain a suffixed filename token, and no
+# segment may span toward a distant slash-anchored filename
+# ("...then consult docs/README.md") — longer runs fall through to the
+# conservative known-root pass, which preserves the trailing prose.
 _WINDOWS_FILE_PATH = re.compile(
     r"[A-Za-z]:[/\\][^\s\"'<>|/\\]+"
     r"(?:[/\\][^\s\"'<>|/\\]+"
     r"|[/\\](?![^\s\"'<>|/\\]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)*)*"
+    r"[^\s\"'<>|/\\]+(?: +[^\s\"'<>|/\\]+)?)*"
     r"[/\\][^\s\"'<>|/\\]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
@@ -44,17 +46,18 @@ _POSIX_PATH = re.compile(
     re.IGNORECASE,
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
-# /srv2/..., custom mounts). Interior segments may contain spaces, but a
+# /srv2/..., custom mounts). Interior segments may contain at most TWO words
+# (real space-bearing directory names are overwhelmingly 1-2 words); a
 # space-bearing interior run may not contain a suffixed filename token, and
-# the final filename is CONTIGUOUS with its suffix — so ordinary prose
-# containing a distant filename ("...then consult docs/README.md") can never
-# extend a path match. A recognizable file suffix is still required to avoid
-# mangling prose that merely starts with a slash.
+# the final filename is CONTIGUOUS with its suffix — so prose can never be
+# consumed across a distant filename ("...consult docs/README.md" or an
+# extensionless path followed by trailing prose); longer runs fall through to
+# the conservative known-root pass, which stops at the first whitespace.
 _ANY_POSIX_FILE = re.compile(
     r"(?<![\w>/.])/[^\s\"'<>|/]+"
     r"(?:/[^\s\"'<>|/]+"
     r"|/(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
-    r"[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)*)*"
+    r"[^\s\"'<>|/]+(?: +[^\s\"'<>|/]+)?)*"
     r"/[^\s\"'<>|/]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )

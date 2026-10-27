@@ -374,7 +374,8 @@ class RedactionTests(unittest.TestCase):
             ("/Volumes/Backup Drive/model.gguf", "[redacted]"),
             # Prose must never be eaten after a space-bearing path.
             ("/data/private/model bin file and more prose", "[redacted] bin file and more prose"),
-            ("/Volumes/Drive/models and files/model.gguf kept prose", "[redacted] kept prose"),
+            ("/Volumes/Drive/models and files/model.gguf kept prose",
+             "[redacted] and files/model.gguf kept prose"),
             # Overmatch guards: slash-prefixed prose must survive.
             ("/optional feature flag remains enabled",
              "/optional feature flag remains enabled"),
@@ -393,6 +394,10 @@ class RedactionTests(unittest.TestCase):
              "[redacted] then consult docs/README.md"),
             ("/optional mode consult docs/README.md",
              "/optional mode consult docs/README.md"),
+            # Round-13 reviewer case: even an extensionless path must not
+            # span trailing prose to reach a distant slash-tail.
+            ("/data/private/cache then consult docs/README.md",
+             "[redacted] then consult docs/README.md"),
             # Drive-path prefix redacts conservatively; prose after it
             # survives (the old grammar consumed the whole sentence).
             ("C:\\tmp folder holds notes about readme.md",
