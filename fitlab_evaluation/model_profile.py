@@ -112,11 +112,13 @@ def derive_profile(model_path, revision=None):
     # would forge provenance. Accept header names that carry the model
     # token (case-insensitive); refuse anything explicitly different.
     declared_name = summary.get("name")
-    if type(declared_name) is str and declared_name:
-        core = MODEL.split("/")[-1].replace(".gguf", "").split(":")[0]
-        if core.lower() not in declared_name.lower():
-            _fail("MODEL_IDENTITY_MISMATCH",
-                  f"header declares {declared_name!r}, contract is {core!r}")
+    core = MODEL.split("/")[-1].replace(".gguf", "").split(":")[0]
+    if type(declared_name) is str and declared_name and \
+            core.lower() not in declared_name.lower():
+        # A header that NAMES a different model must never receive the frozen
+        # contract identity — that would forge provenance.
+        _fail("MODEL_IDENTITY_MISMATCH",
+              f"header declares {declared_name!r}, contract is {core!r}")
 
     def meta(name):
         return metadata.get(prefix + name)
@@ -189,6 +191,10 @@ def derive_profile(model_path, revision=None):
         "context_size": CTX_SIZE,
         "llamacpp_args": LLAMACPP_ARGS,
         "identity_source": "LOCAL_GGUF_HEADER_AND_LEMONADE_REGISTRY",
+        "model_identity": ("VERIFIED_LOCAL_HEADER"
+                           if type(declared_name) is str and declared_name
+                           and core.lower() in declared_name.lower()
+                           else "UNVERIFIED"),
         "file_bytes": summary["file_bytes"],
         "gguf_version": summary["gguf_version"],
         "declared_name": summary.get("name"),

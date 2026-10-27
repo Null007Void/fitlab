@@ -461,7 +461,11 @@ def _render_html(report):
     provenance = report.get("planning_provenance") or {}
     model_rows = []
     if provenance.get("model_id"):
-        model_rows.append(("Model", provenance["model_id"]))
+        # An unverified header identity is disclosed, never silently styled
+        # as the frozen contract checkpoint.
+        suffix = (" (unverified header identity)"
+                  if provenance.get("model_identity") == "UNVERIFIED" else "")
+        model_rows.append(("Model", provenance["model_id"] + suffix))
     if provenance.get("checkpoint"):
         model_rows.append(("Checkpoint", provenance["checkpoint"]))
     if provenance.get("quantization"):

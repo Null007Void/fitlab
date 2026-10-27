@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from .grader import grade, load_pack
+from .redact import REDACTED
 from .lemonade import IntegrationError, LemonadeClient, MODEL, windows_memory, require_resources, validate_health, validate_result, validate_memory
 from .artifacts import source_digest,digest,stable_json
 from fitlab_foundation.planner_cli import _read_bounded_document, run_document
@@ -69,6 +70,23 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
                     raise IntegrationError('session time budget exhausted')
                 snapshot=validate_memory(memory()); record['resource_samples'].append(snapshot); require_resources(snapshot)
                 health=validate_health(client.ready())
+                # Runtime identity is redacted at the SOURCE (before any
+                # checkpoint byte exists): the adapter's launch command and
+                # endpoint carry local cache paths. Raw health already passed
+                # validation; every stored copy holds only redacted identity.
+                health=dict(health)
+                for loaded in health.get('all_models_loaded') or []:
+                    if isinstance(loaded, dict):
+                        cmd = loaded.get('launch_command')
+                        if isinstance(cmd, list):
+                            loaded['launch_command'] = [
+                                REDACTED if (isinstance(part, str) and
+                                             (':' in part and ('\\' in part or '/' in part))) or
+                                             (isinstance(part, str) and part.startswith('http'))
+                                else part
+                                for part in cmd]
+                        if isinstance(loaded.get('backend_url'), str):
+                            loaded['backend_url'] = REDACTED
                 if 'runtime' not in record: record['runtime']=health
                 if time.monotonic()-started+client.timeout+1 > budget_seconds:
                     raise IntegrationError('session time budget exhausted after health check')
@@ -137,6 +155,18 @@ def main():
     from .grader import exact_equal
     if not exact_equal(observed,{'offline':True,'no_fetch_executables':True}):
         print(stable_json({'status':'ERROR','code':'RUNTIME_NOT_PROVEN_OFFLINE'}),end='',file=sys.stderr)
+        return 2
+    # Telemetry parity (workflow.execute's guarded_ready contract): the
+    # ready runtime must report telemetry explicitly disabled before this
+    # entry point may issue inference.
+    try:
+        probe_health=validate_health(LemonadeClient().ready())
+    except (IntegrationError,OSError,ValueError):
+        print(stable_json({'status':'ERROR','code':'RUNTIME_NOT_READY'}),end='',file=sys.stderr)
+        return 2
+    telemetry=probe_health.get('telemetry')
+    if type(telemetry) is not dict or telemetry.get('enabled') is not False:
+        print(stable_json({'status':'ERROR','code':'RUNTIME_TELEMETRY_NOT_DISABLED'}),end='',file=sys.stderr)
         return 2
     # Reserve a new evidence path before any inference; never overwrite past trials.
     # newline='' keeps the placeholder byte-stable across platforms.
