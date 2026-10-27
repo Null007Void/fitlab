@@ -54,7 +54,7 @@ self = <test_f5_seal_security.SealSecurityTests testMethod=test_real_passport_ex
             self.assertEqual(seal["status"], "FINISHED")
     
 >           from fitlab_evaluation.seal import verify_campaign
-E           ImportError: cannot import name 'verify_campaign' from 'fitlab_evaluation.seal' (C:\Users\Overh\AppData\Local\hermes\profiles\milo\workspace\fitlab-phase-a-closure-lane\fitlab_evaluation\seal.py)
+E           ImportError: cannot import name 'verify_campaign' from 'fitlab_evaluation.seal' (<dev-env>\profiles\engineering\workspace\fitlab-phase-a-closure-lane\fitlab_evaluation\seal.py)
 
 tests\test_f5_seal_security.py:218: ImportError
 =========================== short test summary info ===========================

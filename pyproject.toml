@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fitlab-capability-passport"
+version = "1.0.0"
+description = "Local AI Capability Passport - measure what your machine and model can actually do"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+authors = [{name = "Null007Void"}]
+keywords = ["local-ai", "llm", "benchmark", "lemonade", "llama-cpp", "gguf"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Benchmark",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Null007Void/fitlab"
+
+[project.scripts]
+fitlab = "fitlab_evaluation.public_cli:main"
+
+[tool.setuptools]
+packages = ["fitlab_evaluation", "fitlab_foundation"]
+
+[tool.setuptools.package-data]
+fitlab_evaluation = ["py.typed"]

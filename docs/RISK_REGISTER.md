@@ -78,11 +78,14 @@ redaction list has been chosen or approved.
 **Impact.** An unreviewed export could leak private detail or unrelated
 material.
 
-**Mitigation.** The proposed package scope and the privacy audit are recorded
-in `docs/RELEASE_READINESS.md`. Publication remains a separate, explicit
-owner decision.
+**Mitigation.** EXECUTED for this release: a fresh allowlisted export was
+audited (privacy scan, provenance audit, stale-claim sweep), independently
+reviewed, and published only after the explicit owner authorization.
+The allowlist itself is the shipped tree; the accepted internal lane remains
+private.
 
-**Owner action required.** Yes.
+**Owner action required.** Owner authorization was obtained for this
+publication; future re-publications need their own.
 
 ## High risks
 

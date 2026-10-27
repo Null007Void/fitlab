@@ -110,6 +110,11 @@ security finding in a project that has not been published.
 - No third-party security audit has been performed.
 - The F1/F2/F3 scientific contracts have independent review from the
   project's own review process, not from an external auditor.
-- The measurement path has not yet been exercised against a live runtime, so
-  the live-only defences are verified by synthetic tests rather than by
-  observation.
+- The measurement path was exercised against a live runtime in the sealed
+  LIVE-002 campaign (2026-10-26: Lemonade 2026.43.3, LFM2.5-1.2B-Instruct
+  Q4_K_M on CPU, 8/8 authorized requests once, 6 pass / 2 retained
+  model-output failures, `COMPLETED`/`FINISHED`; `complete_protocol=false`
+  because the full protocol specifies 3 repetitions — bounded qualification,
+  not a general reliability claim). The live-only defences listed here are
+  therefore verified both by synthetic tests and by one sealed live run;
+  broader live coverage remains future work.

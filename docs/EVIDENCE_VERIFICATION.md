@@ -70,7 +70,7 @@ For each listed file, `Get-FileHash` must equal the recorded digest.
 ## Layer 5 — a live evaluation record replays
 
 ```powershell
-python -m fitlab_evaluation.cli verify --trust evidence/session-001/trust.json --evaluation evidence/session-001/evaluation.json
+python -m fitlab_evaluation.cli verify --trust evidence/phase-a/live-validation-001/trust.json --evaluation evidence/phase-a/live-validation-001/evaluation.json
 ```
 
 The verifier does not trust the record. It independently:
@@ -94,6 +94,28 @@ The verifier does not trust the record. It independently:
 A record that fails any of these is refused with a specific code. See
 `docs/TROUBLESHOOTING.md`.
 
+Note on the shipped LIVE-002 record: it is bound to the historical source
+commit it ran against (recorded in its `trust.json` `source` fields). The
+public repository deliberately carries a fresh commit history, so a
+git-resolution of that historical hash is expected to fail here — that is
+the fail-closed design, not a defect. Use `verify_campaign` (Layer 7) for
+byte-level verification of the sealed historical campaign, and
+`fitlab evaluate` produces fresh campaigns whose trust resolves against
+your own checkout's HEAD.
+
+## Layer 5b — the sealed campaign re-verifies from a fresh checkout
+
+```console
+python -c "from fitlab_evaluation.seal import verify_campaign; print(verify_campaign('evidence/phase-a/live-validation-001')['status'])"
+```
+
+`COMPLETED` means every sealed byte matched the recorded hashes: the file
+inventory, the FINISHED-status gates, the passport component bindings and
+the trust/evaluation cross-binding. This path needs no Git history and no
+network, and is exercised by
+`tests/test_windows_byte_stability.py` (produce → seal → commit → fresh
+clone → re-verify).
+
 ## Layer 6 — the report cannot be edited into a claim
 
 The export path always rebuilds the report from verified facts and compares
@@ -114,17 +136,18 @@ relative to a trusted checkpoint**. It does not establish:
 - that the model would behave the same way on different hardware
 
 Execution-origin corroboration requires a human able to observe the runtime.
-That is an outstanding F5 acceptance requirement, recorded in
-`SPRINT_STATUS.md`.
+For the shipped campaign, the complete machine-observed session stream
+(runtime launch metadata, per-request latency, memory samples, response
+hashes) is preserved inside the sealed `evaluation.json`; the historical F5
+acceptance trail is in the project's internal records.
 
-## Hash inventory
+## Hash inventory (shipped artifacts)
 
 | Artifact | Digest |
 |---|---|
 | `fixtures/tasks-v2.json` | `99df7e161d97f23fac67ceefcf1e567080e1ecbe04047c8875c4898ffb651552` |
-| Local model file (730,895,168 bytes) | `b1b3de114215d9507409a662a501a631095a479a419584e8a2ded6304b19b4f5` |
-| Accepted baseline commit | `f2c0cf8e1221ea15db4aa87739b99ed5e30e7409` |
-| Accepted baseline tree | `3ab84e6584ef6ae68926c03bc5f76279bb91e78f` |
+| LIVE-002 final-seal.json | see `evidence/phase-a/live-validation-001/final-seal.json` (hashes every campaign byte) |
 
-The review package archive and its member digests are recorded in
-`evidence/review4/REVIEW_PACKAGE.md`.
+The sealed campaign's `final-seal.json` is the authoritative hash inventory
+for the recorded LIVE-002 qualification; every entry is re-checked by
+`verify_campaign`.

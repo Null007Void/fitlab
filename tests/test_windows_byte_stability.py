@@ -149,25 +149,26 @@ class SealedEvidenceCheckoutStability(unittest.TestCase):
             _git("add", "-A", cwd=work)
             _git("commit", "-q", "-m", "sealed synthetic campaign", cwd=work)
 
-            # Fresh clone of that commit.
+            # Fresh clone of that commit. Verification runs in an ISOLATED
+            # subprocess: the checked-out product is imported only there, so
+            # no module from the checkout can leak into this test session
+            # (a same-interpreter import left ROOT bound to the checkout and
+            # poisoned later tests).
             checkout = Path(tmp) / "checkout"
             _git("clone", "-q", str(work), str(checkout), cwd=tmp)
-
-            # The checked-out bytes must still satisfy the recorded seal.
-            sys.path_snapshot = list(sys.path)
-            sys.path.insert(0, str(checkout))
-            try:
-                from fitlab_evaluation.seal import verify_campaign
-                result = verify_campaign(
-                    checkout / "evidence" / "phase-a" /
-                    "synthetic-checkout-001")
-                self.assertEqual(result["status"], "COMPLETED")
-                self.assertEqual(result["execution_kind"], "SYNTHETIC_TEST")
-                self.assertEqual(result["source"]["commit"], source_commit)
-            finally:
-                sys.path[:] = sys.path_snapshot
-                for mod in [m for m in sys.modules if m.startswith("fitlab_")]:
-                    del sys.modules[mod]
+            verifier = (
+                "import sys\n"
+                "from fitlab_evaluation.seal import verify_campaign\n"
+                "result = verify_campaign(r'%s')\n"
+                "assert result['status'] == 'COMPLETED', result['status']\n"
+                "assert result['execution_kind'] == 'SYNTHETIC_TEST'\n"
+                "assert result['source']['commit'] == '%s'\n"
+                "print('CHECKOUT-VERIFY-OK')\n"
+            ) % (checkout / "evidence" / "phase-a" / "synthetic-checkout-001",
+                 source_commit)
+            verified = _run_python(checkout, verifier)
+            self.assertIn("CHECKOUT-VERIFY-OK", verified.stdout,
+                          msg=verified.stdout + verified.stderr)
 
 
 class AcceptedLIVE002EvidenceStillVerifies(unittest.TestCase):

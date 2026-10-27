@@ -1,10 +1,17 @@
 # FITLAB-PHASEA-001 — Phase A closure report
 
+> Publication context: this is a preserved historical engineering record of
+> the Phase A evidence-chain work. References to internal review artifacts
+> (evidence/review2, review3, review4) describe the project's private quality
+> process; those directories are not part of this public repository. The live
+> qualification superseding this phase's scope is the sealed LIVE-002 campaign
+> in evidence/phase-a/live-validation-001/.
+
 Offline, local-only closure of the FitLab F5 final-release evidence chain.
 No inference was run. No Lemonade endpoint, provider, network service, Git
 remote, publication or submission was contacted in any form.
 
-Author: Hodor (engineering worker). Reviewer: integration-reviewer (independent).
+Author: the engineering worker (PHASEA task context). Reviewer: independent integration reviewer.
 This report is a builder-authored record of measurements; it is not an
 acceptance verdict.
 
@@ -14,12 +21,12 @@ acceptance verdict.
 
 | Item | Value |
 | --- | --- |
-| Lane workspace | `C:/Users/Overh/AppData/Local/hermes/profiles/milo/workspace/fitlab-phase-a-closure-lane` |
+| Lane workspace | `<internal engineering workspace>` |
 | Branch | `work/fitlab-f5-corrective-20261022` |
 | Frozen candidate (start) | `08d6377f053d0ce8ac162ed329e2da02dc2a2cec` |
 | Frozen candidate tree | `28576f859ec4c1024f32ac58249baf9d590b698f` |
 | Lane start status | clean (`git status --porcelain` empty) |
-| Origin remote | `C:/Users/Overh/Lemonade-FitLab-Private/fitlab-f5-corrective-20261022`, read-only |
+| Origin remote | <private source origin>, read-only |
 | Origin HEAD after work | `08d6377f053d0ce8ac162ed329e2da02dc2a2cec` (unchanged) |
 | Interpreter | Python 3.13.2 (`py -3.13`), pytest 9.1.1 |
 
@@ -437,7 +444,7 @@ external spend. Stop before the owner-stated promotion deadline.
 ## 7. Remaining work to submission-ready
 
 1. Owner authorises and runs the 8-request (or 24-request) local validation
-   above; Hodor then binds the resulting campaign with `verify_campaign()` and
+   above; the engineering worker then binds the resulting campaign with `verify_campaign()` and
    records its seal/passport hashes as `MEASURED`.
 2. Independent reviewer confirms: the restored test is byte-identical to the
    stash blob, `verify_campaign()` adds no duplicate sealed check, and the

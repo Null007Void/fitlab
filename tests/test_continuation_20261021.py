@@ -335,19 +335,19 @@ class RedactionTests(unittest.TestCase):
 
     def test_removes_paths_users_emails_and_network_detail(self):
         cases = [
-            "Model at C:\\Users\\Overh\\models\\LFM.gguf",
-            "Path C:/Users/Overh/AppData/Local/lemonade",
-            "host /home/overh/.cache/huggingface",
+            "Model at C:\\Users\\sampleuser\\models\\LFM.gguf",
+            "Path C:/Users/sampleuser/AppData/Local/lemonade",
+            "host /home/sampleuser/.cache/huggingface",
             "mail owner@example.com",
             "server 192.168.1.44:13305 running",
             "mac 00:1A:2B:3C:4D:5E",
             "\\\\FILESRV\\share\\model.gguf",
-            "Users/Overh/Documents",
+            "Users/sampleuser/Documents",
         ]
         for value in cases:
             with self.subTest(value=value):
                 result = redact_text(value)
-                self.assertNotIn("Overh", result)
+                self.assertNotIn("sampleuser", result)
                 self.assertFalse(contains_private_detail(result))
 
     def test_redacts_paths_with_spaces_and_reserved_internal_hostnames(self):
@@ -372,14 +372,14 @@ class RedactionTests(unittest.TestCase):
 
     def test_redacts_nested_structures(self):
         payload = {
-            "label": "host at C:\\Users\\Overh\\x",
-            "items": ["mail a@b.co", {"deep": "/home/overh/y"}],
+            "label": "host at C:\\Users\\sampleuser\\x",
+            "items": ["mail a@b.co", {"deep": "/home/sampleuser/y"}],
             "number": 7,
             "flag": True,
             "none": None,
         }
         result = redact_value(payload)
-        self.assertNotIn("Overh", json.dumps(result))
+        self.assertNotIn("sampleuser", json.dumps(result))
         self.assertNotIn("a@b.co", json.dumps(result))
         self.assertEqual(result["number"], 7)
         self.assertIs(result["flag"], True)

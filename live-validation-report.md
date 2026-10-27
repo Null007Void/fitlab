@@ -1,7 +1,7 @@
 # LIVE-002 — authorized 8-request FitLab campaign (fitlab-f5-v1)
 
 Campaign directory: `evidence/phase-a/live-validation-001`
-Task: FITLAB-PHASEA-002 (MOW-LL, worker hodor, phase build)
+Task: FITLAB-PHASEA-002 (executed under an internal governed-dispatch work order, build phase)
 Report authored: 2026-10-26
 
 ## 1. Verdict summary
@@ -208,7 +208,7 @@ The suite is deterministic and contacts no model or external service
 
 ### Deviation from the dispatched procedure (recorded honestly)
 
-The dispatch referenced `docs/TEST_REPORT.md:7-9` and a
+The internal dispatch (project record, not part of this repository) referenced a `TEST_REPORT.md` and a
 `requirements-dev.lock`/`pip install --require-hashes` step. Neither file
 exists in this repository: it is standard-library-only with no third-party
 dependencies, and docs/INSTALL_AND_REPRODUCE.md:14-15 states explicitly that
@@ -244,7 +244,7 @@ step the product does not have.
   cryptographic proof; the raw replies and runtime identity above are what an
   independent reviewer should inspect.
 - This report is builder-authored engineering evidence. Acceptance is decided
-  by Milo and an independent reviewer, not by this document.
+  by the operator and an independent reviewer, not by this document.
 
 ## 10. Artifacts
 

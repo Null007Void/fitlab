@@ -1,7 +1,7 @@
 # LEMONADE FITLAB — F1 OFFLINE FOUNDATION ENGINEERING ACCEPTANCE REPORT
 
 Grant: `FITLAB-F1-20261019-GO`  
-Workspace: `C:\Users\Overh\Lemonade-FitLab-Private\fitlab-r2-foundation`  
+Workspace: `<private development workspace>`  
 Controlling implementation source: owner authorization reproduced in the grant; no approved R2 ZIP was found locally.  
 Engineering checkpoint: `fac4c3a044afac474ba0b8b7ed5b43cd3f447502`
 
@@ -181,7 +181,7 @@ This was an independent AI read-only review, not external technical acceptance. 
 
 Workspace:
 
-`C:\Users\Overh\Lemonade-FitLab-Private\fitlab-r2-foundation`
+`<private development workspace>`
 
 Python:
 
@@ -208,7 +208,7 @@ Verified:
 - The target workspace was absent before creation; unrelated work was not overwritten.
 - No approved R2 ZIP was found in searched local FitLab/private locations; the reproduced grant requirements controlled.
 - All project files, tests, reports, and Git state remained in the isolated workspace.
-- No private OFOS, ADWS, BOUNDARY, Walter, Hodor, Minimum Safe Worker, or other portfolio code was imported.
+- No private portfolio, estate, or other unrelated project code was imported.
 - Source imports are standard-library or project-local only.
 - Credential-pattern scan returned zero matches.
 - No dependency was installed.

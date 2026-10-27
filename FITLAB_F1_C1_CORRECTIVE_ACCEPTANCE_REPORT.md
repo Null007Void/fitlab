@@ -3,16 +3,16 @@
 **Date:** 2026-10-19  
 **Engineering verdict:** PASS — corrective candidate complete.  
 **Independent adversarial re-review:** PASS (`deleg_a8e8242f`).  
-**Owner acceptance:** Not inferred; remains Tyrell's decision.  
+**Owner acceptance:** Not inferred; remains the owner's decision.  
 **Next-stage authority:** F2–F8 remain NOT AUTHORIZED.
 
 ## Scope and source identity
 
-This corrective pass started from clean local Git commit `2b3aa25ca2b9dd37c24ad39aacb798d434cff83a` in the private repository `C:/Users/Overh/Lemonade-FitLab-Private/fitlab-r2-foundation` with no remotes.
+This corrective pass started from clean local Git commit in the private development repository with no remotes.
 
 The immutable original 36-member acceptance ZIP was re-identified at 54,634 bytes and SHA-256 `45b78fbeed15559c831bb3f264103c2844fe733cefa2a03d56e3047846d0359f`; its path safety passed. Its source/package manifests were previously verified and the archive was not modified.
 
-The controlling F1-C1 review and exact R2 scope/matrix text were supplied directly by Tyrell after the initial attachment proved to be that original 36-member archive. The separately described 12,477-byte five-member corrective-docs ZIP did not materialize as a local file in this session, so its expected SHA-256 `9660ddbff5696ecd52e4ff7c431b4d7d6068dc8408b25c978254facc24c15a47` could not honestly be recomputed. The supplied controlling text is preserved in `evidence/F1_C1_CONTROLLING_INDEPENDENT_REVIEW.md`; canonical T01–T09 wording and traceability are preserved in `evidence/R2_F1_T01_T09_TRACEABILITY.md`.
+The controlling F1-C1 review and exact R2 scope/matrix text were supplied directly by the owner after the initial attachment proved to be that original 36-member archive. The separately described 12,477-byte five-member corrective-docs ZIP did not materialize as a local file in this session, so its expected SHA-256 `9660ddbff5696ecd52e4ff7c431b4d7d6068dc8408b25c978254facc24c15a47` could not honestly be recomputed. The supplied controlling text is preserved in `evidence/F1_C1_CONTROLLING_INDEPENDENT_REVIEW.md`; canonical T01–T09 wording and traceability are preserved in `evidence/R2_F1_T01_T09_TRACEABILITY.md`.
 
 ## Red-phase reproduction
 

@@ -4,7 +4,7 @@
 
 | Item | Requirement |
 |---|---|
-| Python | 3.11 or newer. Tested on CPython 3.13 on Windows 11. |
+| Python | 3.12 or newer (`pathlib.Path.is_junction` is required). Tested on CPython 3.13 on Windows 11; Python 3.11 is known-incompatible. |
 | Dependencies | none. Standard library only. |
 | Network | not required for any offline command. |
 | GPU | not used. CPU only. |
@@ -101,8 +101,8 @@ To check the model file's integrity independently:
 Get-FileHash "<path-to-gguf>" -Algorithm SHA256
 ```
 
-The expected digest for the reviewed local artifact is recorded in
-`evidence/review4/`.
+Model files are operator-provided; this repository ships no model and no
+model digests (weights are external, see `NOTICE.md`).
 
 ## Environment variables
 
