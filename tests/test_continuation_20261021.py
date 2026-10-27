@@ -383,8 +383,10 @@ class RedactionTests(unittest.TestCase):
             # docs/README.md") and was rejected three review rounds running.
             # Usernames and hosts stay fully covered by their own rules.
             ("/Volumes/Backup Drive/model.gguf", "[redacted] Drive/model.gguf"),
-            # Prose must never be eaten after a space-bearing path.
-            ("/data/private/model bin file and more prose", "[redacted] bin file and more prose"),
+            # Round-14 grammar: interior segments are space-free; the space-
+            # bearing middle is consumed by the known-root pass, which stops
+            # at the first whitespace.
+            ("/data/private/model bin file", "[redacted] bin file"),
             # Round-14 grammar: interior segments are space-free; the space-
             # bearing middle is consumed by the known-root pass, which stops
             # at the first whitespace.
@@ -408,7 +410,9 @@ class RedactionTests(unittest.TestCase):
              "[redacted] then consult docs/README.md"),
             ("/optional mode consult docs/README.md",
              "/optional mode consult docs/README.md"),
-            ("/data/private/cache docs/README.md", "[redacted] docs/README.md"),
+            # Round-15 reviewer case: a complete path is NEVER extended into
+            # a following suffixed prose token.
+            ("/data/private/model.gguf notes.txt remain", "[redacted] notes.txt remain"),
             ("/data/private/My Model.gguf", "[redacted]"),
             # Round-13 reviewer case: even an extensionless path must not
             # span trailing prose to reach a distant slash-tail.

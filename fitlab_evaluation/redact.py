@@ -44,15 +44,21 @@ _POSIX_PATH = re.compile(
 )
 # Any other absolute POSIX-looking path with a file suffix (covers /data/...,
 # /srv2/..., custom mounts). Interior segments are space-free single tokens;
-# the filename tail directly before the anchor suffix may contain ONE space
-# ("My Model.gguf" style), never crossing a segment boundary. Prose can
-# therefore never be consumed across a distant filename
-# ("...consult docs/README.md") or trailing prose. A recognizable file suffix
-# is still required to avoid mangling prose that merely starts with a slash.
+# the filename tail directly before the anchor suffix may contain ONE space,
+# ONLY when the pre-space word itself carries no known suffix — so a
+# complete path is never extended into a following suffixed prose token
+# ("model.gguf notes.txt" stops at model.gguf) while space-bearing model
+# filenames ("My Model.gguf") are consumed whole. Prose can never be consumed
+# across a distant slash-anchored filename. A recognizable file suffix is
+# still required to avoid mangling prose that merely starts with a slash.
 _ANY_POSIX_FILE = re.compile(
     r"(?<![\w>/.])/[^\s\"'<>|/]+"
     r"(?:/[^\s\"'<>|/]+)*"
-    r"/[^\s\"'<>|/]+(?: [^\s\"'<>|/]+)?\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
+    r"(?:/"
+    r"(?![^\s\"'<>|/]*\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b)"
+    r"[^\s\"'<>|/]+ [^\s\"'<>|/]+"
+    r"|/[^\s\"'<>|/]+"
+    r")\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
 # IPv6: full form (8 groups) or compressed form containing "::" (including

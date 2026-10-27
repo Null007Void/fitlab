@@ -781,5 +781,8 @@ def export_report(directory, trust, record=None, plan=None, advisory=None, prove
     if provenance is not None:
         files["planning-provenance.json"] = stable_json(redact_value(provenance))
     if host is not None:
-        files["host-identity.json"] = stable_json(host)
+        # The companion must satisfy the same privacy contract as the
+        # rendered report: owner-supplied host values may carry local paths,
+        # emails or endpoints.
+        files["host-identity.json"] = stable_json(redact_value(host))
     return publish_bundle(directory, files)
