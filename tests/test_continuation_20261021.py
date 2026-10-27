@@ -364,6 +364,18 @@ class HybridArchitectureTests(unittest.TestCase):
             1000,
         )
         self.assertEqual((convolution, attention), ([], []))
+        # Superscript-style unicode digits satisfy str.isdigit() but int()
+        # rejects them; oversized ASCII decimal indexes exceed the default
+        # int-conversion limit. Both are IGNORED, never abort (round-44 A-1).
+        convolution, attention = classify_blocks(
+            [
+                {"name": "blk.\u00b2.attn_q.weight"},
+                {"name": "blk." + "9" * 5000 + ".attn_q.weight"},
+                {"name": "blk.\u0661\u0662\u0663.attn_q.weight"},
+            ],
+            1000,
+        )
+        self.assertEqual((convolution, attention), ([], []))
 
     def test_excessive_block_count_is_refused_before_classification(self):
         # Round-42: a structurally valid GGUF can declare a UINT64-maximum

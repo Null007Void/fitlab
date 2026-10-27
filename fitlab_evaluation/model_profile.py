@@ -94,6 +94,7 @@ def classify_blocks(tensors, block_count):
     ignored exactly as range(block_count) excluded them.
     """
     convolution, attention = set(), set()
+    canonical_width = len(str(block_count - 1)) if block_count > 0 else 0
     for name in {tensor["name"] for tensor in tensors}:
         if not name.startswith("blk."):
             continue
@@ -102,10 +103,23 @@ def classify_blocks(tensors, block_count):
         if dot <= 0:
             continue
         digits = tail[:dot]
-        if not digits.isdigit():
+        # Only canonical ASCII decimal indexes classify. Superscript and
+        # other unicode digit characters satisfy str.isdigit() but int()
+        # rejects them; ASCII strings of thousands of digits exceed the
+        # interpreter's default int-conversion limit and would abort
+        # instead of being ignored (round-44 A-1). Both names were ignored
+        # by the former prefix scan and must be ignored now.
+        if not digits.isascii() or not digits.isdigit():
+            continue
+        if digits[0] == "0" and len(digits) > 1:
+            continue
+        # Bounded string comparison before any int conversion: a canonical
+        # (no leading zeros) decimal with more digits than block_count - 1
+        # necessarily indexes at or beyond block_count.
+        if len(digits) > canonical_width:
             continue
         index = int(digits)
-        if digits != str(index) or index >= block_count:
+        if index >= block_count:
             continue
         if CONVOLUTION_BLOCK in name:
             convolution.add(index)
