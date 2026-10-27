@@ -154,7 +154,10 @@ def execute(directory,trust,*,memory=windows_memory,config=safe_runtime_config,c
             raise ArtifactError('RUNTIME_COMPATIBILITY_IDENTITY_MISMATCH')
         if compatibility.get('model_discovery',{}).get('status') != 'AVAILABLE_LISTED':
             raise ArtifactError('RUNTIME_MODEL_NOT_AVAILABLE')
-        session['runtime_compatibility']=compatibility
+        from .redact import redact_value
+        # The compatibility snapshot embeds runtime launch/endpoint identity:
+        # store the redacted copy (raw values already served validation).
+        session['runtime_compatibility']=redact_value(compatibility)
         session['status']='EVALUATING';_checkpoint(directory/'session.json',session)
         # Recheck offline/no-fetch state before each health request through a guard.
         original_ready=adapter.ready

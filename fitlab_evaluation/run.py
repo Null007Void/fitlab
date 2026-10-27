@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from .grader import grade, load_pack
-from .redact import REDACTED
+from .redact import redact_value
 from .lemonade import IntegrationError, LemonadeClient, MODEL, windows_memory, require_resources, validate_health, validate_result, validate_memory
 from .artifacts import source_digest,digest,stable_json
 from fitlab_foundation.planner_cli import _read_bounded_document, run_document
@@ -74,19 +74,7 @@ def evaluate(plan_document, repeats, *, client, memory, pause=time.sleep, budget
                 # checkpoint byte exists): the adapter's launch command and
                 # endpoint carry local cache paths. Raw health already passed
                 # validation; every stored copy holds only redacted identity.
-                health=dict(health)
-                for loaded in health.get('all_models_loaded') or []:
-                    if isinstance(loaded, dict):
-                        cmd = loaded.get('launch_command')
-                        if isinstance(cmd, list):
-                            loaded['launch_command'] = [
-                                REDACTED if (isinstance(part, str) and
-                                             (':' in part and ('\\' in part or '/' in part))) or
-                                             (isinstance(part, str) and part.startswith('http'))
-                                else part
-                                for part in cmd]
-                        if isinstance(loaded.get('backend_url'), str):
-                            loaded['backend_url'] = REDACTED
+                health=redact_value(health)
                 if 'runtime' not in record: record['runtime']=health
                 if time.monotonic()-started+client.timeout+1 > budget_seconds:
                     raise IntegrationError('session time budget exhausted after health check')

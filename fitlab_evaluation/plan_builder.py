@@ -164,6 +164,7 @@ def provenance(profile, workload, budget_bytes=None):
     """Return the declaration provenance that accompanies a built plan."""
     return {
         "model_identity_source": profile["identity_source"],
+        "model_identity": profile.get("model_identity", "UNVERIFIED"),
         "model_id": profile["model_id"],
         "checkpoint": profile["checkpoint"],
         "snapshot_revision": profile["snapshot_revision"],
