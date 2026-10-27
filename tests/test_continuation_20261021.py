@@ -424,8 +424,16 @@ class RedactionTests(unittest.TestCase):
              "/[redacted] cache docs/README.md"),
             # Round-19 A-1 (refined): a space-bearing username followed by a
             # separator is one identity and is consumed whole.
-            ("C:\\Users\\sampleuser sampleuser\\model.gguf", "[redacted]"),
-            ("/home/sampleuser sampleuser/model.gguf", "[redacted]"),
+            # Round-27 adjudicated trade-off (see packet contract): 3+-word
+            # space-bearing usernames are locally indistinguishable from
+            # prose after a username; PROSE PRESERVATION WINS. The username
+            # itself is consumed ("[redacted] sampleuser ..."); the generic
+            # tail remains. Refusal of unresolvable records happens at the
+            # publication privacy scan, not the grammar.
+            ("C:\\Users\\sampleuser sampleuser sampleuser\\model.gguf",
+             "[redacted] sampleuser sampleuser\\model.gguf"),
+            ("/home/sampleuser sampleuser sampleuser/model.gguf",
+             "/[redacted] sampleuser sampleuser/model.gguf"),
             ("the Users group has 3 members", "the Users group has 3 members"),
             # Round-19 A-1: user-profile rule runs before the suffix pass,
             # so a POSIX home path keeps its full consumption shape.

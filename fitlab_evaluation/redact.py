@@ -36,21 +36,25 @@ _WINDOWS_FILE_PATH = re.compile(
 )
 # UNC path, e.g. \\server\share\file.
 _UNC_PATH = re.compile(r"\\\\[^\s\"'<>|\\]+\\[^\s\"'<>|]*")
-# User-profile identity segments are handled BEFORE generic path grammar:
-# the user name may itself contain one space, so consuming only to the first
-# whitespace would leave the rest of the identity ("sampleuser sampleuser")
-# exposed. The optional second word is only consumed when the NEXT
-# non-space character after it is a path separator — prose after the user
-# name ("sampleuser cache docs/README.md") is never taken (round-26 A-1),
-# and a following separator means the space-bearing run really was one
-# user-directory name. Ordinary prose ("the Users group") is untouched
-# because the root must be followed by a separator first.
+# User-profile identity segments are handled BEFORE generic path grammar.
+# A user-directory identity is: the root, the username, then AT MOST ONE
+# further space-joined word — and that word is consumed only when it is
+# followed IMMEDIATELY by a path separator (one directory whose name
+# contains a space, "...\Users\John Smith\model.gguf"). Prose after the
+# username ("sampleuser cache docs/README.md") is never taken: three review
+# rounds (13, 14, 26) each rejected space-joined extension rules that could
+# consume prose, and probe-verified token analysis shows 3+-word usernames
+# to be locally indistinguishable from prose after a username; the adopted
+# contract is that PROSE PRESERVATION WINS, so 3+-word usernames degrade to
+# the same declared generic-tail exception as other space-bearing segments.
+# The root must be followed by a separator first, so ordinary prose
+# ("the Users group") is untouched.
 _WINDOWS_USER = re.compile(
     r"[/\\]Users[/\\][^\\/\s\"'<>|]+(?: [^\\/\s\"'<>|]+(?=[/\\]))?(?=[/\\]|\s|$)"
 )
 _POSIX_USER = re.compile(
     r"/(?:home|Users)/(?![/\s])"
-    r"[^\s/\"'<>|]+(?: [^\s/\"'<>|]+(?=[/\\]))?(?=[/\s]|$)",
+    r"[^\s/\"'<>|]+(?: [^\s/\"'<>|]+(?=[/]))?(?=[/\s]|$)",
     re.IGNORECASE,
 )
 # Absolute POSIX path under a system or home root. Two-pass design:
