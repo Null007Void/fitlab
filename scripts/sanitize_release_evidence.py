@@ -14,14 +14,22 @@ Then: rebuild final-seal.json via the product's _write_final_seal-equivalent
  passport's evaluation copy must carry the same redacted content, and the
  bundle manifest must hash the current components). passport.html,
  passport.json and passport/trust.json remain byte-untouched.
+
+Historical-handoff verification record: this public export intentionally
+omits private handoff infrastructure identities (index/delivery-record file
+names, private paths, schemas, digests). The record inside the export is
+regenerated from the original with those fields reduced to outcome counters;
+nothing else about the verification story changes.
 """
 import hashlib
 import json
 import sys
+
 from pathlib import Path
 
 EXPORT = Path(__file__).resolve().parents[1]  # repository root
 CAMP = EXPORT / "evidence/phase-a/live-validation-001"
+HANDOFF_RECORD = EXPORT / "evidence/phase-a/historical-handoff-verification.json"
 sys.path.insert(0, str(EXPORT))
 
 from fitlab_evaluation.redact import redact_value, contains_private_detail  # noqa: E402
@@ -30,6 +38,13 @@ from fitlab_evaluation.seal import inventory, verify_campaign  # noqa: E402
 
 TARGET_KEYS = {"launch_command", "backend_url", "model_path"}
 FILES = ("evaluation.json", "session.json")
+# Private handoff-infrastructure identity fields (names, schemas, mission
+# ids, private sub-paths) that must not ship in the public record.
+HANDOFF_PRIVATE_KEYS = ("index", "mission_id", "schema_version",
+                        "external_members", "source_commit", "source_tree")
+HANDOFF_OUTCOME_KEYS = ("bytes_verified", "failures", "inference_requests",
+                        "members_declared", "members_failed",
+                        "members_verified", "unused_externals", "verdict")
 
 
 def scrub(value):
@@ -49,6 +64,15 @@ def scrub(value):
     return value
 
 
+def sanitize_handoff_record(raw_text):
+    """Reduce the private handoff record to its public outcome summary."""
+    data = json.loads(raw_text.decode("utf-8"))
+    public = {key: data[key] for key in HANDOFF_OUTCOME_KEYS if key in data}
+    assert public.get("verdict") == "PASS", public
+    assert public.get("members_failed") == 0 and public.get("members_verified") == public.get("members_declared"), public
+    return stable_json(public)
+
+
 def main():
     for name in FILES:
         raw = (CAMP / name).read_bytes()
@@ -59,6 +83,13 @@ def main():
         assert not contains_private_detail(text), name
         (CAMP / name).write_bytes(text.encode("utf-8"))
         print(f"{name}: rewritten, LF, {len(raw)} -> {len(text.encode())} bytes")
+
+    # Public record: handoff verification outcome only (no private handoff
+    # infrastructure identities).
+    handoff_text = sanitize_handoff_record(HANDOFF_RECORD.read_bytes())
+    assert "\r" not in handoff_text
+    HANDOFF_RECORD.write_bytes(handoff_text.encode("utf-8"))
+    print("historical-handoff-verification.json: reduced to public outcome summary")
 
     # The passport bundle echoes evaluation.json; its copy must carry the
     # SAME sanitized content (verify_campaign binds the two by digest), and

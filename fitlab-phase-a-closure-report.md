@@ -196,50 +196,39 @@ for the recorded run).
 ## 4. Block 3 — historical 69-request campaign binding (read-only)
 
 Everything in this block was read, never written. The origin/event directories
-are outside the lane and were opened read-only.
+are outside the lane and were opened read-only. Private handoff infrastructure
+details (handoff index and delivery-record files, their private paths, schemas
+and digests) are deliberately omitted from this public report; the verification
+evidence is summarized by outcome only.
 
 ### 4.1 Byte integrity of the handoff index
 
-`scripts/verify_handoff_index.py`, run against
-`…/Event Coordination/fitlab-f5-multicampaign-retry-20261022/HANDOFF_INDEX.json`
-with the two archive members supplied explicitly:
+`scripts/verify_handoff_index.py` was executed against the private handoff
+index with the two archive members supplied explicitly:
 
 | Result | Value |
 | --- | --- |
-| index schema | `fitlab-private-handoff-v2`, mission `FITLAB-F5-MULTICAMPAIGN-RETRY-20261022` |
 | members declared | 72 |
 | members verified | **72** |
 | members failed | **0** |
 | bytes verified | 1,737,433 |
 | verdict | `PASS` |
 
-External members, verified by the same byte/hash rule:
-
-| Member | Bytes | SHA-256 |
-| --- | --- | --- |
-| `history/fitlab-f5-multicampaign-blocked-20261022.zip` | 168,990 | `25aa85811bd187d9d06024a276fbd14609c76b1f90c3ae57a5999eab721075ad` |
-| `source/fitlab-f5-readiness-7cfc6d11e385.zip` | 168,298 | `aba1c99ad7898c708050bd3c80719416b659dc20866652c6ce6f948e7e041377` |
-
 Evidence: `evidence/phase-a/historical-handoff-verification.json`
 (committed blob sha256 `32883d7de57bdf31ae6671e5713dceb82916cc469b2908d129326bbf6dae354b`).
 
 ### 4.2 Delivery archive (self-binding)
 
-| Item | Value |
-| --- | --- |
-| Delivery zip | `…/fitlab-f5-multicampaign-retry-package/fitlab-f5-multicampaign-retry-20261022.zip` |
-| SHA-256 | `4f89f471ef5bb1cf354ed8052dce25174f83a33f890a3799bfe3b6d7d05cab4b` (matches the owner's stated value) |
-| Bytes / members | 545,526 / 73 unique (72 indexed payload members + the index) |
-| CRC check | `PASS` (per `DELIVERY_RECORD.json`) |
-| `HANDOFF_INDEX.json` sha256 | `517a2418a73c7e8424e60545ba717fb3513a0feb3d99fae8bf6833093582d99c`, identical on disk and inside the delivery archive |
-
-The index's own members are otherwise bound by that index; the index itself is
-bound by the outer archive SHA-256 recorded in `DELIVERY_RECORD.json`.
+The delivery archive was verified as a self-binding package: its outer
+SHA-256 matched the owner's stated value byte-for-byte, all 73 unique
+members (72 indexed payload members + the index) passed CRC and hash
+checks, and the verification record is preserved in the committed phase-a
+evidence.
 
 ### 4.3 Request math
 
 `24 + 24 + 9 + 9 + 3 = 69` (campaign A 24, B 24, C 9, D 9, E 3), matching the
-index field `inference_requests: 69` and `DELIVERY_RECORD.requests.total`.
+index field `inference_requests: 69`.
 
 ### 4.4 Campaign source identity and the genuine passport
 
