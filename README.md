@@ -94,7 +94,7 @@ list), retained verbatim in the sealed evidence.
 Machine demonstrated: MSI Summit E13 AI Evo A1MTG — Intel Core Ultra 7 155H,
 16 GB RAM, Windows 11 Home.
 
-**Regression evidence for this release:** 268 tests passed + 291 subtests
+**Regression evidence for this release:** 269 tests passed + 293 subtests
 (warning-strict run identical), including the byte-stability regression that
 proves sealed evidence re-verifies `COMPLETED` from a fresh checkout.
 
@@ -144,7 +144,7 @@ examples/            runnable, offline examples
 fixtures/            frozen task packs (v1 historical, v2 accepted)
 docs/                architecture, evidence classes, reproduction, privacy
 evidence/            sealed LIVE-002 campaign + per-phase records
-tests/               268 tests / 291 subtests, stdlib unittest + pytest-compatible
+tests/               269 tests / 293 subtests, stdlib unittest + pytest-compatible
 ```
 
 ## Prerequisites
