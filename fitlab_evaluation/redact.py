@@ -35,10 +35,15 @@ _ANY_POSIX_FILE = re.compile(
     r"(?<![\w>/])/(?:[\w.-]+/)+[\w.-]+\.(?:gguf|safetensors|bin|pt|pth|onnx|exe|dll|json|txt|md|log)\b",
     re.IGNORECASE,
 )
-# IPv6 (compressed and full forms), conservative: requires a colon-pair and
-# hex groups; avoids version strings like 1.2 by requiring colons.
+# IPv6: full form (8 groups) or compressed form containing "::" (including
+# leading "::" like ::1 and suffix forms like fd00::1234). Ordinary clock or
+# duration strings (12:34:56) contain no "::" and fewer than 8 groups, so
+# they survive.
 _IPV6 = re.compile(
-    r"(?<![\w:])(?:[A-Fa-f0-9]{1,4}:){2,7}[A-Fa-f0-9]{0,4}(?:::[A-Fa-f0-9:]+)?(?![\w:])"
+    r"(?<![\w:])"
+    r"(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}"
+    r"|(?:[A-Fa-f0-9]{0,4}:){1,7}:(?:[A-Fa-f0-9]{1,4}(?::[A-Fa-f0-9]{0,4}){0,6})?"
+    r"(?![\w:])"
 )
 # Bare user-home fragment such as Users/name or home/name.
 _HOME_SEGMENT = re.compile(r"\b(?:Users|home)/[^\s\"'<>]+")
