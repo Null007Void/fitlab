@@ -290,41 +290,49 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
             and historical_campaign["request_count"] <= 100000 \
             and historical_campaign["request_count"] > 0:
         # Request-count corroboration: the shipped sealed campaign must be
-        # VERIFY_CAMPAIGN-verified (round-31 A-1: json.loads + len(rows) is
-        # not verification), bound to the SAME source identity as the
-        # declaration, AND its campaign identity must match the
-        # declaration's campaign_id — the shipped verification record pins
-        # the campaign identity through the verification record schema (the
-        # delivery digest is bound by the verification record's seal digest
-        # chain, not free text). Its durable measured row count must cover
-        # the declared requests. A declaration whose campaign_id does not
-        # match the shipped verified campaign stays DECLARED (round-32 A-1).
+        # VERIFY_CAMPAIGN-verified (round-31 A-1), bound to the SAME source
+        # identity as the declaration, AND its campaign identity must match
+        # the declaration's campaign_id (round-32 A-2: identity fails open
+        # is not allowed — the shipped verification record must carry an
+        # explicit campaign_id that matches). delivery_sha256 must equal the
+        # shipped public verification record's own file digest (round-33
+        # A-2): the record IS the corroborating artifact, so the declared
+        # delivery digest must bind its bytes. The evaluation record digest
+        # in the report always hashes the SUPPLIED record — never any
+        # verification document (round-33 A-1: separate variable).
         corroborated = False
         evidence_dir = EXPORT_EVIDENCE / "phase-a/live-validation-001"
         evidence_eval = evidence_dir / "evaluation.json"
         verified_record_path = EXPORT_EVIDENCE / "phase-a/live-validation-public-verification.json"
         if evidence_eval.exists() and verified_record_path.exists():
             try:
+                shipped_record_bytes = verified_record_path.read_bytes()
                 shipped = json.loads(evidence_eval.read_text(encoding="utf-8"))
                 from .seal import verify_campaign
                 campaign_view = verify_campaign(evidence_dir)
                 if campaign_view.get("status") != "COMPLETED":
                     raise ArtifactError("HISTORICAL_CORROBORATION_NOT_VERIFIED")
-                # The public verification record must itself bind the exact
-                # shipped bytes (its seal files must equal what
-                # verify_campaign just attested) — otherwise a stale record
-                # describes a different export.
-                record = json.loads(verified_record_path.read_text(encoding="utf-8"))
+                # Read the public verification record under a DISTINCT name
+                # (round-33 A-1): the evaluation record variable below is
+                # never touched by this block.
+                public_record = json.loads(
+                    shipped_record_bytes.decode("utf-8"))
                 shipped_seal_files = campaign_view["seal"]["files"]
-                record_seal_files = record.get("seal", {}).get("files", {})
+                record_seal_files = public_record.get("seal", {}).get("files", {})
                 if record_seal_files != shipped_seal_files:
                     raise ArtifactError("HISTORICAL_CORROBORATION_STALE_RECORD")
-                # Campaign identity: declaration's campaign_id must match the
-                # shipped verification record's campaign identity.
-                record_campaign = record.get("campaign_id")
-                if record_campaign is not None \
-                        and record_campaign != historical_campaign["campaign_id"]:
+                # Explicit campaign identity: the shipped record must name
+                # the declared campaign, not omit it (fails closed, round-33
+                # A-2).
+                record_campaign = public_record.get("campaign_id")
+                if type(record_campaign) is not str or not record_campaign \
+                        or record_campaign != historical_campaign["campaign_id"]:
                     raise ArtifactError("HISTORICAL_CORROBORATION_IDENTITY_MISMATCH")
+                # delivery digest: must equal the public verification
+                # record's own file bytes (the corroborating artifact).
+                from .artifacts import digest as _digest
+                if historical_campaign["delivery_sha256"] != _digest(shipped_record_bytes):
+                    raise ArtifactError("HISTORICAL_CORROBORATION_DELIVERY_MISMATCH")
                 rows = shipped.get("rows", [])
                 measured_rows = [r for r in rows if r.get("status") == "MEASURED"]
                 if shipped.get("execution_kind") == "LOCAL_RUNTIME" \
