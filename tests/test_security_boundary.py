@@ -131,6 +131,24 @@ class RevisionArgumentTests(unittest.TestCase):
                 path_trust["source_sha256"][path_key] = trust["source_sha256"]["fitlab_evaluation/run.py"]
                 with self.assertRaisesRegex(ArtifactError, "TRUST_NOT_SANITIZED"):
                     validate_trust(path_trust)
+                # A NON-STRING boundary (object carrying private detail)
+                # is refused outright: contains_private_detail returns
+                # False for non-strings, so an untyped boundary would
+                # otherwise skip the scan while trust.json is published
+                # verbatim (round-55 A-1).
+                object_boundary = dict(trust)
+                object_boundary["boundary"] = {
+                    "note": "reach me at researcher@fitlab.invalid"}
+                with self.assertRaisesRegex(ArtifactError, "INVALID_TRUST"):
+                    validate_trust(object_boundary)
+                empty_boundary = dict(trust)
+                empty_boundary["boundary"] = ""
+                with self.assertRaisesRegex(ArtifactError, "INVALID_TRUST"):
+                    validate_trust(empty_boundary)
+                oversized_boundary = dict(trust)
+                oversized_boundary["boundary"] = "x" * 513
+                with self.assertRaisesRegex(ArtifactError, "INVALID_TRUST"):
+                    validate_trust(oversized_boundary)
         # The frozen trust (boundary included) still validates cleanly.
         validate_trust(make_trust("HEAD"))
 

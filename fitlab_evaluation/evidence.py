@@ -121,6 +121,13 @@ def _validate_trust(trust):
     if type(files) is not dict or not files or any(type(k) is not str or type(v) is not str or not HASH.fullmatch(v) for k,v in files.items()):reject('INVALID_TRUST')
     if not {'fitlab_evaluation/run.py','fitlab_evaluation/lemonade.py'}<=files.keys():reject('INCOMPLETE_SOURCE_IDENTITY')
     if any('\\' in p or p.startswith('/') or '..' in p.split('/') for p in files):reject('INVALID_TRUST')
+    # The boundary field is the trust's free-text surface: it must be a
+    # bounded STRING before the privacy scan runs. The scan helper returns
+    # False for non-strings, so an object or list boundary would otherwise
+    # skip the scan entirely while export publishes trust.json verbatim
+    # (round-55 A-1).
+    boundary=trust['boundary']
+    if type(boundary) is not str or not boundary or len(boundary)>512:reject('INVALID_TRUST')
 
     # The whole trust document is scanned BEFORE any snapshot path is
     # touched: every trust string is published verbatim (trust.json rides
