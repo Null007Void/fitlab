@@ -218,11 +218,17 @@ _DISCARDED_ARRAY_KEYS = {
 
 def _read_metadata(reader):
     pairs = {}
+    seen_raw_keys = set()
     count = reader.unpack("<Q", 8)
     if count > MAX_KV_PAIRS:
         _fail("GGUF_TOO_MANY_METADATA")
     for _ in range(count):
         key = reader.string()
+        if key in seen_raw_keys:
+            # A repeated key would silently shadow the first declaration;
+            # provenance must come from unambiguous file content.
+            _fail("GGUF_DUPLICATE_METADATA")
+        seen_raw_keys.add(key)
         value_type = reader.unpack("<I", 4)
         if key in _DISCARDED_ARRAY_KEYS and value_type == ARRAY:
             element_type = reader.unpack("<I", 4)
@@ -232,11 +238,14 @@ def _read_metadata(reader):
             # Discarded items are read one at a time and immediately
             # dropped: only ONE decoded item is ever alive, so their
             # charges route to the transient pool and must not consume
-            # the retained budget (round-46 A-2). The cumulative
-            # transient cap still bounds hostile streaming payloads.
+            # the retained budget (round-46 A-2). EVERY item charges the
+            # transient pool, including numeric and BOOL scalars whose
+            # processing would otherwise bypass the cumulative bound
+            # entirely (round-47 A-1).
             reader.set_transient(True)
             try:
                 for _ in range(length):
+                    reader.charge(_SCALAR_ITEM_RESIDENCY_BYTES)
                     reader.scalar(element_type)
             finally:
                 reader.set_transient(False)

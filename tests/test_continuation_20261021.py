@@ -287,9 +287,9 @@ class GgufParserTests(unittest.TestCase):
             raw = read_metadata(path)
             self.assertEqual(raw["metadata"]["token_count"], 70000)
             # Aggregate discarded payload beyond the transient cap is
-            # refused before allocation: 520 one-MiB tokens declare ~2.7 GiB
-            # of transient decode volume; each item charges ~5.25 MiB, so
-            # the cap crosses within the first ~104 included items.
+            # refused before allocation: each discarded item charges the
+            # transient pool, so 110 one-MiB STRING tokens (~2.7 GiB
+            # declared, ~5.25 MiB charged each) cross the 512 MiB cap.
             hostile = discard_header(b"tokenizer.ggml.tokens", 520)
             piece = b"t" * (1 << 20)
             hostile += b"".join([struct.pack("<Q", 1 << 20) + piece] * 110)
@@ -297,6 +297,44 @@ class GgufParserTests(unittest.TestCase):
             path2.write_bytes(hostile)
             with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
                 read_metadata(path2)
+
+    def test_repeated_discarded_keys_refused_and_numeric_items_charged(self):
+        # Round-47 A-1: the reported trigger - repeated
+        # tokenizer.ggml.token_type arrays of 1,048,576 UINT64 items each,
+        # whose discarded numeric processing bypassed every charge - is
+        # now refused outright: duplicate metadata keys fail with a stable
+        # code before any second array is processed. With duplicates
+        # impossible, the three discarded keys cap uncharged numeric
+        # processing at zero and charged transient processing at
+        # 3 x MAX_ARRAY_ITEMS items. Every discarded item (numeric and
+        # BOOL included) charges the transient pool.
+        with tempfile.TemporaryDirectory() as directory:
+            head = b"GGUF" + struct.pack("<I", 3)
+            head += struct.pack("<Q", 0)
+            head += struct.pack("<Q", 2)
+            head += struct.pack("<Q", 25) + b"tokenizer.ggml.token_type"
+            head += struct.pack("<I", 9) + struct.pack("<I", 10)
+            head += struct.pack("<Q", 4) + b"\x00" * (4 * 8)
+            head += struct.pack("<Q", 25) + b"tokenizer.ggml.token_type"
+            path = Path(directory) / "repeat.gguf"
+            path.write_bytes(head)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_DUPLICATE_METADATA"):
+                read_metadata(path)
+            # A single legitimate numeric discarded array still parses
+            # and reports its counted length with per-item charging
+            # active (1,048,576 UINT64 items = 32 MiB transient charge,
+            # far below the 512 MiB cap).
+            ok = b"GGUF" + struct.pack("<I", 3)
+            ok += struct.pack("<Q", 0)
+            ok += struct.pack("<Q", 1)
+            ok += struct.pack("<Q", 25) + b"tokenizer.ggml.token_type"
+            ok += struct.pack("<I", 9) + struct.pack("<I", 10)
+            ok += struct.pack("<Q", 1 << 20) + b"\x00" * ((1 << 20) * 8)
+            ok += b"\x00" * ((-len(ok)) % 32)
+            path2 = Path(directory) / "numeric-ok.gguf"
+            path2.write_bytes(ok)
+            raw = read_metadata(path2)
+            self.assertEqual(raw["metadata"]["token_type_count"], 1 << 20)
 
     def test_rejects_missing_tensor_payload(self):
         with tempfile.TemporaryDirectory() as directory:
