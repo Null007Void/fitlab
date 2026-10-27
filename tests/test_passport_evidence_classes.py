@@ -206,6 +206,19 @@ class EvidenceClassMappingTests(unittest.TestCase):
             ):
                 build_report(self.trust, historical=binding)
 
+    def test_publication_scanner_sees_user_profile_patterns(self):
+        # Round-34 A-1: contains_private_detail must include the dedicated
+        # user-profile patterns, otherwise a single-backslash
+        # "\Users\name\..." fragment slips into the published record.
+        from fitlab_evaluation.redact import contains_private_detail
+        probe = "resumed from " + chr(92) + "Users" + chr(92) + "sampleuser" + chr(92) + "model.gguf"
+        self.assertTrue(contains_private_detail(probe))
+        probe2 = "host /home/sampleuser/artifacts"
+        self.assertTrue(contains_private_detail(probe2))
+        # Plain prose without private shapes is not a finding.
+        self.assertFalse(contains_private_detail(
+            "resumed from the checkpoint directory after the outage"))
+
     def test_forged_label_cannot_upgrade_a_report(self):
         forged = build_report(self.trust)
         forged["claims"][0]["evidence_label"] = "MEASURED"

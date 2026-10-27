@@ -262,6 +262,8 @@ def contains_private_detail(value):
         _WINDOWS_FILE_PATH,
         _WINDOWS_PATH,
         _UNC_PATH,
+        _WINDOWS_USER,
+        _POSIX_USER,
         _POSIX_PATH,
         _ANY_POSIX_FILE,
         _IPV6,
