@@ -55,7 +55,7 @@ checkout.)
 python -W error -m unittest discover -s tests -v
 ```
 
-Expected result: `OK` (267 tests / 287 subtests as of this release).
+Expected result: `OK` (268 tests / 291 subtests as of this release).
 Warnings are treated as errors, so a deprecation in any
 dependency would fail the run rather than pass quietly.
 
