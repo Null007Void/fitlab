@@ -221,6 +221,19 @@ def derive_profile(model_path, revision=None):
 
     weight_bits = declared_weight_bits(summary)
 
+    # Operator-supplied display metadata must be a string or absent: an
+    # ARRAY<STRING> license field would otherwise carry nested private
+    # strings through every publisher (round-57 A-1). The declared name is
+    # already type-checked at the mismatch gate above; these fields have
+    # no structural role and are accepted only in their declared shape.
+    def _declared_text(name):
+        value = metadata.get(name)
+        if value is None:
+            return None
+        if type(value) is not str or not value or len(value) > 512:
+            return None
+        return value
+
     return {
         "model_id": MODEL,
         "repo_id": REPO,
@@ -260,9 +273,9 @@ def derive_profile(model_path, revision=None):
         "quantization": summary.get("quantization"),
         "quantization_known": summary.get("quantization_known"),
         "weight_bits_per_parameter": weight_bits,
-        "declared_license_name": metadata.get("general.license.name"),
-        "declared_license_link": metadata.get("general.license.link"),
-        "size_label": metadata.get("general.size_label"),
+        "declared_license_name": _declared_text("general.license.name"),
+        "declared_license_link": _declared_text("general.license.link"),
+        "size_label": _declared_text("general.size_label"),
     }
 
 

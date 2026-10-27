@@ -35,8 +35,9 @@ from pathlib import Path
 
 from .artifacts import ArtifactError, BoundedParser, load_json, publish_bundle, stable_json
 from .evidence import make_trust, validate_trust, verify_record
-from .redact import redact_text
+from .redact import redact_text, redact_with_distinct_identities
 from .report_v3 import export_report, validate_advisory
+from fitlab_foundation.serialization import to_primitive
 
 # The two planning journeys share one requirements engine.
 DIRECTIONS = ("workload_to_hardware", "hardware_to_workloads")
@@ -236,9 +237,18 @@ def _doctor(arguments):
             # GGUF header strings; a private path, username, email or
             # other identifier inside general.license.name or
             # general.architecture would otherwise ride doctor/inspect
-            # output verbatim (round-56 A-1). Redaction replaces the
-            # identifier; a non-string passes through unchanged.
-            return redact_text(value) if type(value) is str else value
+            # output verbatim (round-56 A-1). Strings are redacted;
+            # structured container values are sanitized recursively so a
+            # nested array cannot smuggle private strings through
+            # unchanged (round-57 A-1); a non-string scalar (None, int)
+            # passes through unchanged.
+            if type(value) is str:
+                return redact_text(value)
+            if isinstance(value, (dict, list)):
+                primitive = to_primitive(value)
+                sanitized, _ = redact_with_distinct_identities(primitive)
+                return sanitized
+            return value
 
         record["model"] = {
             "model_id": profile["model_id"],

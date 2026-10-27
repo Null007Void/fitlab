@@ -93,6 +93,73 @@ class PublicCliSurface(unittest.TestCase):
         self.assertIn("[redacted", model["snapshot_revision"])
         self.assertEqual(model["architecture_family"], "lfm2")
 
+    def test_array_valued_license_metadata_is_never_published(self):
+        # Round-57 A-1: an ARRAY<STRING> general.license.name would carry
+        # nested private strings through _display unchanged (non-strings
+        # passed through raw) and ride the doctor result verbatim.
+        # derive_profile accepts the license field only as a bounded
+        # string (non-strings collapse to None) and the _display boundary
+        # sanitizes any structured container recursively.
+        from unittest.mock import patch
+        from fitlab_evaluation import cli as cli_module
+        from fitlab_evaluation.model_profile import derive_profile
+        array_profile = {
+            "model_id": "m", "checkpoint": "c",
+            "architecture_family": "lfm2",
+            "architecture_kind": "DENSE",
+            "attention_mechanism": "STANDARD_FULL",
+            "hybrid": False, "total_parameters": 1,
+            "quantization": "Q4_K_M", "weight_bits_per_parameter": "4",
+            "declared_license_name": [
+                "reach researcher@fitlab.invalid",
+                "C:/Users/sampleuser/notes.txt",
+            ],
+        }
+
+        class _Args:
+            commit = "HEAD"
+
+        with patch.object(cli_module, "make_trust",
+                          side_effect=ArtifactError("SOURCE_UNAVAILABLE")), \
+             patch("fitlab_evaluation.model_profile.profile_hardware",
+                   lambda: {"t": 1}), \
+             patch("fitlab_evaluation.model_profile.locate_model_file",
+                   lambda: ("plain.gguf", "r1")), \
+             patch("fitlab_evaluation.model_profile.derive_profile",
+                   lambda *a, **k: array_profile):
+            record = cli_module._doctor(_Args())
+        serialized = json.dumps(record["model"])
+        self.assertNotIn("researcher@fitlab.invalid", serialized)
+        self.assertNotIn("sampleuser", serialized)
+        self.assertIn("[redacted", serialized)
+        # At the profiling layer the non-string license metadata
+        # collapses to None before any publisher sees it.
+        from fitlab_evaluation import model_profile as profile_module
+        summarize = {
+            "source": "GGUF_HEADER_METADATA", "file_bytes": 1,
+            "gguf_version": 3,
+            "metadata": {
+                "lfm2.block_count": 4,
+                "lfm2.embedding_length": 64,
+                "lfm2.attention.head_count": 4,
+                "general.license.name": [" hostile@fitlab.invalid "],
+            },
+            "tensors": [], "name": "LFM2.5-1.2B-Instruct-GGUF",
+            "architecture": "lfm2", "file_type_id": 15,
+            "quantization": "Q4_K_M", "quantization_known": True,
+            "total_parameters": 0, "tensor_count": 0,
+            "block_count": 4, "head_count": 4, "head_count_kv": None,
+            "head_dimension": None, "embedding_length": 64,
+            "context_length": None, "vocab_size": None,
+            "expert_markers": [], "mixture_of_experts": False,
+        }
+        with patch.object(profile_module, "summarize", lambda p: summarize), \
+             patch.object(profile_module, "locate_model_file",
+                          lambda: ("plain.gguf", None)):
+            profile = derive_profile("header-only.gguf", None)
+        self.assertIsNone(profile["declared_license_name"])
+        self.assertNotIn("hostile@fitlab.invalid", json.dumps(profile))
+
     def test_module_entry_points_exist(self):
         from fitlab_evaluation import public_cli, cli, workflow
         from fitlab_evaluation import seal as seal_module
