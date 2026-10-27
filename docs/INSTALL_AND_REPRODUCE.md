@@ -11,8 +11,13 @@
 | Disk | about 2 MB for the source tree. |
 | Model file | optional. Only needed for real-model planning, not for the tests. |
 
-There is no `pip install` step, no build step and no lockfile, because there
-are no third-party packages. Clone the repository and run from its root.
+There is no `pip install` step REQUIRED, no third-party packages and no
+lockfile: clone the repository and run from its root. If you want the
+`fitlab` console command on PATH, install the project in editable mode from
+the clone (see Installing the `fitlab` command below) — an editable install
+keeps the repository layout the engine's source/fixture binding expects;
+a non-editable wheel install is NOT a supported route for `evaluate`/`trust`
+because those commands bind to the frozen checkout layout by design.
 
 ## Supported platforms
 
@@ -32,11 +37,15 @@ python -m pip install .
 fitlab --help
 ```
 
-`pip install .` exposes the console script `fitlab` (entry point
-`fitlab_evaluation.public_cli:main`; packaging metadata in
-`pyproject.toml`). Without installing, the same commands work as modules:
+`pip install -e .` (editable, from the clone) exposes the console script
+`fitlab` — entry point `fitlab_evaluation.public_cli:main`, packaging
+metadata in `pyproject.toml` — while keeping the repository layout that the
+engine's frozen source/fixture binding requires. Without installing, the
+same commands work as modules:
 `python -m fitlab_evaluation.public_cli inspect|evaluate|passport`. No
-third-party packages are required either way.
+third-party packages are required either way. (`inspect`/`passport` also
+work from a non-editable install; `evaluate`/`trust` require the editable
+checkout.
 
 ## Reproducing the offline results
 
@@ -44,7 +53,7 @@ third-party packages are required either way.
 python -W error -m unittest discover -s tests -v
 ```
 
-Expected result: `OK` (258 tests / 276 subtests as of this release).
+Expected result: `OK` (259 tests / 276 subtests as of this release).
 Warnings are treated as errors, so a deprecation in any
 dependency would fail the run rather than pass quietly.
 

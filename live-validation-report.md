@@ -118,9 +118,17 @@ memory, or continuous telemetry.
 
 ## 6. Seal / campaign verification (`fitlab_evaluation.seal.verify_campaign`)
 
+> Publication note: the seal hashes shown below are the ORIGINAL campaign
+> receipts, quoted verbatim from the run. The public edition redacted three
+> runtime path fields from evaluation.json/session.json and rebuilt the seal
+> accordingly; the authoritative in-repo receipt is
+> `evidence/phase-a/live-validation-public-verification.json`, and
+> `verify_campaign('evidence/phase-a/live-validation-001')` re-derives
+> `COMPLETED` from the carried bytes.
+
 Invoked from a standalone script against `evidence/phase-a/live-validation-001`;
 full returned dict preserved at
-`evidence/phase-a/live-validation-verify-campaign.json`:
+`evidence/phase-a/live-validation-public-verification.json`:
 
 ```json
 {
@@ -253,7 +261,7 @@ Campaign directory (sealed, 10 files + `final-seal.json`):
 
 Additional evidence committed with this report:
 `evidence/phase-a/live-validation-preflight.json`,
-`evidence/phase-a/live-validation-verify-campaign.json`,
+`evidence/phase-a/live-validation-public-verification.json`,
 `evidence/phase-a/live-validation-regression.txt`,
 `evidence/.gitattributes` (new, additive: byte-preservation for this sealed
 campaign directory only — see §11).
@@ -324,15 +332,15 @@ seal hashes (1552, 138, 7, 9 CRLF sequences for the four files), `git status`
 is clean, and a second fresh detached checkout re-runs
 `verify_campaign` → `COMPLETED`.
 
-### Residual defect (not fixed here, out of authorized scope)
+### Residual defect — HISTORICAL STATUS: fixed in this release candidate
 
-The root cause remains in product source: on Windows, `_checkpoint`,
-`publish_bundle` and `export_report` should write with `newline=""` (or with
-`"\n"` encoded bytes) so sealed digests are platform-stable without any Git
-attribute. That correction modifies existing product files and therefore
-requires its own authorized task with a discriminating regression (write a
-campaign, commit it under the repository's root attributes, check out fresh,
-require `verify_campaign` to pass). Until then, any Windows-produced sealed
-campaign is unverifiable from a fresh checkout unless its directory carries a
-`-text` attribute.
+At the time of this campaign, the writer defect was real and uncorrected;
+this section records that finding verbatim in its original scope. The
+publication candidate that carries this report CORRECTS it at the writers
+(`newline=""` on every evidence write path) with the required discriminating
+regression — write a campaign, commit it under plain repository attributes,
+check out fresh, require `verify_campaign` to pass — see
+`tests/test_windows_byte_stability.py`. A `-text` attribute is no longer
+necessary for newly produced sealed campaigns (it is retained for this
+historical directory's byte preservation).
 

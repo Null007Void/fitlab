@@ -55,9 +55,10 @@ denominators.
 ## Layer 3 — the report is byte-reproducible
 
 ```powershell
-# Output parents must exist first: publication never creates them (atomic
-# no-overwrite contract). Non-Windows shells: use forward slashes.
-mkdir v1\source, v1\passport, v2\source, v2\passport
+# Create ONLY the top directories v1 and v2. The publication destinations
+# (v1\source, v1\passport, ...) must NOT pre-exist: publication is atomic
+# and never overwrites (OUTPUT_EXISTS). Non-Windows shells: forward slashes.
+mkdir v1, v2
 python -m fitlab_evaluation.cli trust --output-dir v1\source
 python -m fitlab_evaluation.cli passport --trust v1\source\trust.json --output-dir v1\passport
 python -m fitlab_evaluation.cli trust --output-dir v2\source

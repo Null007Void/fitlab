@@ -57,28 +57,35 @@ class PublicCliSurface(unittest.TestCase):
         self.assertTrue(callable(advanced_workflow))
 
     def test_evaluate_fails_fast_through_guarded_gates(self):
-        # With every runtime gate made to refuse deterministically, the
-        # public evaluate entry must stop BEFORE any model contact, write
-        # durable BLOCKED evidence, and never reach completion. The runtime
-        # client itself is assertion-armed: any attempt to call it fails the
-        # test, so this regression can never perform inference — on any
-        # machine, with or without a prepared runtime.
+        # Deterministic, host-independent injection: the runtime adapter's
+        # readiness probe is made to refuse, and the adapter's completion is
+        # assertion-armed — an inference attempt fails the test. So this
+        # regression can never reach the model on any machine (with or
+        # without a prepared runtime), and the public evaluate entry must
+        # produce durable sealed BLOCKED evidence with zero requests.
         import tempfile
         from unittest.mock import patch
         from fitlab_evaluation import workflow as wf
-        for bad_config in ({}, {"offline": True, "no_fetch_executables": False}):
-            with tempfile.TemporaryDirectory() as tmp:
-                output = Path(tmp) / "campaign"
-                with patch.object(wf.LemonadeClient, "complete",
-                                  side_effect=AssertionError("inference attempted")):
-                    code, text = _run("evaluate", "--output-dir", str(output),
-                                      "--repeats", "1")
-                self.assertEqual(code, 2, out_debug(code, text))
-                session = json.loads((output / "session.json").read_text("utf-8"))
-                self.assertEqual(session["status"], "BLOCKED")
-                self.assertEqual(session["inference_requests"], 0)
-                seal = json.loads((output / "final-seal.json").read_text("utf-8"))
-                self.assertEqual(seal["status"], "BLOCKED")
+        from fitlab_evaluation.lemonade import IntegrationError
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "campaign"
+            with patch.object(wf.LemonadeClient, "ready",
+                              side_effect=IntegrationError(
+                                  "runtime offline state changed")), \
+                 patch.object(wf.LemonadeClient, "complete",
+                              side_effect=AssertionError(
+                                  "inference attempted")) as complete:
+                code, text = _run("evaluate", "--output-dir", str(output),
+                                  "--repeats", "1")
+                complete.assert_not_called()
+            self.assertEqual(code, 2, out_debug(code, text))
+            session = json.loads((output / "session.json").read_text("utf-8"))
+            self.assertEqual(session["status"], "BLOCKED")
+            self.assertIsInstance(session.get("reason"), str)
+            self.assertTrue(session["reason"])
+            self.assertEqual(session["inference_requests"], 0)
+            seal = json.loads((output / "final-seal.json").read_text("utf-8"))
+            self.assertEqual(seal["status"], "BLOCKED")
 
     def test_evaluate_passes_plan_through(self):
         # A planning document naming a different model must be refused before
@@ -132,6 +139,18 @@ class PublicCliSurface(unittest.TestCase):
             self.assertEqual(hashes[0], hashes[1])
             # Rendered HTML must stay free of private detail by construction.
             self.assertNotIn(b"C:\\Users\\", hashes[0])
+
+    def test_install_layout_contract(self):
+        # The supported install is the editable checkout: the engine binds
+        # fixtures and source roots relative to the package's parent
+        # directory. This test pins that contract so a future packaging
+        # change cannot silently break evaluate/trust.
+        import os
+        self.assertTrue((ROOT / "fixtures" / "tasks-v2.json").exists())
+        self.assertTrue((ROOT / "fitlab_evaluation" / "run.py").exists())
+        self.assertTrue((ROOT / "pyproject.toml").exists())
+        entry = "fitlab = \"fitlab_evaluation.public_cli:main\""
+        self.assertIn(entry, (ROOT / "pyproject.toml").read_text("utf-8"))
 
     def test_console_script_module_invocation(self):
         # The documented module invocation must expose the three public
