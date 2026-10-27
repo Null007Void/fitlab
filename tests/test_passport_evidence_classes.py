@@ -143,6 +143,22 @@ class EvidenceClassMappingTests(unittest.TestCase):
         self.assertIn(HISTORICAL["source_commit"], html)
         self.assertIn("69", html)
 
+    def test_historical_measured_promotion_requires_corroboration(self):
+        # Round-30 A-1: a matching-source zero-observation record cannot
+        # promote a declared campaign to measured, and the request count is
+        # corroborated only against the shipped sealed campaign. The
+        # synthetic HISTORICAL fixture names a commit that is NOT this
+        # checkout's, so without shipped-corroboration it stays DECLARED.
+        record = self.synthetic_record()
+        report = build_report(self.trust, record, historical=HISTORICAL)
+        # Synthetic record: not LOCAL_RUNTIME/measurement-eligible, so no
+        # promotion.
+        self.assertFalse(report["historical_campaign"]["evidence_corroborated"])
+        self.assertEqual(
+            report["historical_campaign"]["evidence_class"], "DECLARED")
+        self.assertEqual(
+            report["evidence_class"], SYNTHETIC_TEST_EVIDENCE)
+
     def test_incomplete_or_forged_historical_binding_is_rejected(self):
         variants = []
         for key in HISTORICAL:

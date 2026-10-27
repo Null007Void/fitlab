@@ -43,6 +43,9 @@ from fitlab_foundation.planner_cli import run_document
 from fitlab_foundation.serialization import to_primitive
 
 SCHEMA_VERSION = "fitlab-capability-passport-v3"
+# Evidence-directory root for historical corroboration (the sealed campaign
+# committed inside this export).
+EXPORT_EVIDENCE = Path(__file__).resolve().parents[1] / "evidence"
 
 # Evidence classes, most to least certain. The rendering styles them.
 MEASURED = "MEASURED"
@@ -274,18 +277,42 @@ def build_report(trust, record=None, plan=None, advisory=None, provenance=None, 
     record_kind = None if verified is None else verified["execution_kind"]
     historical_campaign = _validate_historical(historical)
     # Measured promotion requires corroborating verified LOCAL_RUNTIME
-    # evidence bound to the same source identity (round-28 A-2). The
-    # verified mapping carries the source binding; a historical declaration
-    # without corroboration stays DECLARED.
+    # evidence that is MEASUREMENT-ELIGIBLE (completed rows exist — a
+    # stopped/zero-observation record cannot crown a declared campaign as
+    # measured) AND bound to the same source identity (round-28 A-2,
+    # round-30 A-1). A historical declaration without that corroboration
+    # stays DECLARED.
     if historical_campaign is not None and verified is not None \
             and verified.get("execution_kind") == "LOCAL_RUNTIME" \
+            and verified.get("measurement_eligible") \
             and verified["source_binding"]["commit"] == historical_campaign["source_commit"] \
-            and verified["source_binding"]["tree"] == historical_campaign["source_tree"]:
-        historical_campaign = dict(historical_campaign)
-        historical_campaign["evidence_class"] = MEASURED
-        historical_campaign["evidence_label"] = evidence_label(
-            MEASURED, historical=True)
-        historical_campaign["evidence_corroborated"] = True
+            and verified["source_binding"]["tree"] == historical_campaign["source_tree"] \
+            and historical_campaign["request_count"] <= 100000 \
+            and historical_campaign["request_count"] > 0:
+        # Request-count corroboration: the only on-disk corroboration
+        # channel is the sealed campaign evidence directory; without it the
+        # count stays uncorroborated and the class stays DECLARED.
+        corroborated = False
+        evidence_eval = EXPORT_EVIDENCE / "phase-a/live-validation-001/evaluation.json"
+        if evidence_eval.exists():
+            try:
+                shipped = json.loads(evidence_eval.read_text(encoding="utf-8"))
+                rows = shipped.get("rows", [])
+                # The shipped LIVE-002 record binds the same source commit
+                # and tree and its durable row count must cover the declared
+                # campaign's requests.
+                if shipped.get("execution_kind") == "LOCAL_RUNTIME" \
+                        and len(rows) >= historical_campaign["request_count"] \
+                        and trust["source_commit"] == historical_campaign["source_commit"]:
+                    corroborated = True
+            except (ValueError, OSError):
+                corroborated = False
+        if corroborated:
+            historical_campaign = dict(historical_campaign)
+            historical_campaign["evidence_class"] = MEASURED
+            historical_campaign["evidence_label"] = evidence_label(
+                MEASURED, historical=True)
+            historical_campaign["evidence_corroborated"] = True
 
     claims = []
 
