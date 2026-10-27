@@ -58,13 +58,16 @@ class EvidencePipelineTests(unittest.TestCase):
     def test_bundle_atomicity_and_no_overwrite(self):
         with tempfile.TemporaryDirectory() as directory:
             dest=Path(directory)/'report'
-            with patch('fitlab_evaluation.artifacts._rename_new',side_effect=OSError('fault')):
-                with self.assertRaises(ArtifactError):export_report(dest,self.trust)
-            self.assertFalse(dest.exists());self.assertEqual(list(Path(directory).iterdir()),[])
-            export_report(dest,self.trust)
-            before={p.name:p.read_bytes() for p in dest.iterdir()}
-            with self.assertRaises(ArtifactError):export_report(dest,self.trust)
-            self.assertEqual(before,{p.name:p.read_bytes() for p in dest.iterdir()})
+            # The legacy v2 export API is withdrawn entirely (round-52
+            # A-1): it predates the publication privacy boundary and
+            # published record/planning content verbatim. Every
+            # publication goes through the enforcing v3 exporter.
+            with self.assertRaisesRegex(ArtifactError,'LEGACY_PASSPORT_WITHDRAWN_USE_V3_EXPORTER'):
+                export_report(dest,self.trust)
+            self.assertEqual(list(Path(directory).iterdir()),[])
+            with self.assertRaisesRegex(ArtifactError,'LEGACY_PASSPORT_WITHDRAWN_USE_V3_EXPORTER'):
+                export_report(dest,self.trust,self.record)
+            self.assertEqual(list(Path(directory).iterdir()),[])
     def test_html_and_forged_report(self):
         p=build_report(self.trust)
         p['claims'][0]['value']=100
@@ -74,6 +77,21 @@ class EvidencePipelineTests(unittest.TestCase):
         p=build_report(self.trust,plan=plan)
         rendered=render_report(p,self.trust,plan=plan)
         self.assertNotIn('<script>',rendered)
+
+    def test_legacy_export_api_never_publishes_private_planning(self):
+        # Round-52 A-1: the callable legacy v2 exporter published
+        # planning_input verbatim with no publication privacy scan; a
+        # personal path or email inside a declared planning assumption
+        # would survive into the shareable bundle. The direct API is now
+        # refused with the migration error and publishes NOTHING.
+        plan=json.loads((ROOT/'examples/f2_workload_to_hardware.json').read_text())
+        plan['scenarios'][0]['memory_assumption']={
+            'resident_bytes':'C:/Users/sampleuser/AppData/Local/lemonade'}
+        with tempfile.TemporaryDirectory() as directory:
+            dest=Path(directory)/'passport'
+            with self.assertRaisesRegex(ArtifactError,'LEGACY_PASSPORT_WITHDRAWN_USE_V3_EXPORTER'):
+                export_report(dest,self.trust,plan=plan)
+            self.assertEqual(list(Path(directory).iterdir()),[])
 
     def test_replay_rejects_memory_and_time_contradictions(self):
         variants=[]

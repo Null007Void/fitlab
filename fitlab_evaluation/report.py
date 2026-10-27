@@ -91,10 +91,11 @@ def render_report(report,trust,record=None,plan=None):
 
 
 def export_report(directory,trust,record=None,plan=None):
-    report=build_report(trust,record,plan)
-    rendered=render_report(report,trust,record,plan)
-    files={'passport.json':stable_json(report),'passport.html':rendered,'trust.json':stable_json(trust)}
-    if record is not None:files['evaluation.json']=stable_json(record)
-    planning_input=plan if plan is not None else (None if record is None else record['planning_input'])
-    if planning_input is not None:files['planning-input.json']=stable_json(planning_input)
-    return publish_bundle(directory,files)
+    # The legacy v2 passport predates the publication privacy boundary:
+    # it publishes record/planning_input verbatim with no redaction scan,
+    # so the CLI route has been withdrawn since the round-25 review and
+    # the direct Python API is withdrawn too (round-52 A-1). Every
+    # publication goes through the enforcing v3 exporter
+    # (fitlab_evaluation.report_v3.export_report), the same engine the
+    # fitlab passport / cli passport commands already use.
+    raise ArtifactError("LEGACY_PASSPORT_WITHDRAWN_USE_V3_EXPORTER")
