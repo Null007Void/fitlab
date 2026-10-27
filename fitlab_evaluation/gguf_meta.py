@@ -22,17 +22,25 @@ MAX_ARRAY_ITEMS = 1 << 20
 MAX_TENSOR_DIMS = 8
 MAX_QUANTIZATION_NAME = 64
 
-# Cumulative retained-residency budget for everything the parser builds
-# (metadata strings, array items and tensor descriptors). Per-field limits
-# alone permit hostile combinations - e.g. thousands of 1 MiB retained
-# strings - whose aggregate allocation exhausts memory before any later
-# gate runs (round-45 A-1). Every component is charged BEFORE it is
-# allocated: strings from their declared byte length, scalar array items
-# and descriptor dimensions at fixed footprints. 64 MiB is roughly three
-# orders of magnitude above the largest metadata any planner-relevant
-# model carries (vocab arrays are counted but discarded) and caps the
-# former multi-gigabyte exposure.
+# Two cumulative budgets, both charged BEFORE the allocation happens:
+#
+# RETAINED residency (MAX_METADATA_RESIDENCY_BYTES): everything that stays
+#   alive in the result - metadata strings, retained array items and tensor
+#   descriptors. Per-field limits alone permit hostile combinations whose
+#   aggregate allocation exhausts memory before any later gate runs
+#   (round-45 A-1). Strings charge a conservative DECODED footprint, not
+#   raw bytes: CPython stores a decoded string at up to 4 bytes per
+#   character (one supplementary or non-BMP character forces UCS-4 for the
+#   WHOLE string), and the raw buffer coexists with the decoded object at
+#   peak, hence the length*5 + overhead charge (round-46 A-1).
+# TRANSIENT decode volume (MAX_DISCARDED_BYTES): discarded-array items
+#   (e.g. tokenizer vocabularies) are read one at a time and immediately
+#   dropped, so only ONE item is ever alive; they must not consume the
+#   retained budget - a legitimate 70+ MiB vocabulary would otherwise be
+#   refused despite tiny live residency (round-46 A-2). The cumulative
+#   transient cap still bounds hostile streaming payloads.
 MAX_METADATA_RESIDENCY_BYTES = 64 * 1024 * 1024
+MAX_DISCARDED_BYTES = 512 * 1024 * 1024
 _SCALAR_ITEM_RESIDENCY_BYTES = 32
 _DESCRIPTOR_DIMENSION_RESIDENCY_BYTES = 64
 
@@ -109,27 +117,39 @@ def _fail(code, detail=""):
 class _Reader:
     """Sequential, length-bounded reader over a file handle."""
 
-    def __init__(self, handle, limit, residency_budget):
+    def __init__(self, handle, limit):
         self._handle = handle
         self._limit = limit
         self._offset = 0
-        self._residency_budget = residency_budget
-        self._residency = 0
+        self._retained = 0
+        self._transient = 0
+        self._transient_mode = False
 
     @property
     def offset(self):
         return self._offset
 
+    def set_transient(self, on):
+        """Route charges to the transient pool while discarding items."""
+        self._transient_mode = bool(on)
+
     def charge(self, amount):
         """Charge declared parse residency BEFORE the allocation happens.
 
-        A charge that crosses the budget fails with a stable code, so a
-        hostile declaration can never drive the parser into unbounded
-        allocation or a MemoryError at process scale.
+        Retained charges enforce MAX_METADATA_RESIDENCY_BYTES; charges
+        taken while discarding array items enforce MAX_DISCARDED_BYTES.
+        Either crossing fails with a stable code, so a hostile
+        declaration can never drive unbounded allocation or a
+        MemoryError at process scale.
         """
-        if self._residency + amount > self._residency_budget:
-            _fail("GGUF_METADATA_BUDGET_EXCEEDED")
-        self._residency += amount
+        if self._transient_mode:
+            if self._transient + amount > MAX_DISCARDED_BYTES:
+                _fail("GGUF_METADATA_BUDGET_EXCEEDED")
+            self._transient += amount
+        else:
+            if self._retained + amount > MAX_METADATA_RESIDENCY_BYTES:
+                _fail("GGUF_METADATA_BUDGET_EXCEEDED")
+            self._retained += amount
 
     def read(self, count):
         if count < 0 or self._offset + count > self._limit:
@@ -163,8 +183,11 @@ class _Reader:
         length = self.unpack("<Q", 8)
         if length > MAX_STRING_BYTES:
             _fail("GGUF_STRING_TOO_LARGE")
-        # Charge the declared payload BEFORE reading or decoding it.
-        self.charge(length)
+        # Conservative DECODED residency charge BEFORE the allocation: the
+        # raw bytes coexist with the decoded object at peak, and one
+        # supplementary character forces 4-byte UCS-4 storage for the
+        # whole decoded string (round-46 A-1).
+        self.charge(length * 5 + 64)
         raw = self.read(length)
         try:
             return raw.decode("utf-8")
@@ -206,8 +229,17 @@ def _read_metadata(reader):
             length = reader.unpack("<Q", 8)
             if length > MAX_ARRAY_ITEMS:
                 _fail("GGUF_ARRAY_TOO_LARGE")
-            for _ in range(length):
-                reader.scalar(element_type)
+            # Discarded items are read one at a time and immediately
+            # dropped: only ONE decoded item is ever alive, so their
+            # charges route to the transient pool and must not consume
+            # the retained budget (round-46 A-2). The cumulative
+            # transient cap still bounds hostile streaming payloads.
+            reader.set_transient(True)
+            try:
+                for _ in range(length):
+                    reader.scalar(element_type)
+            finally:
+                reader.set_transient(False)
             pairs[_DISCARDED_ARRAY_KEYS[key]] = length
             continue
         pairs[key] = reader.scalar(value_type)
@@ -256,7 +288,7 @@ def read_metadata(path):
         _fail("GGUF_UNUSABLE_SIZE")
     try:
         with source.open("rb") as handle:
-            reader = _Reader(handle, size, MAX_METADATA_RESIDENCY_BYTES)
+            reader = _Reader(handle, size)
             if reader.read(4) != MAGIC:
                 _fail("GGUF_BAD_MAGIC")
             version = reader.unpack("<I", 4)

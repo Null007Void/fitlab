@@ -198,12 +198,12 @@ class GgufParserTests(unittest.TestCase):
                 read_metadata(path)
 
     def test_retained_metadata_residency_is_capped_before_allocation(self):
-        # Round-45 A-1: per-field limits alone allowed retained metadata
+        # Round-45/46 A-1: per-field limits alone allowed retained metadata
         # arrays whose aggregate allocation exhausts memory before any
         # later gate runs; the cumulative budget must refuse the crossing
         # charge BEFORE allocation, with a stable error code. 65 declared
-        # 1 MiB strings charge 65 MiB > the 64 MiB budget, so the 65th
-        # string is refused at its pre-charge with ~64 MiB peak residency.
+        # 1 MiB strings charge 65 MiB > the 64 MiB retained budget, so the
+        # crossing string is refused at its pre-charge.
         with tempfile.TemporaryDirectory() as directory:
             header = b"GGUF" + struct.pack("<I", 3)
             header += struct.pack("<Q", 1)
@@ -219,6 +219,25 @@ class GgufParserTests(unittest.TestCase):
             path.write_bytes(header + payload)
             with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
                 read_metadata(path)
+            # A retained array whose items contain ONE supplementary
+            # character each decodes UCS-4: each 1 MiB item charges
+            # ~5.25 Mi decoded footprint, so a 20-item array (~105 Mi
+            # charged) crosses the 64 Mi retained budget before
+            # allocation (round-46 A-1).
+            header2 = b"GGUF" + struct.pack("<I", 3)
+            header2 += struct.pack("<Q", 1)
+            header2 += struct.pack("<Q", 2)
+            header2 += struct.pack("<Q", 20) + b"general.architecture"
+            header2 += struct.pack("<I", 8) + struct.pack("<Q", 4) + b"lfm2"
+            header2 += struct.pack("<Q", 19) + b"attacker.ucs4.array"
+            header2 += struct.pack("<I", 9) + struct.pack("<I", 8)
+            header2 += struct.pack("<Q", 20)
+            tail = b"x" * ((1 << 20) - 4) + "\U0001F600".encode("utf-8")
+            body = b"".join([struct.pack("<Q", 1 << 20) + tail] * 20)
+            path2 = Path(directory) / "ucs4.gguf"
+            path2.write_bytes(header2 + body)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
+                read_metadata(path2)
             # Normal models stay far below the budget and parse cleanly.
             ok = _write_gguf(
                 directory,
@@ -234,6 +253,50 @@ class GgufParserTests(unittest.TestCase):
             raw = read_metadata(ok)
             self.assertEqual(raw["metadata"]["lfm2.block_count"], 4)
             self.assertEqual(raw["metadata"]["token_count"], 2000)
+
+    def test_discarded_tokenizer_array_exceeding_retained_budget_parses(self):
+        # Round-46 A-2: discarded tokenizer items are transient and must
+        # NOT consume the retained budget - a legitimate large vocabulary
+        # (aggregate payload beyond MAX_METADATA_RESIDENCY_BYTES, tiny live
+        # residency) still parses with its counted length, while the
+        # transient pool still fails a file that declares more discarded
+        # payload than MAX_DISCARDED_BYTES.
+        def discard_header(key, count):
+            head = b"GGUF" + struct.pack("<I", 3)
+            head += struct.pack("<Q", 0)
+            head += struct.pack("<Q", 2)
+            head += struct.pack("<Q", 20) + b"general.architecture"
+            head += struct.pack("<I", 8) + struct.pack("<Q", 4) + b"lfm2"
+            head += struct.pack("<Q", len(key)) + key
+            head += struct.pack("<I", 9) + struct.pack("<I", 8)
+            head += struct.pack("<Q", count)
+            return head
+
+        with tempfile.TemporaryDirectory() as directory:
+            # 70000 x 1 KiB ASCII tokens = ~70 MiB aggregate payload, above
+            # the 64 MiB retained budget, below the 512 MiB transient cap.
+            ok = discard_header(b"tokenizer.ggml.tokens", 70000)
+            token = b"t" * 1024
+            ok += b"".join([struct.pack("<Q", 1024) + token] * 70000)
+            # GGUF alignment: the tensor-data section starts at the next
+            # 32-byte boundary, so the file must carry padding up to it
+            # even with zero tensors.
+            ok += b"\x00" * ((-len(ok)) % 32)
+            path = Path(directory) / "vocab.gguf"
+            path.write_bytes(ok)
+            raw = read_metadata(path)
+            self.assertEqual(raw["metadata"]["token_count"], 70000)
+            # Aggregate discarded payload beyond the transient cap is
+            # refused before allocation: 520 one-MiB tokens declare ~2.7 GiB
+            # of transient decode volume; each item charges ~5.25 MiB, so
+            # the cap crosses within the first ~104 included items.
+            hostile = discard_header(b"tokenizer.ggml.tokens", 520)
+            piece = b"t" * (1 << 20)
+            hostile += b"".join([struct.pack("<Q", 1 << 20) + piece] * 110)
+            path2 = Path(directory) / "flood.gguf"
+            path2.write_bytes(hostile)
+            with self.assertRaisesRegex(ArtifactError, "GGUF_METADATA_BUDGET_EXCEEDED"):
+                read_metadata(path2)
 
     def test_rejects_missing_tensor_payload(self):
         with tempfile.TemporaryDirectory() as directory:
